@@ -1,82 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney scripts" commit="efe5bbeb819c918ab5abf24dae8209b2be544ac4">
-  <category name="reascript/Razor Edits">
+<index version="1" name="mccrabney scripts" commit="9daf701af1b4dce7e5a55beef9b9ce358fa0549c">
+  <category name="Razor Edits">
     <reapack name="mccrabney_razor edits_keep RE, cut contents.lua" type="script" desc="keep RE, cut contents">
-      <version name="1.0" author="mccrabney" time="2021-03-30T15:03:13Z">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/reapack/raw/0398fda5a31ae30094b44a1576fb03607360be54/reascript/Razor%20Edits/mccrabney_razor%20edits_keep%20RE,%20cut%20contents.lua</source>
+        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_keep%20RE,%20cut%20contents.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_keep RE, delete contents.lua" type="script" desc="keep RE, delete contents">
-      <version name="1.0" author="mccrabney" time="2021-03-30T15:03:13Z">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/reapack/raw/0398fda5a31ae30094b44a1576fb03607360be54/reascript/Razor%20Edits/mccrabney_razor%20edits_keep%20RE,%20delete%20contents.lua</source>
+        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_keep%20RE,%20delete%20contents.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_move RE &amp; edit cursor (backwards).lua" type="script" desc="move RE &amp; edit cursor (backwards)">
-      <version name="1.0" author="mccrabney" time="2021-03-30T15:03:13Z">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/reapack/raw/0398fda5a31ae30094b44a1576fb03607360be54/reascript/Razor%20Edits/mccrabney_razor%20edits_move%20RE%20&amp;%20edit%20cursor%20(backwards).lua</source>
+        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_move%20RE%20&amp;%20edit%20cursor%20(backwards).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_move RE &amp; edit cursor (forwards).lua" type="script" desc="move RE &amp; edit cursor (forwards)">
-      <version name="1.0" author="mccrabney" time="2021-03-30T15:03:13Z">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/reapack/raw/0398fda5a31ae30094b44a1576fb03607360be54/reascript/Razor%20Edits/mccrabney_razor%20edits_move%20RE%20&amp;%20edit%20cursor%20(forwards).lua</source>
+        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_move%20RE%20&amp;%20edit%20cursor%20(forwards).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_move RE &amp;or edit cursor by visible grid division (backwards).lua" type="script" desc="move RE &amp;or edit cursor by visible grid division (backwards)">
-      <version name="1.0" author="mccrabney" time="2021-03-30T15:03:13Z">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/reapack/raw/0398fda5a31ae30094b44a1576fb03607360be54/reascript/Razor%20Edits/mccrabney_razor%20edits_move%20RE%20&amp;or%20edit%20cursor%20by%20visible%20grid%20division%20(backwards).lua</source>
+        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_move%20RE%20&amp;or%20edit%20cursor%20by%20visible%20grid%20division%20(backwards).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_move RE &amp;or edit cursor by visible grid division (forwards).lua" type="script" desc="move RE &amp;or edit cursor by visible grid division (forwards)">
-      <version name="1.0" author="mccrabney" time="2021-03-30T15:03:13Z">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/reapack/raw/0398fda5a31ae30094b44a1576fb03607360be54/reascript/Razor%20Edits/mccrabney_razor%20edits_move%20RE%20&amp;or%20edit%20cursor%20by%20visible%20grid%20division%20(forwards).lua</source>
+        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_move%20RE%20&amp;or%20edit%20cursor%20by%20visible%20grid%20division%20(forwards).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_Razor Edit Control Functions.lua" type="script" desc="Razor Edit Control Functions">
-      <version name="1.0" author="mccrabney" time="2021-03-30T15:03:13Z">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/reapack/raw/0398fda5a31ae30094b44a1576fb03607360be54/reascript/Razor%20Edits/mccrabney_razor%20edits_Razor%20Edit%20Control%20Functions.lua</source>
+        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_Razor%20Edit%20Control%20Functions.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_resize RE end by visible grid division (backwards).lua" type="script" desc="resize RE end by visible grid division (backwards)">
-      <version name="1.0" author="mccrabney" time="2021-03-30T15:03:13Z">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/reapack/raw/0398fda5a31ae30094b44a1576fb03607360be54/reascript/Razor%20Edits/mccrabney_razor%20edits_resize%20RE%20end%20by%20visible%20grid%20division%20(backwards).lua</source>
+        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_resize%20RE%20end%20by%20visible%20grid%20division%20(backwards).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_resize RE end by visible grid division (forwards).lua" type="script" desc="resize RE end by visible grid division (forwards)">
-      <version name="1.0" author="mccrabney" time="2021-03-30T15:03:13Z">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/reapack/raw/0398fda5a31ae30094b44a1576fb03607360be54/reascript/Razor%20Edits/mccrabney_razor%20edits_resize%20RE%20end%20by%20visible%20grid%20division%20(forwards).lua</source>
+        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_resize%20RE%20end%20by%20visible%20grid%20division%20(forwards).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_resize RE start by visible grid division (backwards).lua" type="script" desc="resize RE start by visible grid division (backwards)">
-      <version name="1.0" author="mccrabney" time="2021-03-30T15:03:13Z">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/reapack/raw/0398fda5a31ae30094b44a1576fb03607360be54/reascript/Razor%20Edits/mccrabney_razor%20edits_resize%20RE%20start%20by%20visible%20grid%20division%20(backwards).lua</source>
+        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_resize%20RE%20start%20by%20visible%20grid%20division%20(backwards).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_resize RE start by visible grid division (forwards).lua" type="script" desc="resize RE start by visible grid division (forwards)">
-      <version name="1.0" author="mccrabney" time="2021-03-30T15:03:13Z">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/reapack/raw/0398fda5a31ae30094b44a1576fb03607360be54/reascript/Razor%20Edits/mccrabney_razor%20edits_resize%20RE%20start%20by%20visible%20grid%20division%20(forwards).lua</source>
+        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_resize%20RE%20start%20by%20visible%20grid%20division%20(forwards).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_select tracks with REs.lua" type="script" desc="select tracks with razor edits">
-      <version name="1.0" author="mccrabney" time="2021-03-30T15:03:13Z">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/reapack/raw/0398fda5a31ae30094b44a1576fb03607360be54/reascript/Razor%20Edits/mccrabney_razor%20edits_select%20tracks%20with%20REs.lua</source>
+        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_select%20tracks%20with%20REs.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_solo tracks with REs.lua" type="script" desc="select tracks with razor edits">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_solo%20tracks%20with%20REs.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_toggle enclose item under mouse cursor in RE.lua" type="script" desc="toggle-enclose item under mouse cursor in RE">
-      <version name="1.0" author="mccrabney" time="2021-03-30T15:03:13Z">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/reapack/raw/0398fda5a31ae30094b44a1576fb03607360be54/reascript/Razor%20Edits/mccrabney_razor%20edits_toggle%20enclose%20item%20under%20mouse%20cursor%20in%20RE.lua</source>
+        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_toggle%20enclose%20item%20under%20mouse%20cursor%20in%20RE.lua</source>
       </version>
     </reapack>
   </category>
