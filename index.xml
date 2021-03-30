@@ -85,29 +85,11 @@
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
-{\pard \ql \f0 \sa180 \li0 \fi0 \b \fs36 ReaPack Repository Template\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 A template for GitHub-hosted ReaPack repositories with automated {\field{\*\fldinst{HYPERLINK "https://github.com/cfillion/reapack-index"}}{\fldrslt{\ul
-reapack-index
-}}}
- running from GitHub Actions.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 Replace the name of the repository in {\field{\*\fldinst{HYPERLINK "/index.xml"}}{\fldrslt{\ul
-index.xml
-}}}
- when using this template. This will be the name shown in ReaPack.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 \f1 <index version="1" name="Name of your repository here">\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 Replace the contents of this file ({\field{\*\fldinst{HYPERLINK "/README.md"}}{\fldrslt{\ul
-README.md
-}}}
-). This will be the text shown when using ReaPack's "About this repository" feature.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 reapack-index looks for package files in subfolders. The folder tree represents the package categories shown in ReaPack.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 Each package file is expected to begin with a metadata header. See {\field{\*\fldinst{HYPERLINK "https://github.com/cfillion/reapack-index/wiki/Packaging-Documentation"}}{\fldrslt{\ul
-Packaging Documentation
-}}}
- on reapack-index's wiki.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 The URL to import in ReaPack is {\field{\*\fldinst{HYPERLINK "https://github.com/cfillion/reapack-repository-template/raw/master/index.xml"}}{\fldrslt{\ul
-https://github.com/{\f1 <your username>}/{\f1 <repository name>}/raw/master/index.xml
-}}}
-.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 welcome to mccrabney's repo\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 here you will find some scripts that i have created to fulfill some needs i had in REAPER.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 mostly scripts for controlling razor edits in REAPER. most of these allow better keyboard/midi controller control of REs. use these to navigate your project with REs - quick slicing and repatterning of blocks.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 places i've been:\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Wheelboro, NC - Thumbville, South Carolina - Garnett, Virginia - Thimpleton, SC - Dimple, Kentucky - Marmott, Indiana - Thumb of God, Georgia - Chaff County, Alabama - Thorny Bush, Mississippi - Whiddle, South Carolina - Dickle, Tennessee - Abstinence, Tennessee - Gurth, Texas - Foyble Valley, Mississippi - Godhood, Arkansas - Berlapp, Tennessee - Kinkle Village, Florida - Gurney, Virginia - Mouthole, Kentucky - Mooth, Kentucky - Mutton Beach, South Carolina - Franton, North Carolina - Dunth, NC - Menthol, Georgia - Bunkle, Texas - Slaw Canyon, Tennessee - Hayte Village, Alabama - Brood, Kentucky - Blanders, North Carolina - Knobbit, Alabama - Burth, Virginia - Nawtonomy, Alabamistan - Dormancy, Florida - Putina, Kentucky - Sholder, Kentucky - Chinsville, Georgia - Bamboozle, NC - Dimple Canyon, Virginia - Twiddy, Alabama - Gerbage, Tennessee - Complicit, California - Obtoose, U.S.A. - Quisling, Arizona - Discretion, Ohio - Doopt, Florida - Dundle, Louisiana - Farcey, Georgia - Harblesburg, Texas - Sputumton, Florida - Transmission, Georgia - Bungle, Nevada - Phlemming, NC - Wooleye, Louisiana - Blueseets, Oklahoma - Barrph, NY - Pinkerton, Oregon - Bludgeon, NY - Swindelton, FL - Theeble, GA - Wwoshnington D.C. - Dewlapp, Kentucky - Gruntleton, GA\par}
 }
 ]]></description>
   </metadata>
