@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="crabpack" commit="efe5bbeb819c918ab5abf24dae8209b2be544ac4">
+<index version="1" name="mccrabney's scripts" commit="efe5bbeb819c918ab5abf24dae8209b2be544ac4">
   <category name="reascript/Razor Edits">
     <reapack name="mccrabney_razor edits_keep RE, cut contents.lua" type="script" desc="keep RE, cut contents">
       <version name="1.0" author="mccrabney" time="2021-03-30T15:03:13Z">
