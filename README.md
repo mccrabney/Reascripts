@@ -1,23 +1,30 @@
-# ReaPack Repository Template
+welcome to mccrabney's repo
 
-A template for GitHub-hosted ReaPack repositories with automated
-[reapack-index](https://github.com/cfillion/reapack-index)
-running from GitHub Actions.
+here you will find some scripts that i have created to fulfill some needs i had in REAPER.
 
-Replace the name of the repository in [index.xml](/index.xml) when using this template.
-This will be the name shown in ReaPack.
+mostly scripts for controlling razor edits in REAPER. most of these allow better keyboard/midi controller control of REs. use these to navigate your project with REs - quick slicing and repatterning of blocks.
 
-```xml
-<index version="1" name="Name of your repository here">
-```
 
-Replace the contents of this file ([README.md](/README.md)).
-This will be the text shown when using ReaPack's "About this repository" feature.
 
-reapack-index looks for package files in subfolders.
-The folder tree represents the package categories shown in ReaPack.
 
-Each package file is expected to begin with a metadata header.
-See [Packaging Documentation](https://github.com/cfillion/reapack-index/wiki/Packaging-Documentation) on reapack-index's wiki.
 
-The URL to import in ReaPack is [https://github.com/`<your username>`/`<repository name>`/raw/master/index.xml](https://github.com/cfillion/reapack-repository-template/raw/master/index.xml).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+places i've been:
+
+Wheelboro, NC - Thumbville, South Carolina - Garnett, Virginia - Thimpleton, SC - Dimple, Kentucky - Marmott, Indiana - Thumb of God, Georgia - Chaff County, Alabama - Thorny Bush, Mississippi - Whiddle, South Carolina - Dickle, Tennessee - Abstinence, Tennessee - Gurth, Texas - Foyble Valley, Mississippi - Godhood, Arkansas - Berlapp, Tennessee - Kinkle Village, Florida - Gurney, Virginia - Mouthole, Kentucky - Mooth, Kentucky - Mutton Beach, South Carolina - Franton, North Carolina - Dunth, NC - Menthol, Georgia - Bunkle, Texas - Slaw Canyon, Tennessee - Hayte Village, Alabama - Brood, Kentucky - Blanders, North Carolina - Knobbit, Alabama - Burth, Virginia - Nawtonomy, Alabamistan - Dormancy, Florida - Putina, Kentucky - Sholder, Kentucky - Chinsville, Georgia - Bamboozle, NC - Dimple Canyon, Virginia - Twiddy, Alabama - Gerbage, Tennessee - Complicit, California - Obtoose, U.S.A. - Quisling, Arizona - Discretion, Ohio - Doopt, Florida - Dundle, Louisiana - Farcey, Georgia - Harblesburg, Texas - Sputumton, Florida - Transmission, Georgia - Bungle, Nevada - Phlemming, NC - Wooleye, Louisiana - Blueseets, Oklahoma - Barrph, NY - Pinkerton, Oregon - Bludgeon, NY - Swindelton, FL - Theeble, GA - Wwoshnington D.C. - Dewlapp, Kentucky - Gruntleton, GA
+
