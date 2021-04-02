@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney scripts" commit="32ac99a589978e58cd2a022c695c3325ba310b86">
+<index version="1" name="mccrabney scripts" commit="fcf2a03914b6c3076a7204365fcea6d0d32db105">
   <category name="Razor Edits">
     <reapack name="mccrabney_razor edits_keep RE, cut contents.lua" type="script" desc="keep RE, cut contents">
       <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
@@ -89,6 +89,12 @@
         <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_toggle%20enclose%20item%20under%20mouse%20cursor%20in%20RE.lua</source>
       </version>
     </reapack>
+    <reapack name="mccrabney_razor edits_toggle mute RE contents or selected items.lua" type="script" desc="toggle mute RE contents or selected items">
+      <version name="1.0" author="mccrabney" time="2021-04-02T17:10:06Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/fcf2a03914b6c3076a7204365fcea6d0d32db105/Razor%20Edits/mccrabney_razor%20edits_toggle%20mute%20RE%20contents%20or%20selected%20items.lua</source>
+      </version>
+    </reapack>
   </category>
   <metadata>
     <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 Courier;}}
@@ -97,8 +103,8 @@
 
 {\pard \ql \f0 \sa180 \li0 \fi0 welcome to mccrabney's repo\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 here you will find some scripts that i have created to fulfill some needs i had in REAPER.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 mostly scripts for controlling razor edits in REAPER. most of these allow better keyboard/midi controller control of REs. use these to navigate your project with REs - quick slicing and repatterning of blocks.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 i like to assign these to my directional keys (and all of their modifiers). this lets me navigate my project quickly by grid (keyboard zooming shortcuts are helpful herre)\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 most of these allow better keyboard/midi controller control of Razor Editss. use these to navigate your project with REs, or to quickly slice/repattern RE blocks. this is great for grid-based sampling and sound design.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 i like to assign these to my directional keys (and all of their modifiers). this lets me navigate my project quickly by grid (keyboard zooming shortcuts are also helpful here)\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 note that quickly retriggering scripts that move cursor/RE forwards/backwards will trigger the [ReaScript task control "Script name" is running in the background] message. for each action, select "new instance" and "remember choice" this will retrigger the script and it should behave as expected when hammering a directional key.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 places i've been:\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 Wheelboro, NC - Thumbville, South Carolina - Garnett, Virginia - Thimpleton, SC - Dimple, Kentucky - Marmott, Indiana - Thumb of God, Georgia - Chaff County, Alabama - Thorny Bush, Mississippi - Whiddle, South Carolina - Dickle, Tennessee - Abstinence, Tennessee - Gurth, Texas - Foyble Valley, Mississippi - Godhood, Arkansas - Berlapp, Tennessee - Kinkle Village, Florida - Gurney, Virginia - Mouthole, Kentucky - Mooth, Kentucky - Mutton Beach, South Carolina - Franton, North Carolina - Dunth, NC - Menthol, Georgia - Bunkle, Texas - Slaw Canyon, Tennessee - Hayte Village, Alabama - Brood, Kentucky - Blanders, North Carolina - Knobbit, Alabama - Burth, Virginia - Nawtonomy, Alabamistan - Dormancy, Florida - Putina, Kentucky - Sholder, Kentucky - Chinsville, Georgia - Bamboozle, NC - Dimple Canyon, Virginia - Twiddy, Alabama - Gerbage, Tennessee - Complicit, California - Obtoose, U.S.A. - Quisling, Arizona - Discretion, Ohio - Doopt, Florida - Dundle, Louisiana - Farcey, Georgia - Harblesburg, Texas - Sputumton, Florida - Transmission, Georgia - Bungle, Nevada - Phlemming, NC - Wooleye, Louisiana - Blueseets, Oklahoma - Barrph, NY - Pinkerton, Oregon - Bludgeon, NY - Swindelton, FL - Theeble, GA - Wwoshnington D.C. - Dewlapp, Kentucky - Gruntleton, GA\par}
