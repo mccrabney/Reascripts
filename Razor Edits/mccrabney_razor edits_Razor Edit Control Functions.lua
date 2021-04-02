@@ -11,6 +11,8 @@
  * Changelog:
  * v1.01 (2021-04-02)
    + cleanup, slight nod toward documentation
+   + added "toggle mute RE contents or selected items"
+   
  * v1.0 (2021-03-22)
    + Initial Release
 --]]
@@ -27,10 +29,11 @@
 
 function SetGlobalParam(val, param, incr)
     reaper.ClearConsole()
-    if param  < 2 then resizeREbyVisibleGrid(param, incr) end
+    if param == 1 then resizeREbyVisibleGrid(param, incr) end
     if param == 2 then moveREbyVisibleGrid(incr) end
     if param == 3 then resizeREvertically(incr) end
     if param == 4 then moveREwithcursor(incr) end
+    if param == 5 then muteREcontents(incr) end
     
 end
 
@@ -504,8 +507,25 @@ end
 ---------------------------------------------------------------------   
 
     --[[------------------------------[[--
-        mute RE contents ?
+        toggle mute RE contents or selected items 
     --]]------------------------------]]--
+
+
+function muteREcontents(incr)
+    
+    local selections = GetRazorEdits()
+    SplitRazorEdits(selections)
+    local areas = GetRazorEdits()
+    for i = 1, #areas do
+        local areaData = areas [i]
+        local items = areaData.items
+        for j = 1, #items do 
+            reaper.SetMediaItemSelected(items[j], true)
+        end
+    end    
+    reaper.Main_OnCommand(40183, 0)  -- toggle mute 
+end
+
 
 ---------------------------------------------------------------------   
 
