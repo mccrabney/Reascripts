@@ -29,7 +29,7 @@
 
 function SetGlobalParam(val, param, incr)
     reaper.ClearConsole()
-    if param == 1 then resizeREbyVisibleGrid(param, incr) end
+    if param  < 2 then resizeREbyVisibleGrid(param, incr) end
     if param == 2 then moveREbyVisibleGrid(incr) end
     if param == 3 then resizeREvertically(incr) end
     if param == 4 then moveREwithcursor(incr) end
