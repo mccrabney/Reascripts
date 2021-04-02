@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney scripts" commit="9daf701af1b4dce7e5a55beef9b9ce358fa0549c">
+<index version="1" name="mccrabney scripts" commit="32ac99a589978e58cd2a022c695c3325ba310b86">
   <category name="Razor Edits">
     <reapack name="mccrabney_razor edits_keep RE, cut contents.lua" type="script" desc="keep RE, cut contents">
       <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
@@ -41,6 +41,10 @@
       <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
         <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.01" author="mccrabney" time="2021-04-02T15:12:24Z">
+        <changelog><![CDATA[+ cleanup, slight nod toward documentation]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/32ac99a589978e58cd2a022c695c3325ba310b86/Razor%20Edits/mccrabney_razor%20edits_Razor%20Edit%20Control%20Functions.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_resize RE end by visible grid division (backwards).lua" type="script" desc="resize RE end by visible grid division (backwards)">
