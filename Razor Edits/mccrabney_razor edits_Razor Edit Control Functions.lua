@@ -4,14 +4,20 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.0
+ * Version: 1.01
 --]]
  
 --[[
  * Changelog:
+ * v1.01 (2021-04-02)
+   + cleanup, slight nod toward documentation
  * v1.0 (2021-03-22)
    + Initial Release
 --]]
+
+
+-- README: select "new instance" for repetitive triggering of child actions.
+
 
 
     --[[------------------------------[[--
@@ -360,7 +366,7 @@ end -- GetVisibleGridDivision()
 
 
     --[[------------------------------[[--
-     In/Decrement Razor Edit Start/End by Visible Grid     --mccrabney      
+     In/Decrement Razor Edit Start/End by Visible Grid        
     --]]------------------------------]]--
     
 function resizeREbyVisibleGrid(param, incr)    -- where param informs direction of movement
@@ -422,7 +428,7 @@ end
 
 
     --[[------------------------------[[--
-        Move Razor Edit (and/or edit cursor) End by Visible Grid           
+        Move Razor Edit (and/or edit cursor) End by Visible Grid               
     --]]------------------------------]]--
 
 function moveREbyVisibleGrid(incr)
@@ -497,25 +503,14 @@ end
 
 ---------------------------------------------------------------------   
 
-
     --[[------------------------------[[--
-        move RE and edit cursor backwards without contents 
+        mute RE contents ?
     --]]------------------------------]]--
-
-
 
 ---------------------------------------------------------------------   
 
 
-    --[[------------------------------[[--
-        resize RE vertically
-    --]]------------------------------]]--
-
-
-
-
----------------------------------------------------------------------
-    
+  
 
 
 

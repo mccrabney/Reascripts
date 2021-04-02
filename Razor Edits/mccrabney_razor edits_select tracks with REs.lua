@@ -9,8 +9,12 @@
  
 --[[
  * Changelog:
+ * v1.1 (2021-1-02)
+   + accidentally used setonlytrackselected
+
  * v1.0 (2021-03-22)
    + Initial Release
+    
 --]]
 
 
@@ -18,6 +22,6 @@ for t = 0, reaper.CountTracks(0)-1 do
     local track = reaper.GetTrack(0, t)
     local razorOK, razorStr = reaper.GetSetMediaTrackInfo_String(track, "P_RAZOREDITS", "", false)
     if razorOK and #razorStr ~= 0 then
-    reaper.SetOnlyTrackSelected(track, 1)
+    reaper.SetTrackSelected(track, 1)
         end
 end
