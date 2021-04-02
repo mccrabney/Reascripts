@@ -41,7 +41,7 @@ end
 
     
     --[[------------------------------[[--
-          FTC Razor Edit functions       --thanks, FTC!   
+          FTC Razor Edit functions       --thanks, BirdBird!   
     --]]------------------------------]]--
 
 function literalize(str)
@@ -56,23 +56,30 @@ end
 
 ---------------------------------------------------------------------
 
-function GetItemsInRange(track, areaStart, areaEnd)
-    local items = {}
-    local itemCount = reaper.CountTrackMediaItems(track)
-    for k = 0, itemCount - 1 do 
+local function leq( a, b ) -- a less than or equal to b
+  return a < b + 0.00001
+end
+
+local function geq( a, b ) -- a greater than or equal to b
+  return a + 0.00001 > b 
+end
+
+local function GetItemsInRange(track, areaStart, areaEnd)
+    local items, it = {}, 0
+    for k = 0, reaper.CountTrackMediaItems(track) - 1 do 
         local item = reaper.GetTrackMediaItem(track, k)
         local pos = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
-        local length = reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
-        local itemEndPos = pos+length
+        local itemEndPos = pos + reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
 
         --check if item is in area bounds
-        if (itemEndPos > areaStart and itemEndPos <= areaEnd) or
-            (pos >= areaStart and pos < areaEnd) or
-            (pos <= areaStart and itemEndPos >= areaEnd) then
-                table.insert(items,item)
+        if geq(pos, areaEnd) or leq(itemEndPos, areaStart) then
+          -- outside, do nothing
+        else -- inside
+          it = it + 1
+          items[it] = item
         end
     end
-
+    
     return items
 end
 
@@ -482,8 +489,6 @@ function moveREwithcursor(incr)
     if RazorEditSelectionExists() then
         if incr == 1 then reaper.Main_OnCommand(42399, 0) end -- move RE forwards without content
         if incr == -1 then reaper.Main_OnCommand(42400, 0) end -- backwards
-                    
-        
          
         local test, position = GetRazorEdits()
         local areas = GetRazorEdits()
@@ -511,19 +516,20 @@ end
     --]]------------------------------]]--
 
 
-function muteREcontents(incr)
-    
-    local selections = GetRazorEdits()
-    SplitRazorEdits(selections)
-    local areas = GetRazorEdits()
-    for i = 1, #areas do
-        local areaData = areas [i]
-        local items = areaData.items
-        for j = 1, #items do 
-            reaper.SetMediaItemSelected(items[j], true)
-        end
-    end    
-    reaper.Main_OnCommand(40183, 0)  -- toggle mute 
+function muteREcontents()
+    if RazorEditSelectionExists() then    
+        local areas = GetRazorEdits()
+        SplitRazorEdits(areas)
+        for i = 1, #areas do
+            local areaData = areas [i]
+            local items = areaData.items
+            for j = 1, #items do 
+                reaper.SetMediaItemSelected(items[j], true)
+            end
+        end    
+        reaper.Main_OnCommand(40183, 0)  -- toggle mute 
+    else  
+    end
 end
 
 
