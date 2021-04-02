@@ -4,11 +4,11 @@ here you will find some scripts that i have created to fulfill some needs i had 
 
 mostly scripts for controlling razor edits in REAPER. most of these allow better keyboard/midi controller control of REs. use these to navigate your project with REs - quick slicing and repatterning of blocks.
 
+i like to assign these to my directional keys (and all of their modifiers). this lets me navigate my project quickly by grid (keyboard zooming shortcuts are helpful herre)
 
-
-
-
-
+note that quickly retriggering scripts that move cursor/RE forwards/backwards will trigger the [ReaScript task control "Script name" is running in the background] message.
+for each action, select "new instance" and "remember choice" 
+this will retrigger the script and it should behave as expected when hammering a directional key.
 
 
 
