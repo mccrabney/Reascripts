@@ -4,11 +4,15 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.01
+ * Version: 1.02
 --]]
  
 --[[
  * Changelog:
+ * v1.02 (2021-04-03)
+   + more cleanup and attribution
+   + fixed "toggle mute RE contents or selected items"
+ 
  * v1.01 (2021-04-02)
    + cleanup, slight nod toward documentation
    + added "toggle mute RE contents or selected items"
@@ -20,7 +24,7 @@
 
 -- README: select "new instance" for repetitive triggering of child actions.
 
-
+---------------------------------------------------------------------
 
     --[[------------------------------[[--
      Event trigger params from child scripts          
@@ -38,10 +42,9 @@ function SetGlobalParam(val, param, incr)
 end
 
 ---------------------------------------------------------------------
-
     
     --[[------------------------------[[--
-          FTC Razor Edit functions       --thanks, BirdBird!   
+          Get Razor Edit info --thanks, BirdBird!   
     --]]------------------------------]]--
 
 function literalize(str)
@@ -55,6 +58,10 @@ function GetGUIDFromEnvelope(envelope)
 end
 
 ---------------------------------------------------------------------
+
+    --[[------------------------------[[--
+          Get Items in Range -- thanks, BirdBird and amagalma!          
+    --]]------------------------------]]--
 
 local function leq( a, b ) -- a less than or equal to b
   return a < b + 0.00001
@@ -108,6 +115,11 @@ end
 
 ---------------------------------------------------------------------
 
+    --[[------------------------------[[--
+          Set Track Razor Edit -- thanks, BirdBird!          
+    --]]------------------------------]]--
+
+
 function SetTrackRazorEdit(track, areaStart, areaEnd, clearSelection)
     if clearSelection == nil then clearSelection = false end
     
@@ -156,6 +168,11 @@ function SetTrackRazorEdit(track, areaStart, areaEnd, clearSelection)
 end
 
 ---------------------------------------------------------------------
+
+    --[[------------------------------[[--
+          Set Envelope Razor Edit  -- thanks, BirdBird!          
+    --]]------------------------------]]--
+
 
 function SetEnvelopeRazorEdit(envelope, areaStart, areaEnd, clearSelection, GUID)
     local GUID = GUID == nil and GetGUIDFromEnvelope(envelope) or GUID
@@ -207,6 +224,10 @@ function SetEnvelopeRazorEdit(envelope, areaStart, areaEnd, clearSelection, GUID
 end
 
 ---------------------------------------------------------------------
+
+    --[[------------------------------[[--
+          Get Razor Edits -- thanks, BirdBird!          
+    --]]------------------------------]]--
 
 function GetRazorEdits()
     local trackCount = reaper.CountTracks(0)
@@ -272,6 +293,10 @@ end
 
 ---------------------------------------------------------------------
 
+    --[[------------------------------[[--
+          split razor edits -- thanks, BirdBird!          
+    --]]------------------------------]]--
+
 function SplitRazorEdits(razorEdits)
     local areaItems = {}
     local tracks = {}
@@ -308,7 +333,6 @@ function SplitRazorEdits(razorEdits)
 end
 
 ---------------------------------------------------------------------
-
     
     --[[------------------------------[[--
           Does a Razor Edit exist? thanks, sonictim!          
@@ -329,7 +353,6 @@ function RazorEditSelectionExists()
 end--RazorEditSelectionExists()
 
 ---------------------------------------------------------------------
-
 
     --[[------------------------------[[--
          Get Visible Grid Division - thanks, amagalma!          
@@ -373,7 +396,6 @@ function GetVisibleGridDivision()  ----
 end -- GetVisibleGridDivision()  
 
 ---------------------------------------------------------------------
-
 
     --[[------------------------------[[--
      In/Decrement Razor Edit Start/End by Visible Grid        
@@ -436,7 +458,6 @@ end
 
 ---------------------------------------------------------------------
 
-
     --[[------------------------------[[--
         Move Razor Edit (and/or edit cursor) End by Visible Grid               
     --]]------------------------------]]--
@@ -477,11 +498,9 @@ function moveREbyVisibleGrid(incr)
 end
 ---------------------------------------------------------------------   
 
-
     --[[------------------------------[[--
         move RE and edit cursor forwards without contents 
     --]]------------------------------]]--
-
 
 function moveREwithcursor(incr)
 
@@ -512,49 +531,31 @@ end
 ---------------------------------------------------------------------   
 
     --[[------------------------------[[--
-        toggle mute RE contents or selected items 
+        toggle mute RE contents or selected items  -- thanks, BirdBird!
     --]]------------------------------]]--
 
-
 function muteREcontents()
-    if RazorEditSelectionExists() then    
-        local areas = GetRazorEdits()
-        SplitRazorEdits(areas)
-        for i = 1, #areas do
-            local areaData = areas [i]
-            local items = areaData.items
-            for j = 1, #items do 
-                reaper.SetMediaItemSelected(items[j], true)
-            end
-        end    
-        reaper.Main_OnCommand(40183, 0)  -- toggle mute 
-    else  
+    items = SplitRazorEdits(areas)
+    for j = 1, #items do 
+        reaper.SetMediaItemSelected(items[j], true)
     end
+    reaper.Main_OnCommand(40183, 0)  -- toggle mute
 end
 
 
 ---------------------------------------------------------------------   
-
-
-  
-
-
-
-   
+ 
     --[[------------------------------[[--
                 MAIN
     --]]------------------------------]]--
     
 function Main()
- -- reaper.defer(Main)
 end
 
 ---------------------------------------------------------------------
-
 
     --[[------------------------------[[--
                 loop
     --]]------------------------------]]--
     
-
 Main()
