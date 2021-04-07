@@ -535,6 +535,7 @@ end
     --]]------------------------------]]--
 
 function muteREcontents()
+    local areas = GetRazorEdits()
     items = SplitRazorEdits(areas)
     for j = 1, #items do 
         reaper.SetMediaItemSelected(items[j], true)
