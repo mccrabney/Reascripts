@@ -9,6 +9,9 @@
  
 --[[
  * Changelog:
+ * v1.03 (2021-04-07)
+   + again, fixed "toggle mute RE contents or selected items" 
+ 
  * v1.02 (2021-04-03)
    + more cleanup and attribution
    + fixed "toggle mute RE contents or selected items"
