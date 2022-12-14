@@ -15,14 +15,11 @@
 
 
 function RazorEditSelectionExists()
+ for i=0, reaper.CountTracks(0)-1 do
+ local retval, x = reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(0,i), "P_RAZOREDITS", "string", false)
 
-    for i=0, reaper.CountTracks(0)-1 do
-
-        local retval, x = reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(0,i), "P_RAZOREDITS", "string", false)
-
-        if x ~= "" then return true end
-
-    end--for
+ if x ~= "" then return true end
+ end--for
     
     return false
 

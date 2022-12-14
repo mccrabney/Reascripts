@@ -1,5 +1,5 @@
 --[[
- * ReaScript Name: keep RE, delete contents
+ * ReaScript Name: delete notes whose note-ons are contained in Razor Edit
  * Author: mccrabney
  * Licence: GPL v3
  * REAPER: 6.0
@@ -9,10 +9,9 @@
  
 --[[
  * Changelog:
- * v1.0 (2021-03-22)
+ * v1.0 (2021-04-02)
    + Initial Release
 --]]
-
 
   for key in pairs(reaper) do _G[key]=reaper[key]  end 
   
@@ -21,10 +20,14 @@
   dofile(script_path .. "/mccrabney_razor edits_Razor Edit Control Functions.lua")    
   ----------------------------  
   function main()
-    incr = -1
-    param = 3
+    
+    task = 1
+    job = 1
     SetGlobalParam(job, task, _)
+    reaper.Undo_EndBlock('Delete Notes in Razer Edits', -1) 
+    
   end
   ----------------------------
   defer(main)
+  
 

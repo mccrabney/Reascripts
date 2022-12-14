@@ -22,8 +22,8 @@
   ----------------------------  
   function main()
     incr = -1
-    param = 1
-    SetGlobalParam(_, param, incr )
+    job = 6
+    SetGlobalParam(job, _, _, incr)
   end
   ----------------------------
   defer(main)

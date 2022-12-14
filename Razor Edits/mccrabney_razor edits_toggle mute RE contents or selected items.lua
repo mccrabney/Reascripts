@@ -21,9 +21,8 @@
   dofile(script_path .. "/mccrabney_razor edits_Razor Edit Control Functions.lua")    
   ----------------------------  
   function main()
-    incr = 1
-    param = 5
-    SetGlobalParam(_, param, incr )
+    job = 2
+    SetGlobalParam(job, _, _ )
   end
   ----------------------------
   defer(main)
