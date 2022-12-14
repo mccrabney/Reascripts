@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney scripts" commit="9104015d0289f303ed3603618a5a4b24e0faf2cb">
+<index version="1" name="mccrabney scripts" commit="2cd3de2b42e318dd9256940a66d396ef647d22cf">
   <category name="Razor Edits">
     <reapack name="mccrabney_razor edits_copy selected notes in RE.lua" type="script" desc="copy notes whose note-ons are contained in Razor Edit">
       <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
@@ -53,12 +53,6 @@
       <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
         <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_delete%20notes%20other%20than%20last-hit%20note%20in%20RE.lua</source>
-      </version>
-    </reapack>
-    <reapack name="mccrabney_razor edits_keep RE, delete contents.lua" type="script" desc="keep RE, delete contents">
-      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
-        <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_keep%20RE,%20delete%20contents.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_move RE &amp; edit cursor (backwards).lua" type="script" desc="move RE &amp; edit cursor (backwards)">
@@ -138,12 +132,6 @@
       <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
         <source main="main">https://github.com/mccrabney/crabpack/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_resize%20RE%20start%20by%20visible%20grid%20division%20(forwards).lua</source>
-      </version>
-    </reapack>
-    <reapack name="mccrabney_razor edits_select notes in RE.lua" type="script" desc="delete notes whose note-ons are contained in Razor Edit">
-      <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
-        <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_select%20notes%20in%20RE.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_select notes in REs.lua" type="script" desc="select notes whose note-ons are contained in Razor Edit">
