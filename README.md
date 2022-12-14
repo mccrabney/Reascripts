@@ -2,10 +2,7 @@ welcome to mccrabney's repo
 
 here you will find some scripts that i have created to fulfill some needs i had in REAPER.
 
-most of these allow better keyboard/midi controller control of Razor Editss. use these to navigate your project with REs, or to quickly slice/repattern RE blocks.
-this is great for grid-based sampling and sound design.
-
-i like to assign these to my directional keys (and all of their modifiers). this lets me navigate my project quickly by grid (keyboard zooming shortcuts are also helpful here)
+the focus right now is to provide arrange-screen MIDI editing via Razer Edits. an older focus: keyboard control for razer edits.
 
 note that quickly retriggering scripts that move cursor/RE forwards/backwards will trigger the [ReaScript task control "Script name" is running in the background] message.
 for each action, select "new instance" and "remember choice" 
