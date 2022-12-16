@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <index version="1" name="mccrabney scripts" commit="2cd3de2b42e318dd9256940a66d396ef647d22cf">
+  <category name="MIDI Edits">
   <category name="Razor Edits">
     <reapack name="mccrabney_razor edits_copy selected notes in RE.lua" type="script" desc="copy notes whose note-ons are contained in Razor Edit">
       <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
