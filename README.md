@@ -6,7 +6,7 @@ the focus right now is to provide arrange-screen MIDI editing via Razer Edits. a
 
 note that quickly retriggering scripts that move cursor/RE forwards/backwards will trigger the [ReaScript task control "Script name" is running in the background] message.
 for each action, select "new instance" and "remember choice" 
-this will retrigger the script and it should behave as expected when hammering a directional key.
+this will retrigger the script and it should behave as expected when hammering a directional key...
 
 
 
