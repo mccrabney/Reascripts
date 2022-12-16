@@ -4,17 +4,19 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.1
+ * Version: 1.04
 --]]
 
 -- README: select "new instance" for repetitive triggering of RE moving/resizing child actions.
  
 --[[
  * Changelog:
-  
- * v1.1 (2022-12-16)
-    + edit MIDI with REs
+    
+ * v1.04 (2022-12-16)
     + added "lastnote" reference function
+
+ * v1.03 (2022-12-14)
+    + edit MIDI with REs
     
  * v1.02 (2021-04-03)
    + more cleanup and attribution
