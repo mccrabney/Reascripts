@@ -1,16 +1,19 @@
--- @description Delete notes under edit cursor
--- @version 1.1
--- @author mccrabney, adapted from Stephan Römer
--- @about
---    # Description
---    - this script deletes the notes under the edit cursor
---    - this script works in arrangement (an item has to be selected), the MIDI Editor and Inline Editor
---
--- @link 
---
--- @provides [main=main,midi_editor,midi_inlineeditor] .
--- @changelog
---     v1.0
+--[[
+ * ReaScript Name: Delete notes under edit cursor
+ * Author: mccrabney
+ * Licence: GPL v3
+ * REAPER: 6.0
+ * Extensions: None
+ * Version: 1.0
+--]]
+ 
+--[[
+ * Changelog:
+ * v1.0 (2021-04-02)
+   + Initial Release
+--]]
+
+--  adapted from Stephan Römer
 
 reaper.Undo_BeginBlock()
 
