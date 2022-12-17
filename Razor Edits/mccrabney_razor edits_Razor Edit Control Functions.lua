@@ -7,10 +7,29 @@
  * Version: 1.04
 --]]
 
--- README: select "new instance" for repetitive triggering of RE moving/resizing child actions.
+-- README: 
+--    these functions will perform various edits on REs. 
+--    some MIDI actions look for a "last hit note" to use for the edits.
+--        if not already present, a reference track will be created for this. 
+--    select "new instance" for repetitive triggering of RE moving/resizing child actions.
+--    change the ppqIncr value for a different nudge amount
+
+-- TODO: 
+--    see if the MIDI editor flash that occurs during "Copy Notes in REs" can be suppressed
+--    remove AI from RE areas - ultraschall
+--    suppress UI updates for RE moving/resizing controls
+--    
  
 --[[
  * Changelog:
+ 
+ * v1.05 (2022-12-17)
+    + general cleanup, excessive comments in code
+    + an attempt to use MIDI_Sort properly
+    + RE movement: added undo points 
+    + MIDI edits: added "select last hit notes in RE"
+    + MIDI edits: if no REs exist, enclose selected items in RE then run edit
+    + MIDI edits: nudge last-hit note in RE 
     
  * v1.04 (2022-12-16)
     + added "lastnote" reference function
@@ -28,7 +47,7 @@
    
  * v1.0 (2021-03-22)
    + Initial Release
---]]
+
 
 dofile(reaper.GetResourcePath().."/UserPlugins/ultraschall_api.lua")
 
@@ -39,21 +58,217 @@ dofile(reaper.GetResourcePath().."/UserPlugins/ultraschall_api.lua")
 
 function SetGlobalParam(job, param, clear, incr)   -- get job and details from child scripts
   reaper.ClearConsole()
+  --reaper.PreventUIRefresh(1)        -- doesn't suppress ME flicker
+          
   if clear == 1 then unselectAllMIDIinTrack() end     -- deselect MIDI in every item on selected track
   
-  -- if commands require lastHit value, get it
-  if param == 0 or param == 2 or param ==3 or param ==4 then lastNoteHit = getLastNoteHit() end   
+  if param == 0 or param == 2 or param ==3 or param ==4 or param == 13 or param == 14
+    then lastNoteHit = getLastNoteHit() end    -- sloppy. if commands require lastHit value, get it
       
-  if job == 1 then MIDINotesInRE(param)  end            -- run RE-MIDI edit task
-  if job == 2 then muteREcontents() end
+  if job == 1 then MIDINotesInRE(param)  end            -- run specific RE-MIDI edit task
+  
+  if job == 2 then muteREcontents() end                 -- RE movement/size controls
   if job == 3 then moveREbyVisibleGrid(incr) end
   if job == 4 then moveREwithcursor(incr) end
-  if job == 5 or 
+  if job == 5 or                                        
      job == 6 then resizeREbyVisibleGrid(job, incr) end
-  
-  
+  --reaper.PreventUIRefresh(-1)        
+
 end
 
+---------------------------------------------------------------------
+    --[[------------------------------[[--
+          do edits to notes in RE   -- mccrabney        
+    --]]------------------------------]]--
+
+function MIDINotesInRE(task)
+  
+  local ppqIncr = 100    -- how many ppq to nudge MIDI notes
+  local mouseNote        -- note under mouse cursor
+  
+  --------------------------------------------------
+  -- get the value of the note under the mouse cursor  -- should this be its own function?
+  --------------------------------------------------
+  
+  if task == 9 or task == 10 then                       -- if task is mouse-related,
+    window, _, details = reaper.BR_GetMouseCursorContext() -- initialize cursor context
+    local mouse_pos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position
+    if details == "item" or inline_editor then         -- hovering over item in arrange
+      mouseTake = reaper.BR_GetMouseCursorContext_Take() -- get take under mouse
+      if reaper.TakeIsMIDI(mouseTake) then -- is take MIDI?
+        local item = reaper.BR_GetMouseCursorContext_Item() -- get item under mouse
+        local mouse_position_ppq = reaper.MIDI_GetPPQPosFromProjTime(mouseTake, mouse_pos) -- convert to PPQ
+        local notesCount, _, _ = reaper.MIDI_CountEvts(mouseTake) -- count notes in current take
+        for n = notesCount-1, 0, -1 do
+          _, _, _, startppq, endppq, _, pitch, _ = reaper.MIDI_GetNote(mouseTake, n) -- get note start/end position              
+          if startppq <= mouse_position_ppq and endppq >= mouse_position_ppq then 
+            mouseNote = pitch
+          end
+        end
+      end 
+    end                
+  end                   -- mouseNote and mouseTake are referenced variables for edits
+  
+  ---------------------------------------------------
+  --check each RE for MIDI takes and apply edits to them 
+  --------------------------------------------------- 
+  if RazorEditSelectionExists(1) then 
+    local areas = GetRazorEdits()         -- get all areas 
+    for i = 1, #areas do                   -- for each razor edit, get each item
+      local areaData = areas[i]
+      if not areaData.isEnvelope then
+        local items = areaData.items        
+        local start_pos = areaData.areaStart  
+        local end_pos = areaData.areaEnd
+        
+        for j = 1, #items do                -- for each item, 
+          local item = items[j]
+            --for t = reaper.CountTakes(item)-1, 0, -1 do     
+          for t = 0, reaper.CountTakes(item)-1 do             -- for each take,
+            take = reaper.GetTake(item, t)
+               
+            if reaper.TakeIsMIDI(take) then             -- if it's MIDI, get RE PPQ values
+              razorStart_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, start_pos) 
+              razorEnd_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, end_pos) 
+              notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take                    
+              for n = notesCount-1, 0, -1 do         --- for each note, starting with last in item
+                _, _, _, startppqposOut, endppqposOut, _, pitch, _ = reaper.MIDI_GetNote(take, n) -- get note info
+                
+           -----------------------------------------------------------------------                
+           -- the MIDI task switch section, performs edits on MIDI in RE selection 
+           -----------------------------------------------------------------------
+              -- delete
+              
+                 -- EDIT: delete lasthit notes whose noteons exist within Razor Edit
+                if task == 0 then
+                  if lastNoteHit == pitch and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
+                    reaper.MIDI_DeleteNote( take, n ) 
+                    if n == 0 then undoMessage = "delete lasthit notes in RE" end 
+                  end
+                
+                  -- EDIT: delete all notes whose noteons exist within Razor Edit
+                elseif task == 1 then   
+                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
+                    reaper.MIDI_DeleteNote( take, n )
+                    if n == 0 then undoMessage = "delete notes in RE" end 
+                  end
+                
+                -- EDIT: delete all notes greater/equal than lasthit whose noteons exist within Razor Edit
+                elseif task == 2 then   
+                  if pitch >= lastNoteHit and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
+                    reaper.MIDI_DeleteNote( take, n )
+                    if n == 0 then undoMessage = "delete notes higher than lasthit in RE" end
+                  end
+                
+                -- EDIT: delete all notes less/equal than lasthit whose noteons exist within Razor Edit
+                elseif task == 3 then   
+                  if pitch <= lastNoteHit and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
+                    reaper.MIDI_DeleteNote( take, n )
+                    if n == 0 then undoMessage = "delete notes lower than lasthit in RE" end
+                  end 
+                
+                -- EDIT: delete all but the lasthit notes whose noteons exist within Razor Edit
+                elseif task == 4 then   
+                  if pitch ~= lastNoteHit and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
+                   reaper.MIDI_DeleteNote( take, n )
+                   if n == 0 then undoMessage = "delete all but lasthit in RE" end
+                  end 
+
+                -- EDIT: delete all notes whose noteons AND noteoffs exist within Razor Edit
+                elseif task == 8 then   
+                  if startppqposOut >= razorStart_ppq_pos and endppqposOut < razorEnd_ppq_pos then 
+                    reaper.MIDI_DeleteNote( take, n )
+                    if n == 0 then undoMessage = "delete notes contained within RE" end
+                  end
+                    
+                -- EDIT: delete all notes <= note under mouse cursor whose noteons exist within Razor Edit
+                elseif task == 9 then   
+                  if mouseNote ~= nil and
+                    startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch >= mouseNote then 
+                    reaper.MIDI_DeleteNote( take, n )
+                    if n == 0 then undoMessage = "delete notes <= note under mouse cursor in RE" end
+                  end     
+                    
+                -- EDIT: delete all notes >= note under mouse cursor whose noteons exist within Razor Edit
+                elseif task == 10 then   
+                  if mouseNote ~= nil and
+                    startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch <= mouseNote then 
+                    reaper.MIDI_DeleteNote( take, n ) 
+                    if n == 0 then undoMessage = "delete notes >= note under mouse cursor in RE" end
+                  end    
+                  
+           -----------------------------------------------------------------------
+              -- select
+                         
+                -- EDIT: select all notes whose noteons exist within Razor Edit
+                elseif task == 5 then
+                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
+                    reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, nil, nil)
+                    if n == 0 then undoMessage = "select all notes in RE" end
+                  end
+                  
+                -- EDIT: select all last-hit notes whose noteons exist within Razor Edit
+                elseif task == 12 then
+                  if lastNoteHit == pitch and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
+                    reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, nil, nil)
+                    if n == 0 then undoMessage = "select all last-hit notes in RE" end
+                  end  
+                  
+           -----------------------------------------------------------------------
+              -- nudge
+              
+                -- EDIT: nudge notes whose noteons exist within Razor Edit forwards
+               elseif task == 6 then
+                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
+                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+ppqIncr, endppqposOut+ppqIncr, nil, nil, nil, nil) 
+                    if n == 0 then undoMessage = "nudge notes in RE forwards" end
+                  end
+
+                -- EDIT: nudge notes whose noteons exist within Razor Edit backwards
+                elseif task == 7 then  
+                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
+                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut-ppqIncr, endppqposOut-ppqIncr, nil, nil, nil, nil)
+                    if n == 0 then undoMessage = "nudge notes in RE backwards" end
+                  end
+                
+                -- EDIT: nudge notes whose noteons exist within Razor Edit forwards
+                elseif task == 13 then
+                  if lastNoteHit == pitch and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
+                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+ppqIncr, endppqposOut+ppqIncr, nil, nil, nil, nil) 
+                    if n == 0 then undoMessage = "nudge last-hit notes in RE forwards" end
+                  end
+              
+                -- EDIT: nudge notes whose noteons exist within Razor Edit backwards
+                elseif task == 14 then  
+                  if lastNoteHit == pitch and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
+                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut-ppqIncr, endppqposOut-ppqIncr, nil, nil, nil, nil)
+                    if n == 0 then undoMessage = "nudge last-hit notes in RE backwards" end
+                  end
+                end     -- of MIDI task switch section
+              end       -- for each note    
+
+           -----------------------------------------------------------------------                
+              reaper.MIDI_Sort( take )      -- run once after MIDI task switch section
+                                            -- not sure i'm using this correctly
+              reaper.UpdateArrange()        -- or this  ?
+              
+            end         -- if it's MIDI
+          end           -- for each take
+        end             -- for each item
+      end               -- if not Envelope
+    end                 -- for each area
+  end                   -- if RE   
+  
+  -- EDIT: select and copy all MIDI in REs
+  if task == 11 then copySelectedMIDIinRE()
+    undoMessage = "select/copy all notes in RE"
+  end -- select/copy notes in REs
+  
+  reaper.UpdateArrange()
+  if undoMessage ~= nil then reaper.Undo_OnStateChange2(proj, undoMessage) end
+end                     -- end function MIDINotesInRE()
+
+  
 ---------------------------------------------------------------------
     --[[------------------------------[[--
           watch for last-hit note on dedicated track -- mccrabney        
@@ -72,13 +287,15 @@ function getLastNoteHit()                       -- open the function
     end                                         -- end if/else desired trackname
   end                                           -- end for every track
   
-  if isTrack == 0 then                          -- if track isn't present, 
+  if isTrack == 0 then                          -- if reference track isn't present, 
     
-    reaper.Undo_BeginBlock()
+    reaper.Undo_BeginBlock()                    -- why isn't this working?
     
     reaper.InsertTrackAtIndex( numTracks, false ) -- insert one at end of project
     refTrack = reaper.GetTrack( 0, numTracks)     -- get the new track
     _, _ = reaper.GetSetMediaTrackInfo_String(refTrack, "P_NAME", "lastnote", true)
+    
+        -- using data byte 1 of midi notes received by JS MIDI Examiner - thanks, schwa!
     reaper.TrackFX_AddByName( refTrack, "MIDI Examiner", false, 1 )  -- add js
     reaper.SetMediaTrackInfo_Value( refTrack, "D_VOL", 0 )      -- volume off
     reaper.SetMediaTrackInfo_Value( refTrack, 'I_FOLDERDEPTH', 1 )   -- arm it
@@ -99,178 +316,22 @@ function getLastNoteHit()                       -- open the function
     reaper.ShowConsoleMsg("\n")    
     reaper.ShowConsoleMsg("resend the reference note and rerun the action.")
     reaper.ShowConsoleMsg("\n")
-    reaper.ShowConsoleMsg("for more granular control,")
+    reaper.ShowConsoleMsg("this folder can be hidden and/or ignored from now on.")
+    reaper.ShowConsoleMsg("\n")    
+    reaper.ShowConsoleMsg("note: for more granular control,")
     reaper.ShowConsoleMsg("\n")    
     reaper.ShowConsoleMsg("set the track input to the intended MIDI controller,")
     reaper.ShowConsoleMsg("\n")    
-    reaper.ShowConsoleMsg("duplicate track, and repeat process for more devices,")
+    reaper.ShowConsoleMsg("duplicate track, and repeat process for more devices.")
     reaper.ShowConsoleMsg("\n")    
     
-    reaper.Undo_EndBlock( "lastnote reference tracks created", -1 )
+    reaper.Undo_EndBlock( "lastnote reference tracks created", -1 )      -- why isn't this working?
   
   end
   return lastNote         -- lastNoteHit is a referenced variable for edits
   
 end                                             -- end function
 
-
----------------------------------------------------------------------
-    --[[------------------------------[[--
-          do edits to notes in RE   -- mccrabney        
-    --]]------------------------------]]--
-
-function MIDINotesInRE(task)
-  
-  local ppqIncr = 100    -- how many ppq to nudge MIDI notes
-  local mouseNote        -- note under mouse cursor
-  local doWhat = task    -- which edit is being performed
-
-  --------------------------------------------------
-  -- get the value of the note under the mouse cursor  -- should this be its own function?
-  --------------------------------------------------
-
-  window, _, details = reaper.BR_GetMouseCursorContext() -- initialize cursor context
-  local mouse_pos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position
-  if details == "item" or inline_editor then -- hovering item in arrange
-    mouseTake = reaper.BR_GetMouseCursorContext_Take() -- get take under mouse
-    if reaper.TakeIsMIDI(mouseTake) then -- is take MIDI?
-      local item = reaper.BR_GetMouseCursorContext_Item() -- get item under mouse
-      local mouse_position_ppq = reaper.MIDI_GetPPQPosFromProjTime(mouseTake, mouse_pos) -- convert to PPQ
-      local notesCount, _, _ = reaper.MIDI_CountEvts(mouseTake) -- count notes in current take
-      for n = notesCount-1, 0, -1 do
-        _, _, _, startppq, endppq, _, pitch, _ = reaper.MIDI_GetNote(mouseTake, n) -- get note start/end position              
-        if startppq <= mouse_position_ppq and endppq >= mouse_position_ppq then 
-          mouseNote = pitch
-        end
-      end
-    end 
-  end                -- mouseNote and mouseTake are referenced variables for edits
-
-  ---------------------------------------------------
-  --check each RE for MIDI takes and apply edits to them 
-  --------------------------------------------------- 
-  
-  if RazorEditSelectionExists() then      -- only apply edit to REs. maybe include "enclose item in RE" if no REs yet?  
-    local areas = GetRazorEdits()         -- get all areas 
-    for i = 1, #areas do                   -- for each razer edit, get each item
-      local areaData = areas[i]
-      if not areaData.isEnvelope then
-        local items = areaData.items        
-        local start_pos = areaData.areaStart  
-        local end_pos = areaData.areaEnd
-        
-        for j = 1, #items do                -- for each item, 
-          local item = items[j]
-            --for t = reaper.CountTakes(item)-1, 0, -1 do     
-          for t = 0, reaper.CountTakes(item)-1 do             -- for each take,
-            take = reaper.GetTake(item, t)
-               
-            if reaper.TakeIsMIDI(take) then             -- if it's MIDI, get RE PPQ values
-              razorStart_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, start_pos) 
-              razorEnd_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, end_pos) 
-              notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take                    
-              for n = notesCount-1, 0, -1 do         --- for each note, starting with last in item
-                _, _, _, startppqposOut, endppqposOut, _, pitch, _ = reaper.MIDI_GetNote(take, n) -- get note info
-                
-  ----------------------------------------------------------                
-  -- the RE MIDI edits  ------------------------------------
-                   
-                 -- EDIT: delete lasthit notes whose noteons exist within Razor Edit
-                if doWhat == 0 then
-                  if lastNoteHit == pitch and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_DeleteNote( take, n ) 
-                    if n == 0 then undoMessage = "delete lasthit notes in RE" end 
-                  end
-                
-                  -- EDIT: delete all notes whose noteons exist within Razor Edit
-                elseif doWhat == 1 then   
-                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_DeleteNote( take, n )
-                    if n == 0 then undoMessage = "delete notes in RE" end 
-                  end
-                
-                -- EDIT: delete all notes greater/equal than lasthit whose noteons exist within Razor Edit
-                elseif doWhat == 2 then   
-                  if pitch >= lastNoteHit and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_DeleteNote( take, n )
-                    if n == 0 then undoMessage = "delete notes higher than lasthit in RE" end
-                  end
-                
-                -- EDIT: delete all notes less/equal than lasthit whose noteons exist within Razor Edit
-                elseif doWhat == 3 then   
-                  if pitch <= lastNoteHit and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_DeleteNote( take, n )
-                    if n == 0 then undoMessage = "delete notes lower than lasthit in RE" end
-                  end 
-                
-                -- EDIT: delete all but the lasthit notes whose noteons exist within Razor Edit
-                elseif doWhat == 4 then   
-                  if pitch ~= lastNoteHit and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                   reaper.MIDI_DeleteNote( take, n )
-                   if n == 0 then undoMessage = "delete all but lasthit in RE" end
-                  end                    
-                
-                -- EDIT: select all notes whose noteons exist within Razor Edit
-                elseif doWhat == 5 then
-                  if pitch ~= lastNoteHit and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, nil, nil)
-                    if n == 0 then undoMessage = "select all notes in RE" end
-                  end
-                
-                -- EDIT: nudge notes whose noteons exist within Razor Edit forwards
-               elseif doWhat == 6 then
-                  if pitch ~= lastNoteHit and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+ppqIncr, endppqposOut+ppqIncr, nil, nil, nil, nil) 
-                    if n == 0 then undoMessage = "nudge notes in RE forwards" end
-                  end
-
-                -- EDIT: nudge notes whose noteons exist within Razor Edit backwards
-                elseif doWhat == 7 then  
-                  if pitch ~= lastNoteHit and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut-ppqIncr, endppqposOut-ppqIncr, nil, nil, nil, nil)
-                    if n == 0 then undoMessage = "nudge notes in RE backwards" end
-                  end
-                
-                -- EDIT: delete all notes whose noteons AND noteoffs exist within Razor Edit
-                elseif doWhat == 8 then   
-                  if startppqposOut >= razorStart_ppq_pos and endppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_DeleteNote( take, n )
-                    if n == 0 then undoMessage = "delete notes contained within RE" end
-                  end
-                    
-                -- EDIT: delete all notes <= note under mouse cursor whose noteons exist within Razor Edit
-                elseif doWhat == 9 then   
-                  if mouseNote ~= nil and
-                    startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch >= mouseNote then 
-                    reaper.MIDI_DeleteNote( take, n )
-                    if n == 0 then undoMessage = "delete notes <= note under mouse cursor in RE" end
-                  end     
-                    
-                -- EDIT: delete all notes >= note under mouse cursor whose noteons exist within Razor Edit
-                elseif doWhat == 10 then   
-                  if mouseNote ~= nil and
-                    startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch <= mouseNote then 
-                    reaper.MIDI_DeleteNote( take, n ) 
-                    if n == 0 then undoMessage = "delete notes >= note under mouse cursor in RE" end
-                  end    
-                end     -- of doWhat switch section
-              end       -- for each note
-            end         -- if it's MIDI
-          end           -- for each take
-        end             -- for each item
-      end               -- if not Envelope
-    end                 -- for each area
-  end                   -- if RE   
-  
-  -- EDIT: select and copy all MIDI in REs
-  if doWhat == 11 then copySelectedMIDIinRE()
-    undoMessage = "select/copy all notes in RE"
-  end -- select/copy notes in REs
-  
-  reaper.UpdateArrange()
-  if undoMessage ~= nil then reaper.Undo_OnStateChange2(proj, undoMessage) end
-end                     -- end function MIDINotesInRE()
-  
     
 --------------------------------------------------------------------
     --[[------------------------------[[--
@@ -305,8 +366,9 @@ end        -- function
     --]]------------------------------]]--
 
 function copySelectedMIDIinRE()
+  reaper.PreventUIRefresh(1)
   MIDINotesInRE(5)                        -- select RE-enclosed notes
-  if RazorEditSelectionExists() then      -- if RE exists
+  if RazorEditSelectionExists(0) then      -- if RE exists -- unnecessary?
     local areas = GetRazorEdits()         -- get all areas 
     local areaData = areas[1]             -- look at the first area
     if not areaData.isEnvelope then       -- if not envelope
@@ -315,15 +377,194 @@ function copySelectedMIDIinRE()
       local take = reaper.GetTake(item, 0)   -- get first take
       if reaper.TakeIsMIDI(take) then     -- if it's MIDI,
         reaper.SetMediaItemSelected(item, 1) -- select the first item
-        reaper.Main_OnCommand(40153, 0)    -- open MIDI editor for selected item
+        reaper.Main_OnCommand(40153, 0)   -- open MIDI editor for selected item
+        --local windowHWND = reaper.JS_Window_GetFocus()
+        --reaper.JS_Window_SetOpacity( windowHWND, alpha, 50 )
         local activeEditor = reaper.MIDIEditor_GetActive()
         reaper.MIDIEditor_OnCommand(activeEditor, 40010)   -- copy selected notes from inside ME
-        reaper.MIDIEditor_OnCommand(activeEditor, 40794 )   -- close the ME
+        --reaper.MIDIEditor_OnCommand(activeEditor, 40794 )   -- close the ME
+        
+            -- requires these MIDI editor settings:
+                -- One MIDI editor per track/project
+                -- Open all MIDI in the track/project
+                -- media item selection is linked to visibility OFF
+                -- selection is linked to editability OFF
+                -- Make secondary items editable by default
+                
+            -- note copying is done this way because ME must be open in order for action to be run.
+            -- in order to set MIDI clipboard to include MIDI from multiple editable items
+            -- this results in an undesirable flicker as the MIDI editor opens and closes.
         
       end                                 -- if it's MIDI
     end                                   -- if not Envelope
   end                                     -- if RE  
+  reaper.PreventUIRefresh(-1)
+    
 end                                       -- function
+
+
+---------------------------------------------------------------------
+    --[[------------------------------[[--
+     In/Decrement Razor Edit Start/End by Visible Grid     - mccrabney      
+    --]]------------------------------]]--
+    
+function resizeREbyVisibleGrid(param, incr)    -- where param informs direction of movement
+    --reaper.PreventUIRefresh(1)
+    --reaper.PreventUIRefresh(-1)
+    
+    gridval = GetVisibleGridDivision()
+    
+    if RazorEditSelectionExists(0) then
+        local areas = GetRazorEdits()
+
+        for i=1, #areas do
+            local area = areas[i];
+            local aStart = area.areaStart
+            local aEnd = area.areaEnd
+
+            if param == 0 then ---- if we are incrementing/decrementing RE end
+                aEnd =  reaper.SnapToGrid(0, aEnd+gridval*incr) --increment/decrement by grid
+                if aEnd > aStart then
+                    if area.isEnvelope then
+                        SetEnvelopeRazorEdit(area.envelope, aStart, aEnd, true)
+                    else
+                        SetTrackRazorEdit(area.track, aStart, aEnd, true) 
+                    end
+                end
+            end    
+            
+            if param == 1 then ---- if we are incrementing/decrementing RE start
+                aStart =  reaper.SnapToGrid(0, aStart+gridval*incr) --increment/decrement by grid
+                if aEnd > aStart then
+                    if area.isEnvelope then
+                        SetEnvelopeRazorEdit(area.envelope, aStart, aEnd, true)
+                    else
+                        SetTrackRazorEdit(area.track, aStart, aEnd, true) 
+                    end    
+                end                                
+            end --if param = 0
+        end -- for
+    else  -- RazorEditSelectionExists() -- create if not present maybe deprecated now that check function is improved
+         
+        for i = 0, reaper.CountSelectedTracks(0)-1 do
+            track = reaper.GetSelectedTrack(0, i)
+            reaper.Main_OnCommand(40755, 0) -- Snapping: Save snap state
+            reaper.Main_OnCommand(40754, 0) -- Snapping: Enable snap
+            local cursorpos = reaper.GetCursorPosition()
+            
+            if param == 0 then 
+                if incr == 1 then SetTrackRazorEdit(track, cursorpos, cursorpos+gridval, true) end 
+            else
+                if incr == -1 then SetTrackRazorEdit(track, cursorpos-gridval, cursorpos, true) end 
+            end    
+            
+            reaper.Main_OnCommand(40756, 0) -- Snapping: Restore snap state
+            -- reaper.defer(function() end)
+        end
+    end  -- RazorEditSelectionExists()
+    --reaper.UpdateArrange() 
+   -- reaper.defer(resizeREbyVisibleGrid)
+   reaper.Undo_OnStateChange2(proj, "change RE start/end by visible grid")
+end
+
+
+---------------------------------------------------------------------
+    --[[------------------------------[[--
+        Move Razor Edit (and/or edit cursor) End by Visible Grid   - mccrabney            
+    --]]------------------------------]]--
+
+function moveREbyVisibleGrid(incr)
+    --reaper.PreventUIRefresh(1)
+    --reaper.PreventUIRefresh(-1)
+    
+    local direction = incr
+    
+    gridval = GetVisibleGridDivision()
+    
+    if RazorEditSelectionExists(0) then
+        local test, position = GetRazorEdits()
+        local areas = GetRazorEdits()
+        
+        for i=1, #areas do
+            local area = areas[i];
+            local aStart = area.areaStart 
+            local aEnd = area.areaEnd
+            local aLength = aEnd - aStart
+            local cursorpos = reaper.GetCursorPosition()
+            local grid=cursorpos
+            aStart = reaper.SnapToGrid(0, aStart+gridval*incr)
+            aEnd =  reaper.SnapToGrid(0, aEnd+gridval*incr)
+            
+            if area.isEnvelope then
+                SetEnvelopeRazorEdit(area.envelope, aStart, aEnd, true)
+            else
+                SetTrackRazorEdit(area.track, aStart, aEnd, true)
+                reaper.SetEditCurPos( aStart, true, false)
+            end -- if area.isEnvelope
+        end -- for
+    else -- RazorEditSelectionExists( NO ):
+        local cursorpos = reaper.GetCursorPosition()
+        local grid = reaper.SnapToGrid(0, cursorpos+gridval*incr)
+        reaper.SetEditCurPos(grid,1,1)
+    end  
+    reaper.UpdateArrange()
+    reaper.Undo_OnStateChange2(proj, "move RE/edit cursor by visible grid")
+end
+
+
+---------------------------------------------------------------------   
+    --[[------------------------------[[--
+        move RE and edit cursor forwards without contents 
+    --]]------------------------------]]--
+
+function moveREwithcursor(incr)
+    --reaper.PreventUIRefresh(1)
+    --reaper.PreventUIRefresh(-1)
+    local direction = incr
+    if RazorEditSelectionExists(0) then
+        if incr == 1 then reaper.Main_OnCommand(42399, 0) end -- move RE forwards without content
+        if incr == -1 then reaper.Main_OnCommand(42400, 0) end -- backwards
+         
+        local test, position = GetRazorEdits()
+        local areas = GetRazorEdits()
+        
+        for i=1, #areas do
+            local area = areas[i];
+            local aStart = area.areaStart 
+            reaper.SetEditCurPos(aStart,1,1)
+        end -- for
+        
+    else -- RazorEditSelectionExists( NO ):
+        --local cursorpos = reaper.GetCursorPosition()
+        --local grid = reaper.SnapToGrid(0, cursorpos+gridval*incr)
+        
+    end  
+    reaper.UpdateArrange()
+    reaper.Undo_OnStateChange2(proj, "move RE with cursor without contents")
+    
+end
+
+---------------------------------------------------------------------   
+    --[[------------------------------[[--
+                MAIN
+    --]]------------------------------]]--
+    
+function Main()
+end
+
+
+---------------------------------------------------------------------
+    --[[------------------------------[[--
+                loop
+    --]]------------------------------]]--
+    
+Main()
+
+---------------------------------------------------------------------
+--------------- end of mccrabney functions --------------------------
+---------------------------------------------------------------------
+-- Below are useful RE functions contributed by talented REAPER users.
+---------------------------------------------------------------------   
 
 --------------------------------------------------------------------
     --[[------------------------------[[--
@@ -608,25 +849,54 @@ function SplitRazorEdits(razorEdits)
     return areaItems
 end
 
+---------------------------------------------------------------------
+    --[[------------------------------[[--
+        toggle mute RE contents or selected items  -- thanks, BirdBird!
+    --]]------------------------------]]--
+
+function muteREcontents()
+    local areas = GetRazorEdits()
+    items = SplitRazorEdits(areas)
+    for j = 1, #items do 
+        reaper.SetMediaItemSelected(items[j], true)
+    end
+    reaper.Main_OnCommand(40183, 0)  -- toggle mute
+    reaper.Undo_OnStateChange2(proj, "toggle mute RE contents or selected items")
+end
+
 
 ---------------------------------------------------------------------
     --[[------------------------------[[--
-          Does a Razor Edit exist? thanks, sonictim!          
+          RE exist? if not/if desired, create them  -- thanks, sonictim and julian sader!          
     --]]------------------------------]]--
 
-function RazorEditSelectionExists()
+function RazorEditSelectionExists(make)
 
-    for i=0, reaper.CountTracks(0)-1 do
-
-        local retval, x = reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(0,i), "P_RAZOREDITS", "string", false)
-
-        if x ~= "" then return true end
-
-    end--for
+  for i=0, reaper.CountTracks(0)-1 do    -- for each track, check if RE is present
+    local retval, x = reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(0,i), "P_RAZOREDITS", "string", false)
+    if x ~= "" then return true end       -- if present, return true
+  end                                     -- end for each track
     
-    return false
-
-end--RazorEditSelectionExists()
+  if x == nil and make == 1 then        -- if no RE, but one is needed,
+    reaper.Undo_BeginBlock2(0)          -- make them from selected items.
+    tS = {}
+    for i = 0, reaper.CountSelectedMediaItems(0)-1 do   
+      item = reaper.GetSelectedMediaItem(0, i)
+      left = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
+      right = left + reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
+      track = reaper.GetMediaItemTrack(item)
+      tS[track] = (tS[track] or "") .. string.format([[%.16f %.16f "" ]], left, right)
+    end
+    for track, str in pairs(tS) do
+      reaper.GetSetMediaTrackInfo_String(track, "P_RAZOREDITS", str, true)
+    end
+    reaper.UpdateArrange()
+    reaper.Undo_EndBlock2(0, "Enclose items in minimal razor areas", -1)
+    return true                    -- return that yes, RE exists now
+  else if x == nil and make == 0 then
+      return false end                  -- return that no RE exists
+  end                               -- end if/else
+end                                 -- end RazorEditSelectionExists()
 
 
 ---------------------------------------------------------------------
@@ -671,168 +941,3 @@ function GetVisibleGridDivision()  ----
 
 end -- GetVisibleGridDivision()
 
-
----------------------------------------------------------------------
-    --[[------------------------------[[--
-     In/Decrement Razor Edit Start/End by Visible Grid        
-    --]]------------------------------]]--
-    
-function resizeREbyVisibleGrid(param, incr)    -- where param informs direction of movement
-    gridval = GetVisibleGridDivision()
-    
-    if RazorEditSelectionExists() then
-        local areas = GetRazorEdits()
-
-        for i=1, #areas do
-            local area = areas[i];
-            local aStart = area.areaStart
-            local aEnd = area.areaEnd
-
-            if param == 0 then ---- if we are incrementing/decrementing RE end
-                aEnd =  reaper.SnapToGrid(0, aEnd+gridval*incr) --increment/decrement by grid
-                if aEnd > aStart then
-                    if area.isEnvelope then
-                        SetEnvelopeRazorEdit(area.envelope, aStart, aEnd, true)
-                    else
-                        SetTrackRazorEdit(area.track, aStart, aEnd, true) 
-                    end
-                end
-            end    
-            
-            if param == 1 then ---- if we are incrementing/decrementing RE start
-                aStart =  reaper.SnapToGrid(0, aStart+gridval*incr) --increment/decrement by grid
-                if aEnd > aStart then
-                    if area.isEnvelope then
-                        SetEnvelopeRazorEdit(area.envelope, aStart, aEnd, true)
-                    else
-                        SetTrackRazorEdit(area.track, aStart, aEnd, true) 
-                    end    
-                end                                
-            end --if param = 0
-        end -- for
-    else  -- RazorEditSelectionExists() -- create if not present  
-         
-        for i = 0, reaper.CountSelectedTracks(0)-1 do
-            track = reaper.GetSelectedTrack(0, i)
-            reaper.Main_OnCommand(40755, 0) -- Snapping: Save snap state
-            reaper.Main_OnCommand(40754, 0) -- Snapping: Enable snap
-            local cursorpos = reaper.GetCursorPosition()
-            
-            if param == 0 then 
-                if incr == 1 then SetTrackRazorEdit(track, cursorpos, cursorpos+gridval, true) end 
-            else
-                if incr == -1 then SetTrackRazorEdit(track, cursorpos-gridval, cursorpos, true) end 
-            end    
-            
-            reaper.Main_OnCommand(40756, 0) -- Snapping: Restore snap state
-            -- reaper.defer(function() end)
-        end
-    end  -- RazorEditSelectionExists()
-    --reaper.UpdateArrange() 
-   -- reaper.defer(resizeREbyVisibleGrid)
-end
-
-
----------------------------------------------------------------------
-    --[[------------------------------[[--
-        Move Razor Edit (and/or edit cursor) End by Visible Grid               
-    --]]------------------------------]]--
-
-function moveREbyVisibleGrid(incr)
-
-    local direction = incr
-    
-    gridval = GetVisibleGridDivision()
-    
-    if RazorEditSelectionExists() then
-        local test, position = GetRazorEdits()
-        local areas = GetRazorEdits()
-        
-        for i=1, #areas do
-            local area = areas[i];
-            local aStart = area.areaStart 
-            local aEnd = area.areaEnd
-            local aLength = aEnd - aStart
-            local cursorpos = reaper.GetCursorPosition()
-            local grid=cursorpos
-            aStart = reaper.SnapToGrid(0, aStart+gridval*incr)
-            aEnd =  reaper.SnapToGrid(0, aEnd+gridval*incr)
-            
-            if area.isEnvelope then
-                SetEnvelopeRazorEdit(area.envelope, aStart, aEnd, true)
-            else
-                SetTrackRazorEdit(area.track, aStart, aEnd, true)
-                reaper.SetEditCurPos( aStart, true, false)
-            end -- if area.isEnvelope
-        end -- for
-    else -- RazorEditSelectionExists( NO ):
-        local cursorpos = reaper.GetCursorPosition()
-        local grid = reaper.SnapToGrid(0, cursorpos+gridval*incr)
-        reaper.SetEditCurPos(grid,1,1)
-    end  
-    reaper.UpdateArrange()
-    
-end
-
-
----------------------------------------------------------------------   
-    --[[------------------------------[[--
-        move RE and edit cursor forwards without contents 
-    --]]------------------------------]]--
-
-function moveREwithcursor(incr)
-
-    local direction = incr
-    if RazorEditSelectionExists() then
-        if incr == 1 then reaper.Main_OnCommand(42399, 0) end -- move RE forwards without content
-        if incr == -1 then reaper.Main_OnCommand(42400, 0) end -- backwards
-         
-        local test, position = GetRazorEdits()
-        local areas = GetRazorEdits()
-        
-        for i=1, #areas do
-            local area = areas[i];
-            local aStart = area.areaStart 
-            reaper.SetEditCurPos(aStart,1,1)
-        end -- for
-        
-    else -- RazorEditSelectionExists( NO ):
-        --local cursorpos = reaper.GetCursorPosition()
-        --local grid = reaper.SnapToGrid(0, cursorpos+gridval*incr)
-        
-    end  
-    reaper.UpdateArrange()
-    
-end
-
-
----------------------------------------------------------------------   
-    --[[------------------------------[[--
-        toggle mute RE contents or selected items  -- thanks, BirdBird!
-    --]]------------------------------]]--
-
-function muteREcontents()
-    local areas = GetRazorEdits()
-    items = SplitRazorEdits(areas)
-    for j = 1, #items do 
-        reaper.SetMediaItemSelected(items[j], true)
-    end
-    reaper.Main_OnCommand(40183, 0)  -- toggle mute
-end
-
-
----------------------------------------------------------------------   
-    --[[------------------------------[[--
-                MAIN
-    --]]------------------------------]]--
-    
-function Main()
-end
-
-
----------------------------------------------------------------------
-    --[[------------------------------[[--
-                loop
-    --]]------------------------------]]--
-    
-Main()
