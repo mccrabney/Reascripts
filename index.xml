@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<index version="1" commit="cdc13e0fe3c1addf5da2017ea0fd52fb75132435">
+  <category name="MIDI edits">
+    <reapack name="mccrabney_Delete notes under edit cursor.lua" type="script" desc="Delete notes under edit cursor">
+      <version name="1.0" author="mccrabney" time="2022-12-16T17:35:13Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/bb84900f8e20cd258415ee40ab434dc4e6608165/MIDI%20edits/mccrabney_Delete%20notes%20under%20edit%20cursor.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Razor Edits">
+    <reapack name="mccrabney_razor edits_copy selected notes in RE.lua" type="script" desc="copy notes whose note-ons are contained in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_copy%20selected%20notes%20in%20RE.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_delete last-hit notes in RE.lua" type="script" desc="delete last-hit notes in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_delete%20last-hit%20notes%20in%20RE.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_delete notes contained in RE.lua" type="script" desc="delete notes contained within Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_delete%20notes%20contained%20in%20RE.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_delete notes higher than last-hit note in RE.lua.lua" type="script" desc="delete notes higher than last-hit note in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_delete%20notes%20higher%20than%20last-hit%20note%20in%20RE.lua.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_delete notes higher than note under mouse cursor in RE.lua" type="script" desc="delete notes higher than note under mouse cursor in Razor Edits">
+      <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_delete%20notes%20higher%20than%20note%20under%20mouse%20cursor%20in%20RE.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_delete notes in RE.lua" type="script" desc="delete notes whose note-ons are contained in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_delete%20notes%20in%20RE.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_delete notes lower than last-hit note in RE.lua" type="script" desc="delete notes lower than last-hit note in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_delete%20notes%20lower%20than%20last-hit%20note%20in%20RE.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_delete notes lower than note under mouse cursor in RE.lua" type="script" desc="delete notes lower than note under mouse cursor in Razor Edits">
+      <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_delete%20notes%20lower%20than%20note%20under%20mouse%20cursor%20in%20RE.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_delete notes other than last-hit note in RE.lua" type="script" desc="delete notes whose note-ons are contained in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_delete%20notes%20other%20than%20last-hit%20note%20in%20RE.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_move RE &amp; edit cursor (backwards).lua" type="script" desc="move RE &amp; edit cursor (backwards)">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_move%20RE%20&amp;%20edit%20cursor%20(backwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_move RE &amp; edit cursor (forwards).lua" type="script" desc="move RE &amp; edit cursor (forwards)">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_move%20RE%20&amp;%20edit%20cursor%20(forwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_move RE &amp;or edit cursor by visible grid division (backwards).lua" type="script" desc="move RE &amp;or edit cursor by visible grid division (backwards)">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_move%20RE%20&amp;or%20edit%20cursor%20by%20visible%20grid%20division%20(backwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_move RE &amp;or edit cursor by visible grid division (forwards).lua" type="script" desc="move RE &amp;or edit cursor by visible grid division (forwards)">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_move%20RE%20&amp;or%20edit%20cursor%20by%20visible%20grid%20division%20(forwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_nudge last-hit notes in REs (mousewheel).lua" type="script" desc="nudge last-hit notes whose note-ons are contained in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-17T16:15:00Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/d55efd9a2d1a14ebbe8ed1c799da866112441771/Razor%20Edits/mccrabney_razor%20edits_nudge%20last-hit%20notes%20in%20REs%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_nudge notes in REs (mousewheel).lua" type="script" desc="select notes whose note-ons are contained in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_nudge%20notes%20in%20REs%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_nudge notes in REs forward.lua" type="script" desc="select notes whose note-ons are contained in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_nudge%20notes%20in%20REs%20forward.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_Razor Edit Control Functions.lua" type="script" desc="Razor Edit Control Functions">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.01" author="mccrabney" time="2021-04-02T15:12:24Z">
+        <changelog><![CDATA[+ cleanup, slight nod toward documentation]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/32ac99a589978e58cd2a022c695c3325ba310b86/Razor%20Edits/mccrabney_razor%20edits_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.02" author="mccrabney" time="2021-04-03T15:59:59Z">
+        <changelog><![CDATA[+ more cleanup and attribution
++ fixed "toggle mute RE contents or selected items"
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/ba0b613db6ea4fc40b347fc2e38f6d70898883db/Razor%20Edits/mccrabney_razor%20edits_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.03" author="mccrabney" time="2022-12-14T22:44:48Z">
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.04" author="mccrabney" time="2022-12-16T18:07:02Z">
+        <changelog><![CDATA[+ added "lastnote" reference function
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/2cbfa3a70d142f9b3fe49d236242ddcfc910c88b/Razor%20Edits/mccrabney_razor%20edits_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.05" author="mccrabney" time="2022-12-17T16:21:57Z">
+        <changelog><![CDATA[+ general cleanup, excessive comments in code
++ an attempt to use MIDI_Sort properly
++ RE movement: added undo points 
++ MIDI edits: added "select last hit notes in RE"
++ MIDI edits: if no REs exist, enclose selected items in RE then run edit
++ MIDI edits: nudge last-hit note in RE 
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/5d1fb7d3d1b44ddb04e21e07b4b99e95a878b55c/Razor%20Edits/mccrabney_razor%20edits_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_resize RE end by visible grid division (backwards).lua" type="script" desc="resize RE end by visible grid division (backwards)">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_resize%20RE%20end%20by%20visible%20grid%20division%20(backwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_resize RE end by visible grid division (forwards).lua" type="script" desc="resize RE end by visible grid division (forwards)">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_resize%20RE%20end%20by%20visible%20grid%20division%20(forwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_resize RE start by visible grid division (backwards).lua" type="script" desc="resize RE start by visible grid division (backwards)">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_resize%20RE%20start%20by%20visible%20grid%20division%20(backwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_resize RE start by visible grid division (forwards).lua" type="script" desc="resize RE start by visible grid division (forwards)">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_resize%20RE%20start%20by%20visible%20grid%20division%20(forwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_select notes in REs.lua" type="script" desc="select notes whose note-ons are contained in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-14T22:44:48Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/1766dc129b74e3755ed44c47cd98398a363bd904/Razor%20Edits/mccrabney_razor%20edits_select%20notes%20in%20REs.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_toggle enclose item under mouse cursor in RE.lua" type="script" desc="toggle-enclose item under mouse cursor in RE">
+      <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_toggle%20enclose%20item%20under%20mouse%20cursor%20in%20RE.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_toggle mute RE contents or selected items.lua" type="script" desc="toggle mute RE contents or selected items">
+      <version name="1.0" author="mccrabney" time="2021-04-02T17:10:06Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/fcf2a03914b6c3076a7204365fcea6d0d32db105/Razor%20Edits/mccrabney_razor%20edits_toggle%20mute%20RE%20contents%20or%20selected%20items.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <metadata>
+    <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 welcome to mccrabney's repo\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 here you will find some scripts that i have created to fulfill some needs i had in REAPER.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 the focus right now is to provide arrange-screen MIDI editing via Razer Edits. an older focus: keyboard control for razer edits.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 note that quickly retriggering scripts that move cursor/RE forwards/backwards will trigger the [ReaScript task control "Script name" is running in the background] message. for each action, select "new instance" and "remember choice" this will retrigger the script and it should behave as expected when hammering a directional key...\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 places i've been:\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Wheelboro, NC - Thumbville, South Carolina - Garnett, Virginia - Thimpleton, SC - Dimple, Kentucky - Marmott, Indiana - Thumb of God, Georgia - Chaff County, Alabama - Thorny Bush, Mississippi - Whiddle, South Carolina - Dickle, Tennessee - Abstinence, Tennessee - Gurth, Texas - Foyble Valley, Mississippi - Godhood, Arkansas - Berlapp, Tennessee - Kinkle Village, Florida - Gurney, Virginia - Mouthole, Kentucky - Mooth, Kentucky - Mutton Beach, South Carolina - Franton, North Carolina - Dunth, NC - Menthol, Georgia - Bunkle, Texas - Slaw Canyon, Tennessee - Hayte Village, Alabama - Brood, Kentucky - Blanders, North Carolina - Knobbit, Alabama - Burth, Virginia - Nawtonomy, Alabamistan - Dormancy, Florida - Putina, Kentucky - Sholder, Kentucky - Chinsville, Georgia - Bamboozle, NC - Dimple Canyon, Virginia - Twiddy, Alabama - Gerbage, Tennessee - Complicit, California - Obtoose, U.S.A. - Quisling, Arizona - Discretion, Ohio - Doopt, Florida - Dundle, Louisiana - Farcey, Georgia - Harblesburg, Texas - Sputumton, Florida - Transmission, Georgia - Bungle, Nevada - Phlemming, NC - Wooleye, Louisiana - Blueseets, Oklahoma - Barrph, NY - Pinkerton, Oregon - Bludgeon, NY - Swindelton, FL - Theeble, GA - Wwoshnington D.C. - Dewlapp, Kentucky - Gruntleton, GA\par}
+}
+]]></description>
+  </metadata>
+</index>
