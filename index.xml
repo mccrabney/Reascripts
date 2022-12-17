@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" commit="4f9040cb6964a4eb37fddd306b33570893fb25c4">
+<index version="1" commit="5d1fb7d3d1b44ddb04e21e07b4b99e95a878b55c">
   <category name="MIDI edits">
     <reapack name="mccrabney_Delete notes under edit cursor.lua" type="script" desc="Delete notes under edit cursor">
       <version name="1.0" author="mccrabney" time="2022-12-16T17:35:13Z">
@@ -127,6 +127,16 @@
         <changelog><![CDATA[+ added "lastnote" reference function
 ]]></changelog>
         <source main="main">https://github.com/mccrabney/mccrabney/raw/2cbfa3a70d142f9b3fe49d236242ddcfc910c88b/Razor%20Edits/mccrabney_razor%20edits_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.05" author="mccrabney" time="2022-12-17T16:21:57Z">
+        <changelog><![CDATA[+ general cleanup, excessive comments in code
++ an attempt to use MIDI_Sort properly
++ RE movement: added undo points 
++ MIDI edits: added "select last hit notes in RE"
++ MIDI edits: if no REs exist, enclose selected items in RE then run edit
++ MIDI edits: nudge last-hit note in RE 
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/5d1fb7d3d1b44ddb04e21e07b4b99e95a878b55c/Razor%20Edits/mccrabney_razor%20edits_Razor%20Edit%20Control%20Functions.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_resize RE end by visible grid division (backwards).lua" type="script" desc="resize RE end by visible grid division (backwards)">
