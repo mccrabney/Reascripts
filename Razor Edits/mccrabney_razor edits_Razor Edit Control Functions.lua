@@ -6,19 +6,6 @@
  * Extensions: None
  * Version: 1.05
 --]]
-
--- README: 
---    these functions will perform various edits on REs. 
---    some MIDI actions look for a "last hit note" to use for the edits.
---        if not already present, a reference track will be created for this. 
---    select "new instance" for repetitive triggering of RE moving/resizing child actions.
---    change the ppqIncr value for a different nudge amount
-
--- TODO: 
---    see if the MIDI editor flash that occurs during "Copy Notes in REs" can be suppressed
---    remove AI from RE areas - ultraschall
---    suppress UI updates for RE moving/resizing controls
---    
  
 --[[
  * Changelog:
@@ -47,6 +34,21 @@
    
  * v1.0 (2021-03-22)
    + Initial Release
+--]]
+
+
+-- README: 
+--    these functions will perform various edits on REs. 
+--    some MIDI actions look for a "last hit note" to use for the edits.
+--        if not already present, a reference track will be created for this. 
+--    select "new instance" for repetitive triggering of RE moving/resizing child actions.
+--    change the ppqIncr value for a different nudge amount
+
+-- TODO: 
+--    see if the MIDI editor flash that occurs during "Copy Notes in REs" can be suppressed
+--    remove AI from RE areas - ultraschall
+--    suppress UI updates for RE moving/resizing controls
+--    
 
 
 dofile(reaper.GetResourcePath().."/UserPlugins/ultraschall_api.lua")
