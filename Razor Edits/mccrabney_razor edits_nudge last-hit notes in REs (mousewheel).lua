@@ -1,5 +1,5 @@
 --[[
- * ReaScript Name: select notes whose note-ons are contained in Razor Edit
+ * ReaScript Name: select last-hit notes whose note-ons are contained in Razor Edit
  * Author: mccrabney
  * Licence: GPL v3
  * REAPER: 6.0
