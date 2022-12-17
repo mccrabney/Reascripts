@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" commit="447d2b0b25740bd40645baa70e6d0efd56c526d5">
+<index version="1" name="mccrabney's Reascripts" commit="447d2b0b25740bd40645baa70e6d0efd56c526d5">
   <category name="MIDI edits">
     <reapack name="mccrabney_Delete notes under edit cursor.lua" type="script" desc="Delete notes under edit cursor">
       <version name="1.0" author="mccrabney" time="2022-12-16T17:35:13Z">
