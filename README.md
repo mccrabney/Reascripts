@@ -2,7 +2,7 @@ welcome to mccrabney's repo
 
 here you will find some scripts that i have created to fulfill some needs i had in REAPER.
 
-the focus right now is to provide arrange-screen MIDI editing via Razer Edits. an older focus: keyboard control for razer edits.
+the focus right now is to provide arrange-screen MIDI editing via Razor Edits. an older focus: keyboard control for razor edits.
 
 note that quickly retriggering scripts that move cursor/RE forwards/backwards will trigger the [ReaScript task control "Script name" is running in the background] message.
 for each action, select "new instance" and "remember choice" 
