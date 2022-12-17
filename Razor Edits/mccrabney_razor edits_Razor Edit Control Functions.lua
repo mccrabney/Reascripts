@@ -51,7 +51,7 @@
 --    resize REs to include new space when nudging?
 
 
-dofile(reaper.GetResourcePath().."/UserPlugins/ultraschall_api.lua")
+-- dofile(reaper.GetResourcePath().."/UserPlugins/ultraschall_api.lua")
 
 ---------------------------------------------------------------------
  --[[------------------------------[[--
