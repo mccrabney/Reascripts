@@ -1,4 +1,4 @@
-welcome to mccrabney's repo -
+welcome to mccrabney's repo - - 
 
 here you will find some scripts that i have created to fulfill some needs i had in REAPER.
 
