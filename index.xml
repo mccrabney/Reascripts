@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" commit="2cbfa3a70d142f9b3fe49d236242ddcfc910c88b">
+<index version="1" commit="4f9040cb6964a4eb37fddd306b33570893fb25c4">
   <category name="MIDI edits">
     <reapack name="mccrabney_Delete notes under edit cursor.lua" type="script" desc="Delete notes under edit cursor">
       <version name="1.0" author="mccrabney" time="2022-12-16T17:35:13Z">
@@ -85,6 +85,12 @@
       <version name="1.0" author="mccrabney" time="2021-03-30T15:26:19Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
         <source main="main">https://github.com/mccrabney/mccrabney/raw/9daf701af1b4dce7e5a55beef9b9ce358fa0549c/Razor%20Edits/mccrabney_razor%20edits_move%20RE%20&amp;or%20edit%20cursor%20by%20visible%20grid%20division%20(forwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_razor edits_nudge last-hit notes in REs (mousewheel).lua" type="script" desc="nudge last-hit notes whose note-ons are contained in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-17T16:15:00Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/d55efd9a2d1a14ebbe8ed1c799da866112441771/Razor%20Edits/mccrabney_razor%20edits_nudge%20last-hit%20notes%20in%20REs%20(mousewheel).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_razor edits_nudge notes in REs (mousewheel).lua" type="script" desc="select notes whose note-ons are contained in Razor Edit">
