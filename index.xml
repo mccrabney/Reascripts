@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney's Reascripts" commit="6eb69e9a9c4e54cabbde9f6941584dcfacd33f6f">
+<index version="1" name="mccrabney's Reascripts" commit="50a0226d3f8f1042bbe8311153033bebe8ec2534">
   <category name="MIDI edits">
     <reapack name="mccrabney_Delete notes under edit cursor.lua" type="script" desc="Delete notes under edit cursor">
       <version name="1.0" author="mccrabney" time="2022-12-16T17:35:13Z">
@@ -171,7 +171,7 @@
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
-{\pard \ql \f0 \sa180 \li0 \fi0 welcome to mccrabney's repo -\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 welcome to mccrabney's repo - -\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 here you will find some scripts that i have created to fulfill some needs i had in REAPER.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 the focus right now is to provide arrange-screen MIDI editing via Razor Edits. an older focus: keyboard control for razor edits.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 note that quickly retriggering scripts that move cursor/RE forwards/backwards will trigger the [ReaScript task control "Script name" is running in the background] message. for each action, select "new instance" and "remember choice" this will retrigger the script and it should behave as expected when hammering a directional key...\par}
