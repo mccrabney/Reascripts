@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.04
+ * Version: 1.05
 --]]
 
 -- README: 
