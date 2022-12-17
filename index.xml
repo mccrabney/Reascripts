@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<index version="1" commit="447d2b0b25740bd40645baa70e6d0efd56c526d5">
+  <category name="MIDI edits">
+    <reapack name="mccrabney_Delete notes under edit cursor.lua" type="script" desc="Delete notes under edit cursor">
+      <version name="1.0" author="mccrabney" time="2022-12-16T17:35:13Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/mccrabney/raw/bb84900f8e20cd258415ee40ab434dc4e6608165/MIDI%20edits/mccrabney_Delete%20notes%20under%20edit%20cursor.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <metadata>
+    <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 welcome to mccrabney's repo\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 here you will find some scripts that i have created to fulfill some needs i had in REAPER.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 the focus right now is to provide arrange-screen MIDI editing via Razor Edits. an older focus: keyboard control for razor edits.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 note that quickly retriggering scripts that move cursor/RE forwards/backwards will trigger the [ReaScript task control "Script name" is running in the background] message. for each action, select "new instance" and "remember choice" this will retrigger the script and it should behave as expected when hammering a directional key...\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 places i've been:\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Wheelboro, NC - Thumbville, South Carolina - Garnett, Virginia - Thimpleton, SC - Dimple, Kentucky - Marmott, Indiana - Thumb of God, Georgia - Chaff County, Alabama - Thorny Bush, Mississippi - Whiddle, South Carolina - Dickle, Tennessee - Abstinence, Tennessee - Gurth, Texas - Foyble Valley, Mississippi - Godhood, Arkansas - Berlapp, Tennessee - Kinkle Village, Florida - Gurney, Virginia - Mouthole, Kentucky - Mooth, Kentucky - Mutton Beach, South Carolina - Franton, North Carolina - Dunth, NC - Menthol, Georgia - Bunkle, Texas - Slaw Canyon, Tennessee - Hayte Village, Alabama - Brood, Kentucky - Blanders, North Carolina - Knobbit, Alabama - Burth, Virginia - Nawtonomy, Alabamistan - Dormancy, Florida - Putina, Kentucky - Sholder, Kentucky - Chinsville, Georgia - Bamboozle, NC - Dimple Canyon, Virginia - Twiddy, Alabama - Gerbage, Tennessee - Complicit, California - Obtoose, U.S.A. - Quisling, Arizona - Discretion, Ohio - Doopt, Florida - Dundle, Louisiana - Farcey, Georgia - Harblesburg, Texas - Sputumton, Florida - Transmission, Georgia - Bungle, Nevada - Phlemming, NC - Wooleye, Louisiana - Blueseets, Oklahoma - Barrph, NY - Pinkerton, Oregon - Bludgeon, NY - Swindelton, FL - Theeble, GA - Wwoshnington D.C. - Dewlapp, Kentucky - Gruntleton, GA\par}
+}
+]]></description>
+  </metadata>
+</index>
