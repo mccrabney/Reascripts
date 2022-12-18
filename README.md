@@ -4,12 +4,6 @@ here you will find some scripts that i have created to fulfill some needs i had 
 
 "mccrabney_Razor Edit Control Functions.lua" is the master script, it gets run by the individial function scripts.
 
-the focus right now is to provide arrange-screen MIDI editing via Razor Edits. an older focus: keyboard control for razor edits. 
-
-note that quickly retriggering scripts that move cursor/RE forwards/backwards will trigger 
-the [ReaScript task control "Script name" is running in the background] message.
-for each action, select "new instance" and "remember choice" 
-this will retrigger the script and it should behave as expected when hammering a directional key.
 
 
 
