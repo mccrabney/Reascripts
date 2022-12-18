@@ -14,11 +14,16 @@ multiple notes in multiple items can be enclosed in REs and copied/pasted direct
 REs can also be used to select MIDI notes (must enclose notes' NoteOns) for deeper editing in the MIDI editor.
 
 the select/copy scripts will operate most predictably using these MIDI editor settings:
-  -- One MIDI editor per track/project
-  -- Open all MIDI in the track/project
-  -- media item selection is linked to visibility OFF
-  -- selection is linked to editability OFF
-  -- Make secondary items editable by default
+
+ -- One MIDI editor per track/project
+
+-- Open all MIDI in the track/project
+
+-- media item selection is linked to visibility OFF
+
+-- selection is linked to editability OFF
+
+-- Make secondary items editable by default
 
 
 
