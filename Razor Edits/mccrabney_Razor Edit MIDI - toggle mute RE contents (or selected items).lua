@@ -25,5 +25,5 @@
     SetGlobalParam(job, _, _ )
   end
   ----------------------------
-  defer(main)
+  main()
 

@@ -27,5 +27,5 @@
     SetGlobalParam(job, task, clear)
   end
   ----------------------------
-  defer(main)
+  main()
 

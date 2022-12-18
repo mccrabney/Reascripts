@@ -9,6 +9,10 @@
 
 --[[
  * Changelog:
+ * v1.06 (2022-12-18)
+    + bringing old resize RE functions up to speed
+    + changed child scripts from deferred to one-offs (duh)
+    + 
  
  * v1.05 (2022-12-17)
     + general cleanup, excessive comments in code
@@ -41,7 +45,6 @@
 --    these functions will perform various edits on REs. 
 --    some MIDI actions look for a "last hit note" to use for the edits.
 --        if not already present, a reference track will be created for this. 
---    for "running in background" message, select "new instance" and "remember my answer for this script" 
 --    change the ppqIncr value for a different nudge amount
 
 -- TODO: 
@@ -391,7 +394,7 @@ function copySelectedMIDIinRE()
         --reaper.JS_Window_SetOpacity( windowHWND, alpha, 50 )
         local activeEditor = reaper.MIDIEditor_GetActive()
         reaper.MIDIEditor_OnCommand(activeEditor, 40010)   -- copy selected notes from inside ME
-        --reaper.MIDIEditor_OnCommand(activeEditor, 40794 )   -- close the ME
+        reaper.MIDIEditor_OnCommand(activeEditor, 40794 )   -- close the ME
         
             -- requires these MIDI editor settings:
                 -- One MIDI editor per track/project
@@ -417,64 +420,69 @@ end                                       -- function
      Incr/Decrement Razor Edit Start/End by Visible Grid     - mccrabney      
     --]]------------------------------]]--
     
-function resizeREbyVisibleGrid(job, incr, val)    -- where param informs direction of movement
-    reaper.PreventUIRefresh(1)
-    local size
-    gridval = GetVisibleGridDivision()
-    
-    if RazorEditSelectionExists(0) then      -- if a razor edit exists (else donothing)
-        local areas = GetRazorEdits()
+function resizeREbyVisibleGrid(job, incr)    -- where param informs direction of movement
+  reaper.PreventUIRefresh(1)
+  gridval = GetVisibleGridDivision()
+  if RazorEditSelectionExists(0) then      -- if a razor edit exists (else donothing)
+    local areas = GetRazorEdits()
+    for i=1, #areas do                      -- for each area
+      local area = areas[i];
+      local aStart = area.areaStart
+      local aEnd = area.areaEnd
 
-        for i=1, #areas do
-            local area = areas[i];
-            local aStart = area.areaStart
-            local aEnd = area.areaEnd
-            reaper.ShowConsoleMsg(aEnd) 
-            if job == 5 then ---- if we are incrementing/decrementing RE end
-                aEnd =  reaper.SnapToGrid(0, aEnd+gridval*incr) --increment/decrement by grid
-                if aEnd > aStart then
-                    if area.isEnvelope then
-                        SetEnvelopeRazorEdit(area.envelope, aStart, aEnd, true)
-                    else
-                        SetTrackRazorEdit(area.track, aStart, aEnd, true) 
-                    end
-                end
-            end    
-            
-            if job == 6 then ---- if we are incrementing/decrementing RE start
-                aStart =  reaper.SnapToGrid(0, aStart+gridval*incr) --increment/decrement by grid
-                if aEnd > aStart then
-                    if area.isEnvelope then
-                        SetEnvelopeRazorEdit(area.envelope, aStart, aEnd, true)
-                    else
-                        SetTrackRazorEdit(area.track, aStart, aEnd, true) 
-                    end    
-                end                                
-            end --if job  = 
-        end -- for
-    else  -- RazorEditSelectionExists() -- create if not present maybe deprecated now that check function is improved
-         
-        for i = 0, reaper.CountSelectedTracks(0)-1 do
-            track = reaper.GetSelectedTrack(0, i)
-            reaper.Main_OnCommand(40755, 0) -- Snapping: Save snap state
-            reaper.Main_OnCommand(40754, 0) -- Snapping: Enable snap
-            local cursorpos = reaper.GetCursorPosition()
-            
-            if job == 6 then 
-                if incr == 1 then SetTrackRazorEdit(track, cursorpos, cursorpos+gridval, true) end 
-            else
-                if incr == -1 then SetTrackRazorEdit(track, cursorpos-gridval, cursorpos, true) end 
-            end    
-            
-            reaper.Main_OnCommand(40756, 0) -- Snapping: Restore snap state
-            -- reaper.defer(function() end)
-        end
-    end  -- RazorEditSelectionExists()
-   
-   reaper.PreventUIRefresh(-1)
-   reaper.UpdateArrange() 
-        
-   reaper.Undo_OnStateChange2(proj, "change RE start/end by visible grid")
+      if job == 5 then                  -- if we are incrementing/decrementing RE end
+        aEnd = reaper.SnapToGrid(0, aEnd+gridval*incr) --increment/decrement by grid
+        if aEnd > aStart then
+          if area.isEnvelope then
+            SetEnvelopeRazorEdit(area.envelope, aStart, aEnd, true)
+          else                      -- if not envelope
+            SetTrackRazorEdit(area.track, aStart, aEnd, true) 
+          end   -- is envelope or track RE   
+        end     -- if aEnd > aStart
+      end       -- if job 5
+    
+      if job == 6 then               -- if we are incrementing/decrementing RE start
+        aStart =  reaper.SnapToGrid(0, aStart+gridval*incr) --increment/decrement by grid
+        if aEnd > aStart then
+          if area.isEnvelope then
+            SetEnvelopeRazorEdit(area.envelope, aStart, aEnd, true)
+          else
+            SetTrackRazorEdit(area.track, aStart, aEnd, true) 
+          end   -- is envelope or track RE   
+        end     -- if aEnd > aStart                                
+      end       -- if job == 6
+    end         -- for all RE areas
+      
+  else           -- if no RE, create a grid-sized RE 
+    local track
+    local cursorpos = reaper.GetCursorPosition()
+    reaper.Main_OnCommand(40755, 0) -- Snapping: Save snap state
+    reaper.Main_OnCommand(40754, 0) -- Snapping: Enable snap
+          
+    for i = 0, reaper.CountSelectedTracks(0)-1 do
+      track = reaper.GetSelectedTrack(0, i)
+    end           -- for each track
+    
+    if job == 5 then               -- moving RE end
+      if incr == 1 then 
+        SetTrackRazorEdit(track, cursorpos, cursorpos+gridval, true)
+      else
+        if incr == -1 then SetTrackRazorEdit(track, cursorpos-gridval, cursorpos, true) end
+      end         
+    elseif job == 6 then         -- moving RE start
+      if incr == 1 then 
+        SetTrackRazorEdit(track, cursorpos, cursorpos+gridval, true)
+      else
+        if incr == -1 then SetTrackRazorEdit(track, cursorpos-gridval, cursorpos, true) end
+      end             
+    end           -- if job   
+    
+    reaper.Main_OnCommand(40756, 0) -- Snapping: Restore snap state
+  end  -- RazorEditSelectionExists()
+  reaper.PreventUIRefresh(-1)
+  reaper.UpdateArrange() 
+  reaper.Undo_OnStateChange2(proj, "change RE start/end by visible grid")
+  
 end
 
 
@@ -484,38 +492,37 @@ end
     --]]------------------------------]]--
 
 function moveREbyVisibleGrid(incr)
-    --reaper.PreventUIRefresh(1)
-    --reaper.PreventUIRefresh(-1)
+  --reaper.PreventUIRefresh(1)
+  --reaper.PreventUIRefresh(-1)
+  local direction = incr
+  gridval = GetVisibleGridDivision()
     
-    local direction = incr
-    
-    gridval = GetVisibleGridDivision()
-    
-    if RazorEditSelectionExists(0) then
-        local test, position = GetRazorEdits()
-        local areas = GetRazorEdits()
-        
-        for i=1, #areas do
-            local area = areas[i];
-            local aStart = area.areaStart 
-            local aEnd = area.areaEnd
-            local aLength = aEnd - aStart
-            local cursorpos = reaper.GetCursorPosition()
-            local grid=cursorpos
-            aStart = reaper.SnapToGrid(0, aStart+gridval*incr)
-            aEnd =  reaper.SnapToGrid(0, aEnd+gridval*incr)
+  if RazorEditSelectionExists(0) then
+    local test, position = GetRazorEdits()
+    local areas = GetRazorEdits()
+
+    for i=1, #areas do
+      local area = areas[i];
+      local aStart = area.areaStart 
+      local aEnd = area.areaEnd
+      local aLength = aEnd - aStart
+      local cursorpos = reaper.GetCursorPosition()
+      local grid=cursorpos
+      aStart = reaper.SnapToGrid(0, aStart+gridval*incr)
+      aEnd =  reaper.SnapToGrid(0, aEnd+gridval*incr)
             
-            if area.isEnvelope then
-                SetEnvelopeRazorEdit(area.envelope, aStart, aEnd, true)
-            else
-                SetTrackRazorEdit(area.track, aStart, aEnd, true)
-                reaper.SetEditCurPos( aStart, true, false)
-            end -- if area.isEnvelope
-        end -- for
+      if area.isEnvelope then
+        SetEnvelopeRazorEdit(area.envelope, aStart, aEnd, true)
+      else
+        SetTrackRazorEdit(area.track, aStart, aEnd, true)
+        reaper.SetEditCurPos( aStart, true, false)
+      end           -- if area.isEnvelope
+    end             -- for all areas
+    
     else -- RazorEditSelectionExists( NO ):
-        local cursorpos = reaper.GetCursorPosition()
-        local grid = reaper.SnapToGrid(0, cursorpos+gridval*incr)
-        reaper.SetEditCurPos(grid,1,1)
+      local cursorpos = reaper.GetCursorPosition()
+      local grid = reaper.SnapToGrid(0, cursorpos+gridval*incr)
+      reaper.SetEditCurPos(grid,1,1)
     end  
     reaper.UpdateArrange()
     reaper.Undo_OnStateChange2(proj, "move RE/edit cursor by visible grid")

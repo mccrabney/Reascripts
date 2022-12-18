@@ -35,5 +35,4 @@
     end
   end
   
-  
-  defer(main)
+  main()

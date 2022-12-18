@@ -27,5 +27,5 @@
     reaper.Undo_EndBlock("Delete Notes Contained in Razer Edits", 0) -- End of the undo block. Leave it at the bottom of your main function.
   end
   ----------------------------
-  defer(main)
+  main()
 
