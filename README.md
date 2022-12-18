@@ -1,10 +1,24 @@
 welcome to mccrabney's repo - - 
 
-here you will find some scripts that i have created to fulfill some needs i had in REAPER.
+here you will find some scripts that i have created to fulfill some MIDI editing needs i had in REAPER.
 
-"mccrabney_Razor Edit Control Functions.lua" is the master script, it gets run by the individial function scripts.
+the Razor Edit-MIDI editing scripts are meant to be run from the main screen, and can work on multiple items/REs.
+they are inspired by grid-editing in JJOS 128XL, a third party OS for the MPC1000/2500 sequencers.
 
+the goal is to spend less time in the MIDI editor, so that users can delete/nudge MIDI from the main screen,
+using their MIDI hardware to dictate which notes are deleted by means of monitoring the "last note hit."
+    for example, delete the last note hit from a set of RE selections, 
+    or delete notes higher/lower and equal to the last hit note - or the note under the mouse cursor.
+    
+multiple notes in multiple items can be enclosed in REs and copied/pasted directly from the main screen.
+REs can also be used to select MIDI notes (must enclose notes' NoteOns) for deeper editing in the MIDI editor.
 
+the select/copy scripts will operate most predictably using these MIDI editor settings:
+  -- One MIDI editor per track/project
+  -- Open all MIDI in the track/project
+  -- media item selection is linked to visibility OFF
+  -- selection is linked to editability OFF
+  -- Make secondary items editable by default
 
 
 
