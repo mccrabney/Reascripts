@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="736bcaab8a9b7df0a7ea67b29ed20d626bf4e99e">
+<index version="1" name="mccrabney Reascripts" commit="cb56ccacce18a3719b5f16c287038ed1ae68b56b">
   <category name="MIDI edits">
     <reapack name="mccrabney_MIDI edit - delete notes under edit cursor.lua" type="script" desc="Delete notes under edit cursor">
       <version name="1.0" author="mccrabney" time="2022-12-18T17:34:53Z">
@@ -68,6 +68,15 @@
 ]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
       </version>
+      <version name="1.06" author="mccrabney" time="2022-12-20T13:46:38Z">
+        <changelog><![CDATA[+ RE dimension functions are now up to date
++ changed child scripts from deferred to one-offs (duh)
++ moved (get mouse note, item, take, position) info to dedicated function
++ updated RazorEditSelectionExists(1) to select item under mouse if no item is selected
++ mute: if no RE, mute item under mouse cursor instead
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/cb56ccacce18a3719b5f16c287038ed1ae68b56b/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
     </reapack>
     <reapack name="mccrabney_Razor Edit MIDI - copy selected notes in RE.lua" type="script" desc="copy notes whose note-ons are contained in Razor Edit">
       <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
@@ -133,6 +142,12 @@
       <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20nudge%20notes%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - RE contents - mute.lua" type="script" desc="toggle mute RE contents or selected items">
+      <version name="1.0" author="mccrabney" time="2022-12-20T13:46:38Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/cb56ccacce18a3719b5f16c287038ed1ae68b56b/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20RE%20contents%20-%20mute.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Razor Edit MIDI - select notes in editor.lua" type="script" desc="in MIDI editor, select notes in whose note-ons are contained in Razor Edit">
