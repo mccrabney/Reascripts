@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="cb56ccacce18a3719b5f16c287038ed1ae68b56b">
+<index version="1" name="mccrabney Reascripts" commit="c082cd544fd4dc6e14155e222f6831caa8eb5961">
   <category name="MIDI edits">
+    <reapack name="mccrabney_MIDI edit - delete notes that start at edit cursor.lua" type="script" desc="Delete notes that start at edit cursor">
+      <version name="1.0" author="mccrabney" time="2022-12-29T14:28:33Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4ebc8b14e2f176307febf397395d2b943a17d9c3/MIDI%20edits/mccrabney_MIDI%20edit%20-%20delete%20notes%20that%20start%20at%20edit%20cursor.lua</source>
+      </version>
+    </reapack>
     <reapack name="mccrabney_MIDI edit - delete notes under edit cursor.lua" type="script" desc="Delete notes under edit cursor">
       <version name="1.0" author="mccrabney" time="2022-12-18T17:34:53Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/736bcaab8a9b7df0a7ea67b29ed20d626bf4e99e/MIDI%20edits/mccrabney_MIDI%20edit%20-%20delete%20notes%20under%20edit%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - delete notes under mouse cursor.lua" type="script" desc="Delete notes under mouse cursor">
+      <version name="1.0" author="mccrabney" time="2022-12-29T14:28:33Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4ebc8b14e2f176307febf397395d2b943a17d9c3/MIDI%20edits/mccrabney_MIDI%20edit%20-%20delete%20notes%20under%20mouse%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - insert last-received CC message at edit cursor.lua" type="script" desc="Insert last-received CC in selected item under edit cursor">
+      <version name="1.1" author="mccrabney" time="2022-12-29T14:28:33Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4ebc8b14e2f176307febf397395d2b943a17d9c3/MIDI%20edits/mccrabney_MIDI%20edit%20-%20insert%20last-received%20CC%20message%20at%20edit%20cursor.lua</source>
       </version>
     </reapack>
   </category>
@@ -76,6 +94,11 @@
 + mute: if no RE, mute item under mouse cursor instead
 ]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/cb56ccacce18a3719b5f16c287038ed1ae68b56b/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.07" author="mccrabney" time="2022-12-29T14:29:06Z">
+        <changelog><![CDATA[+ fixes to RazorEditSelectionExists(make) to prevent error when no item is present
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/c082cd544fd4dc6e14155e222f6831caa8eb5961/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Razor Edit MIDI - copy selected notes in RE.lua" type="script" desc="copy notes whose note-ons are contained in Razor Edit">
