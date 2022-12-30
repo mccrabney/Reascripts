@@ -55,7 +55,7 @@ README:
         if not already present, a reference track will be created for this. 
     * you can change the ppqIncr value for a different nudge amount
     * this script currently only works on MIDI notes, not CCs
-	* requires (more or less) these MIDI editor settings:
+  * requires (more or less) these MIDI editor settings:
                 -- One MIDI editor per track/project
                 -- Open all MIDI in the track/project
                 -- media item selection is linked to visibility OFF
@@ -192,8 +192,24 @@ function MIDINotesInRE(task)
                     if n == 0 then undoMessage = "delete notes contained within RE" end
                   end
                     
-                -- EDIT: delete all notes <= note under mouse cursor whose noteons exist within Razor Edit
+                -- EDIT: delete all notes < note under mouse cursor whose noteons exist within Razor Edit
                 elseif task == 9 then   
+                  if mouseNote ~= nil and
+                    startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch > mouseNote then 
+                    reaper.MIDI_DeleteNote( take, n )
+                    if n == 0 then undoMessage = "delete notes <= note under mouse cursor in RE" end
+                  end     
+                    
+                -- EDIT: delete all notes > note under mouse cursor whose noteons exist within Razor Edit
+                elseif task == 10 then   
+                  if mouseNote ~= nil and
+                    startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch < mouseNote then 
+                    reaper.MIDI_DeleteNote( take, n ) 
+                    if n == 0 then undoMessage = "delete notes >= note under mouse cursor in RE" end
+                  end
+                  
+                -- EDIT: delete all notes <= note under mouse cursor whose noteons exist within Razor Edit
+                elseif task == 15 then   
                   if mouseNote ~= nil and
                     startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch >= mouseNote then 
                     reaper.MIDI_DeleteNote( take, n )
@@ -201,13 +217,13 @@ function MIDINotesInRE(task)
                   end     
                     
                 -- EDIT: delete all notes >= note under mouse cursor whose noteons exist within Razor Edit
-                elseif task == 10 then   
+                elseif task == 16 then   
                   if mouseNote ~= nil and
                     startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch <= mouseNote then 
                     reaper.MIDI_DeleteNote( take, n ) 
                     if n == 0 then undoMessage = "delete notes >= note under mouse cursor in RE" end
                   end
-                  
+                                    
            -----------------------------------------------------------------------
               -- select notes with razor edits:
                          
@@ -259,7 +275,7 @@ function MIDINotesInRE(task)
                     if n == 0 then undoMessage = "nudge last-hit notes in RE backwards" end
                   end
                   
-           -----------------------------------------------------------------------
+ --[[          -----------------------------------------------------------------------
               -- toggle mute notes with razor edits:
                 elseif task == 15 then  
                   if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
@@ -276,7 +292,7 @@ function MIDINotesInRE(task)
                     else reaper.MIDI_SetNote( take, n, nil, false, nil, nil, nil, nil, nil, nil)
                     end
                     if n == 0 then undoMessage = "mute last-hit notes in RE " end
-                  end                  
+                  end                  ]]--
                   
                 end     -- of MIDI task switch section
               end       -- for each note    
@@ -371,8 +387,8 @@ function getLastNoteHit()                       -- open the function
     --reaper.ShowConsoleMsg("This folder can be hidden and/or ignored from now on. \n")
     --reaper.ShowConsoleMsg("Close this window, trigger your reference, and re-run the edit. \n")
     
-    reaper.ShowMessageBox("A folder has been created to watch your MIDI controllers.\nRetrigger the reference MIDI and rerun the script.", "No MIDI reference", 0)	
-	
+    reaper.ShowMessageBox("A folder has been created to watch your MIDI controllers.\nRetrigger the reference MIDI and rerun the script.", "No MIDI reference", 0)  
+  
   end
   return lastNote         -- lastNoteHit is a referenced variable for edits
 end                                             -- end function
