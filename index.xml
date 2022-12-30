@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="c082cd544fd4dc6e14155e222f6831caa8eb5961">
+<index version="1" name="mccrabney Reascripts" commit="59dd44fa22318b123376e38ac5672c5e771c1bf7">
   <category name="MIDI edits">
     <reapack name="mccrabney_MIDI edit - delete notes that start at edit cursor.lua" type="script" desc="Delete notes that start at edit cursor">
       <version name="1.0" author="mccrabney" time="2022-12-29T14:28:33Z">
@@ -141,6 +141,30 @@
       <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20(other%20than%20last-hit).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes that are higher than notes under mouse cursor (inclusive).lua" type="script" desc="delete notes under mouse cursor (and higher) in Razor Edits">
+      <version name="1.0" author="mccrabney" time="2022-12-30T13:04:07Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/59dd44fa22318b123376e38ac5672c5e771c1bf7/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20that%20are%20higher%20than%20notes%20under%20mouse%20cursor%20(inclusive).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes that are higher than notes under mouse cursor.lua" type="script" desc="delete notes under mouse cursor (and higher) in Razor Edits">
+      <version name="1.0" author="mccrabney" time="2022-12-30T13:04:07Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/59dd44fa22318b123376e38ac5672c5e771c1bf7/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20that%20are%20higher%20than%20notes%20under%20mouse%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes that are lower than note under mouse cursor (inclusive).lua" type="script" desc="delete notes under mouse cursor (and lower) in Razor Edits">
+      <version name="1.0" author="mccrabney" time="2022-12-30T13:04:07Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/59dd44fa22318b123376e38ac5672c5e771c1bf7/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20that%20are%20lower%20than%20note%20under%20mouse%20cursor%20(inclusive).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes that are lower than note under mouse cursor.lua" type="script" desc="delete notes under mouse cursor (and lower) in Razor Edits">
+      <version name="1.0" author="mccrabney" time="2022-12-30T13:04:07Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/59dd44fa22318b123376e38ac5672c5e771c1bf7/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20that%20are%20lower%20than%20note%20under%20mouse%20cursor.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Razor Edit MIDI - delete notes under mouse cursor (and higher).lua" type="script" desc="delete notes under mouse cursor (and higher) in Razor Edits">
