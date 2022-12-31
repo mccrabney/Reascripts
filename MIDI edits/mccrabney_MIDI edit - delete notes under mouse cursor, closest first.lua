@@ -52,16 +52,17 @@ function main()
   if selectedItem ~= nil then 
     takes = reaper.CountTakes(selectedItem) 
   end
-  local numberNotes = 0
   
+  local numberNotes = 0
   if takes ~= nil then 
     for t = 0, takes-1 do -- Loop through all takes within each selected item
       if reaper.TakeIsMIDI(take) then           -- make sure that take is MIDI
-        local notesUnderCursor = {}
-        local pitchUnderCursor = {}
-        local notesUnderCursorClosest = {}
-        local sortedNotes = {}
-         
+        local pitchUnderCursor = {}             -- pitches of notes under the cursor (for undo)
+        local pitchSorted = {}                  -- ^ same, but to be sorted
+        local notesUnderCursor = {}             -- item notecount numbers under the cursor
+        local distanceFromMouse = {}            -- corresponding distances of notes from mouse
+        local distanceSorted = {}               -- ^ same, but to be sorted
+
         notesCount, _, _ = reaper.MIDI_CountEvts(take)        -- count notes in current take
         for n = 0, notesCount do                              -- for each note, from first to last
           _, selected, _, startppqposOut, endppqposOut, _, pitch, _ = reaper.MIDI_GetNote(take, n) -- get note start/end position
@@ -69,24 +70,46 @@ function main()
           if startppqposOut <= position_ppq and endppqposOut >= position_ppq then -- is current note the note under the cursor?
             numberNotes = numberNotes+1                           -- add to count of how many notes are under mouse cursor
             pitchUnderCursor[numberNotes] = pitch                 -- get the pitch to reference for undo message
-            notesUnderCursor[numberNotes] = n                     -- add the note number to the array
-            notesUnderCursorClosest[numberNotes] = position_ppq - startppqposOut -- put distance to cursor in index position reference table
-            sortedNotes[numberNotes] = position_ppq - startppqposOut             -- put distance to cursor in index position of sorting table
+            pitchSorted[numberNotes] = pitch
+            notesUnderCursor[numberNotes] = n                     -- add the notecount number to the array
+            distanceFromMouse[numberNotes] = position_ppq - startppqposOut       -- put distance to cursor in index position reference table
+            distanceSorted[numberNotes] = position_ppq - startppqposOut          -- put distance to cursor in index position of sorting table
           end                                                                    -- if current note is under the cursor
         end                                                                      -- for each note
         
-        table.sort(sortedNotes)                                     -- sort the table so the closest noteon is at index position 1
-        local closestNoteDistance = sortedNotes[1]                    -- find the distance from mouse cursor of the closest noteon
-        local closestNote                                             -- initialize closestnote variable
-        for i = 1, #notesUnderCursorClosest do                        -- for each entry in the unsorted array
-          
-          if closestNoteDistance == notesUnderCursorClosest[i] then    -- if the entry matchest the closest note distance from mouse cursor
-            closestNote = i                                         -- get the index value of the closest note
-            reaper.MIDI_DeleteNote( take, notesUnderCursor[closestNote] ) 
-            reaper.Undo_OnStateChange2(proj, "deleted note " .. pitchUnderCursor[closestNote] )
+        table.sort(distanceSorted)  -- sort the note table so the closest noteon is at index position 1
+        table.sort(pitchSorted)     -- sort the pitch table so the lowest pitch is at index position 1
 
+        local closestNoteDistance = distanceSorted[1]                 -- find the distance from mouse cursor of the closest noteon
+        local lowestPitch = pitchSorted[1]                            -- find the lowest pitch in array
+        local closestNote                                             -- initialize closestnote variable
+        local sameDistance = 0                                        -- initialize the sameDistance variable
+        local sameDistanceTable = {}
+        
+        for j = 1, #distanceSorted do                                 -- for each entry in the sorted distance array
+          if distanceSorted[j] == distanceSorted[j+1] then            -- if entries are equal
+            sameDistance = sameDistance+1
+          end
+        end
+        
+        for i = 1, #distanceFromMouse do                        -- for each entry in the unsorted distance array
+          if closestNoteDistance == distanceFromMouse[i] then   -- if the entry matchest the closest note distance from mouse cursor
+            if sameDistance == 0 then 
+              closestNote = i                                   -- get the index value of the closest note
+              reaper.MIDI_DeleteNote( take, notesUnderCursor[closestNote] ) 
+              reaper.Undo_OnStateChange2(proj, "deleted note " .. pitchUnderCursor[closestNote] )
+            end
           end                                     
         end                                                         -- end for each entry in array
+        
+        if sameDistance > 0 then                          -- if there are notes that are the same distance from mouse
+          for t = 1, #pitchUnderCursor do                 -- for each entry in the unsorted pitch array
+            if lowestPitch == pitchUnderCursor[t] then    -- if the entry matchest the closest note distance from mouse cursor
+              reaper.MIDI_DeleteNote( take, t ) 
+              reaper.Undo_OnStateChange2(proj, "deleted note " .. t )
+            end
+          end
+        end
         
         reaper.MIDI_Sort(take)
         end
