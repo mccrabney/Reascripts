@@ -8,7 +8,9 @@ they are inspired by grid-editing in JJOS 128XL, a third party OS for the MPC100
 the goal is to spend less time in the MIDI editor, so that users can delete/nudge MIDI from the main screen,
 using their MIDI hardware to dictate which notes are deleted by means of monitoring the "last note hit."
     for example, delete the last note hit from a set of RE selections, 
-    or delete notes higher/lower and equal to the last hit note - or the note under the mouse cursor.
+    or delete notes higher/lower and equal to the last hit note - or the note under the mouse cursor,
+    or insert last-received CC messages at edit cursor position,
+    etc
     
 multiple notes in multiple items can be enclosed in REs and copied/pasted directly from the main screen.
 REs can also be used to select MIDI notes (must enclose notes' NoteOns) for deeper editing in the MIDI editor.
