@@ -9,6 +9,9 @@
  
 --[[
  * Changelog:
+ * v1.2 (2023-1-1)
+   + fixed add js by filename issue
+ 
  * v1.1 (2022-12-29)
    + Initial Release
 --]]
