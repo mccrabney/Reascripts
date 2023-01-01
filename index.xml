@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="ac0efe72b90900edaaafb0b96fe150b7e09c8d4c">
+<index version="1" name="mccrabney Reascripts" commit="5705a1ceafdfbb3fd85f01301b7290c5fb5f2019">
   <category name="MIDI edits">
     <reapack name="mccrabney_MIDI edit - delete notes that start at edit cursor.lua" type="script" desc="Delete notes that start at edit cursor">
       <version name="1.0" author="mccrabney" time="2022-12-29T14:28:33Z">
@@ -105,6 +105,11 @@
         <changelog><![CDATA[+ fixes to RazorEditSelectionExists(make) to prevent error when no item is present
 ]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/c082cd544fd4dc6e14155e222f6831caa8eb5961/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.08" author="mccrabney" time="2023-01-01T15:07:10Z">
+        <changelog><![CDATA[+ fixed add fx by js filename
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/5705a1ceafdfbb3fd85f01301b7290c5fb5f2019/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Razor Edit MIDI - copy selected notes in RE.lua" type="script" desc="copy notes whose note-ons are contained in Razor Edit">
@@ -230,7 +235,7 @@
 {\pard \ql \f0 \sa180 \li0 \fi0 welcome to mccrabney's repo - -\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 here you will find some scripts that i have created to fulfill some MIDI editing needs i had in REAPER.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 the Razor Edit-MIDI editing scripts are meant to be run from the main screen, and can work on multiple items/REs. they are inspired by grid-editing in JJOS 128XL, a third party OS for the MPC1000/2500 sequencers.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 the goal is to spend less time in the MIDI editor, so that users can delete/nudge MIDI from the main screen, using their MIDI hardware to dictate which notes are deleted by means of monitoring the "last note hit." for example, delete the last note hit from a set of RE selections, or delete notes higher/lower and equal to the last hit note - or the note under the mouse cursor.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 the goal is to spend less time in the MIDI editor, so that users can delete/nudge MIDI from the main screen, using their MIDI hardware to dictate which notes are deleted by means of monitoring the "last note hit." for example, delete the last note hit from a set of RE selections, or delete notes higher/lower and equal to the last hit note - or the note under the mouse cursor, or insert last-received CC messages at edit cursor position, etc\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 multiple notes in multiple items can be enclosed in REs and copied/pasted directly from the main screen. REs can also be used to select MIDI notes (must enclose notes' NoteOns) for deeper editing in the MIDI editor.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 the select/copy scripts will operate most predictably using these MIDI editor settings:\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 -- One MIDI editor per track/project\par}
