@@ -4,12 +4,15 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.07
+ * Version: 1.08
  * donation link: 
 --]]
 
 --[[
  * Changelog:
+ * v1.08 (2023-1-1)
+    + fixed add fx by js filename
+ 
  * v1.07 (2022-12-28)
     + fixes to RazorEditSelectionExists(make) to prevent error when no item is present
      
