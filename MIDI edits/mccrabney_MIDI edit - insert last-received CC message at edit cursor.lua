@@ -14,8 +14,8 @@
 --]]
 
 --[[
-	NOTE: This is a "main screen script" - if using it from the MIDI editor, pass through the 
-	keyboard shortcut to the main screen so that the script gets run.
+  NOTE: This is a "main screen script" - if using it from the MIDI editor, pass through the 
+  keyboard shortcut to the main screen so that the script gets run.
 --]]
 
 
@@ -42,7 +42,7 @@ function getLastCC()                            -- observe/create reference trac
     refTrack = reaper.GetTrack( 0, numTracks)     -- get the new track
     _, _ = reaper.GetSetMediaTrackInfo_String(refTrack, "P_NAME", "lastmidi", true)
         -- using data byte 1 of midi notes received by JS MIDI Examiner - thanks, schwa!
-    reaper.TrackFX_AddByName( refTrack, "MIDI Examiner", false, 1 )  -- add js
+    reaper.TrackFX_AddByName( refTrack, "midi_examine", false, 1 )  -- add js
     reaper.SetMediaTrackInfo_Value( refTrack, "D_VOL", 0 )      -- volume off
     reaper.SetMediaTrackInfo_Value( refTrack, 'I_FOLDERDEPTH', 1 )   -- set as folder
     reaper.InsertTrackAtIndex( numTracks+1, false ) -- insert another track
