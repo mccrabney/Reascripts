@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="5705a1ceafdfbb3fd85f01301b7290c5fb5f2019">
+<index version="1" name="mccrabney Reascripts" commit="dcadcf15b94ccde9056bce17039881ee60b392b2">
   <category name="MIDI edits">
     <reapack name="mccrabney_MIDI edit - delete notes that start at edit cursor.lua" type="script" desc="Delete notes that start at edit cursor">
       <version name="1.0" author="mccrabney" time="2022-12-29T14:28:33Z">
@@ -26,9 +26,9 @@
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - insert last-received CC message at edit cursor.lua" type="script" desc="Insert last-received CC in selected item under edit cursor">
-      <version name="1.1" author="mccrabney" time="2022-12-29T14:28:33Z">
+      <version name="1.1" author="mccrabney" time="2023-01-01T19:05:38Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/4ebc8b14e2f176307febf397395d2b943a17d9c3/MIDI%20edits/mccrabney_MIDI%20edit%20-%20insert%20last-received%20CC%20message%20at%20edit%20cursor.lua</source>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/dcadcf15b94ccde9056bce17039881ee60b392b2/MIDI%20edits/mccrabney_MIDI%20edit%20-%20insert%20last-received%20CC%20message%20at%20edit%20cursor.lua</source>
       </version>
     </reapack>
   </category>
