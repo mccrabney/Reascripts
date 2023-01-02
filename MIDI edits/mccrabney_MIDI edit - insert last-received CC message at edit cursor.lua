@@ -4,14 +4,17 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.3
+ * Version: 1.4
 --]]
  
 --[[
  * Changelog:
+ * v1.4 (2023-1-2)
+   + added sanity check to prevent addition of cc 123, whether or not it actually did anything
+   + added better undo messaging
+
  * v1.3 (2023-1-2)
   + fixed overzealous same-location, not-last-received CC deletion to support inserting multiple CCs in same ppqpos
-  + added sanity check to prevent addition of cc 123, whether or not it actually did anything
 
  * v1.2 (2023-1-1)
     + fixed add js by filename issue
