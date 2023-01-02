@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="ef4481193c13498eb1d5335c078d7d9519f4b820">
+<index version="1" name="mccrabney Reascripts" commit="a5ebc2d1b14021a5bc5115a5c179703f2305fda5">
   <category name="MIDI edits">
     <reapack name="mccrabney_MIDI edit - delete notes that start at edit cursor.lua" type="script" desc="Delete notes that start at edit cursor">
       <version name="1.0" author="mccrabney" time="2022-12-29T14:28:33Z">
@@ -31,6 +31,12 @@
 + added sanity check to prevent addition of cc 123, whether or not it actually did anything
 ]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/ef4481193c13498eb1d5335c078d7d9519f4b820/MIDI%20edits/mccrabney_MIDI%20edit%20-%20insert%20last-received%20CC%20message%20at%20edit%20cursor.lua</source>
+      </version>
+      <version name="1.4" author="mccrabney" time="2023-01-02T15:28:01Z">
+        <changelog><![CDATA[+ added sanity check to prevent addition of cc 123, whether or not it actually did anything
++ added better undo messaging
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/a5ebc2d1b14021a5bc5115a5c179703f2305fda5/MIDI%20edits/mccrabney_MIDI%20edit%20-%20insert%20last-received%20CC%20message%20at%20edit%20cursor.lua</source>
       </version>
     </reapack>
   </category>
