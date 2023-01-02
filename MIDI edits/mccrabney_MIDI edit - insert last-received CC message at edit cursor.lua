@@ -4,19 +4,22 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.2
+ * Version: 1.3
 --]]
  
 --[[
  * Changelog:
+ * v1.3 (2023-1-2)
+	+ fixed overzealous same-location, not-last-received CC deletion to support inserting multiple CCs in same ppqpos
  * v1.2 (2023-1-1)
-   + fixed add js by filename issue
+    + fixed add js by filename issue
  
  * v1.1 (2022-12-29)
    + Initial Release
 --]]
 
 --[[
+
   NOTE: This is a "main screen script" - if using it from the MIDI editor, pass through the 
   keyboard shortcut to the main screen so that the script gets run.
 --]]
@@ -86,7 +89,7 @@ function insertLastCC(curPos)
           ccCount, _, _ = reaper.MIDI_CountEvts(take) -- count cc in current take  
           for n = ccCount-1, 0, -1 do         --- for each cc, starting with last in item
             _, _, _, ppqpos, _, _, currentCC, _ = reaper.MIDI_GetCC( take, n )                
-            if ppqpos == editCursor_ppq_pos then reaper.MIDI_DeleteCC( take, n ) end
+            if ppqpos == editCursor_ppq_pos and currentCC == lastCC then reaper.MIDI_DeleteCC( take, n ) end
           end
           reaper.MIDI_InsertCC( take, 0, 0, editCursor_ppq_pos, 191, channel, lastCC, lastCCvalue)    
         end
