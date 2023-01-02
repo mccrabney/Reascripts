@@ -10,7 +10,9 @@
 --[[
  * Changelog:
  * v1.3 (2023-1-2)
-	+ fixed overzealous same-location, not-last-received CC deletion to support inserting multiple CCs in same ppqpos
+  + fixed overzealous same-location, not-last-received CC deletion to support inserting multiple CCs in same ppqpos
+  + added sanity check to prevent addition of cc 123, whether or not it actually did anything
+
  * v1.2 (2023-1-1)
     + fixed add js by filename issue
  
@@ -74,7 +76,7 @@ end                                             -- end function
 
 function insertLastCC(curPos)
   
-  reaper.Undo_BeginBlock()
+  -- reaper.Undo_BeginBlock()
   lastCC, lastCCvalue, isCC = getLastCC()
   --reaper.ShowConsoleMsg(isCC)
   if isCC ~= nil and isCC >= 176 and isCC <= 191 then             -- if the last received message was a CC
@@ -91,12 +93,15 @@ function insertLastCC(curPos)
             _, _, _, ppqpos, _, _, currentCC, _ = reaper.MIDI_GetCC( take, n )                
             if ppqpos == editCursor_ppq_pos and currentCC == lastCC then reaper.MIDI_DeleteCC( take, n ) end
           end
-          reaper.MIDI_InsertCC( take, 0, 0, editCursor_ppq_pos, 191, channel, lastCC, lastCCvalue)    
+          if lastCC ~= 123 then
+            reaper.MIDI_InsertCC( take, 0, 0, editCursor_ppq_pos, 191, channel, lastCC, lastCCvalue)
+            reaper.Undo_OnStateChange2(proj, "inserted CC " .. lastCC .. ", value " .. lastCCvalue )
+          end
         end
       end
     end
     reaper.UpdateArrange()
-    reaper.Undo_EndBlock('Insert last-received CC at edit cursor', -1)
+    -- reaper.Undo_EndBlock('Insert last-received CC at edit cursor', -1)
   end
   
 end
