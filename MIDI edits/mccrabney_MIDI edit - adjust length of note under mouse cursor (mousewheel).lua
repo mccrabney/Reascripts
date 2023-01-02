@@ -48,9 +48,9 @@ function main()
   
    _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
   if mouse_scroll > 0 then 
-    ppqIncr = 50
+    ppqIncr =100                            -- how many ticks to move noteoff forwards, adjust as desired
   elseif mouse_scroll < 0 then 
-    ppqIncr = -50
+    ppqIncr = -100                          -- how many ticks to move noteoff backwards, adjust as desired
   end
   
   local undoMessage
