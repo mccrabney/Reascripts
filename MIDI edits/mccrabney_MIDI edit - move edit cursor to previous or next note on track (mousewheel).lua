@@ -1,5 +1,5 @@
 --[[
- * ReaScript Name: move edit cursor to previous MIDI note in track
+ * ReaScript Name: move edit cursor to next/previous MIDI note in track
  * Author: mccrabney
  * Licence: GPL v3
  * REAPER: 6.0
@@ -10,7 +10,7 @@
 --[[
  * Changelog:
  * v1.1 (2023-1-3)
-   + fixed in-between, end, start cursor pos  
+   + fixed in-between, end, start cursor pos 
  
  * v1.0 (2023-1-3)
    + Initial Release
@@ -39,9 +39,14 @@ local cursPos = reaper.GetCursorPosition()
 local track = reaper.GetSelectedTrack( 0, CountTrack-1 )
 local CountTrItem = reaper.CountTrackMediaItems(track)
 
-incr = -1
-undoMessage = "move edit cursor to prev note"
-
+_,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
+if mouse_scroll > 0 then 
+  incr = 1
+  undoMessage = "move edit cursor to next note"
+elseif mouse_scroll < 0 then 
+  incr = -1
+  undoMessage = "move edit cursor to prev note"
+end
 
 if CountTrack == 0 then no_undo() return end  -- if no tracks, just give it up and quit
   
@@ -84,14 +89,24 @@ if cursNote == nil then
     
                   -- if cursor position is in between notes 
     if cursPos > startPosTable[t] and cursPos > endPosTable[t] and cursPos < startPosTable[t+1] then
-      if incr == -1 then cursNote = t+1 end
+      if     incr ==  1 then cursNote = t 
+      elseif incr == -1 then cursNote = t+1 end
     end
   end
 end
 --]]
 
+--------------------------forwards-----------------------
+if incr == 1 then  
+  if cursNote + incr <= tallyNotes then -- if cursor+1 won't exceed total number of notes, 
+    while startPosTable[cursNote] == startPosTable[cursNote + incr] do  -- if next note is in same place as note,
+      incr = incr - 1                                  -- add another tick to incr to blast past the layered notes
+    end
+    reaper.SetEditCurPos(startPosTable[cursNote + incr], 1, 0 )  -- set edit cursor to next note position
+  end
+
 ----------------------------backwards-----------------------------------------
-if incr == -1 then 
+elseif incr == -1 then 
 
   if cursNote ~= nil and cursNote + incr >= 1 then -- if cursor is in note and movement won't > 1, 
     while startPosTable[cursNote] == startPosTable[cursNote + incr] do  -- if next note is in same place as note,
