@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="c0131222f0ef88a5203fb41c46e92534feb7b574">
+<index version="1" name="mccrabney Reascripts" commit="29125e43a21cd301b2caa323dfa0d133a331731a">
   <category name="MIDI edits">
     <reapack name="mccrabney_MIDI edit - adjust length of note under mouse cursor (mousewheel).lua" type="script" desc="Delete notes under mouse cursor">
       <version name="1.0" author="mccrabney" time="2023-01-02T19:17:22Z">
@@ -45,10 +45,15 @@
         <source main="main">https://github.com/mccrabney/Reascripts/raw/a5ebc2d1b14021a5bc5115a5c179703f2305fda5/MIDI%20edits/mccrabney_MIDI%20edit%20-%20insert%20last-received%20CC%20message%20at%20edit%20cursor.lua</source>
       </version>
     </reapack>
-    <reapack name="mccrabney_MIDI edit - move edit cursor to next note on track.lua" type="script" desc="move edit cursor to next MIDI note on track">
+    <reapack name="mccrabney_MIDI edit - move edit cursor to next note on track.lua" type="script" desc="move edit cursor to next MIDI note in track">
       <version name="1.0" author="mccrabney" time="2023-01-03T17:09:32Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/c0131222f0ef88a5203fb41c46e92534feb7b574/MIDI%20edits/mccrabney_MIDI%20edit%20-%20move%20edit%20cursor%20to%20next%20note%20on%20track.lua</source>
+      </version>
+      <version name="1.1" author="mccrabney" time="2023-01-03T20:57:09Z">
+        <changelog><![CDATA[+ fixed in-between, end, start cursor pos 
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/3cb8f1d4f61e62033593d4b3cf9b8f650009214d/MIDI%20edits/mccrabney_MIDI%20edit%20-%20move%20edit%20cursor%20to%20next%20note%20on%20track.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - move edit cursor to previous note on track.lua" type="script" desc="move edit cursor to previous MIDI note in track">
@@ -56,11 +61,17 @@
         <changelog><![CDATA[+ Initial Release]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/c0131222f0ef88a5203fb41c46e92534feb7b574/MIDI%20edits/mccrabney_MIDI%20edit%20-%20move%20edit%20cursor%20to%20previous%20note%20on%20track.lua</source>
       </version>
+      <version name="1.1" author="mccrabney" time="2023-01-03T20:57:09Z">
+        <changelog><![CDATA[+ fixed in-between, end, start cursor pos  
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/3cb8f1d4f61e62033593d4b3cf9b8f650009214d/MIDI%20edits/mccrabney_MIDI%20edit%20-%20move%20edit%20cursor%20to%20previous%20note%20on%20track.lua</source>
+      </version>
     </reapack>
-    <reapack name="mccrabney_MIDI edit - move edit cursor to previous or next  note on track (mousewheel).lua" type="script" desc="move edit cursor to next/previous MIDI note in track">
-      <version name="1.0" author="mccrabney" time="2023-01-03T17:09:32Z">
-        <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/c0131222f0ef88a5203fb41c46e92534feb7b574/MIDI%20edits/mccrabney_MIDI%20edit%20-%20move%20edit%20cursor%20to%20previous%20or%20next%20%20note%20on%20track%20(mousewheel).lua</source>
+    <reapack name="mccrabney_MIDI edit - move edit cursor to previous or next note on track (mousewheel).lua" type="script" desc="move edit cursor to next/previous MIDI note in track">
+      <version name="1.1" author="mccrabney" time="2023-01-03T20:58:19Z">
+        <changelog><![CDATA[+ fixed in-between, end, start cursor pos 
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/29125e43a21cd301b2caa323dfa0d133a331731a/MIDI%20edits/mccrabney_MIDI%20edit%20-%20move%20edit%20cursor%20to%20previous%20or%20next%20note%20on%20track%20(mousewheel).lua</source>
       </version>
     </reapack>
   </category>
