@@ -9,6 +9,9 @@
  
 --[[
  * Changelog:
+ * v1.2 (2023-1-3)
+   + fixed nil comparisons
+ 
  * v1.1 (2023-1-3)
    + fixed in-between, end, start cursor pos 
  
@@ -48,8 +51,8 @@ elseif mouse_scroll < 0 then
   undoMessage = "move edit cursor to prev note"
 end
 
-if CountTrack == 0 then no_undo() return end  -- if no tracks, just give it up and quit
-  
+if CountTrack   == 0 then no_undo() return end  -- if no tracks or items, just give it up and quit
+if CountTrItems == 0 then no_undo() return end  
 ----------------------- this if statement puts all track notes in a big table -------------
   
 for i = 0, CountTrItem-1 do                       
@@ -59,7 +62,8 @@ for i = 0, CountTrItem-1 do
     
   if IsMIDI then                 -- if take is MIDI
     notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take
-
+    if notesCount == 0  then no_undo() return end  -- if no notes, give up and quit
+ 
     for n = 0, notesCount-1 do               -- for each note
       _, _, _, startppqposOut, endppqposOut, _, _, _ = reaper.MIDI_GetNote(take, n) 
       tallyNotes = tallyNotes+1
