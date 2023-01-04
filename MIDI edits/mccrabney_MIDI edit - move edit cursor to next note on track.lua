@@ -95,7 +95,7 @@ end
 
 --------------------------forwards-----------------------
 if incr == 1 then  
-  if cursNote + incr <= tallyNotes then -- if cursor+1 won't exceed total number of notes, 
+  if cursNote ~= nil and cursNote + incr <= tallyNotes then -- if cursor+1 won't exceed total number of notes, 
     while startPosTable[cursNote] == startPosTable[cursNote + incr] do  -- if next note is in same place as note,
       incr = incr - 1                                  -- add another tick to incr to blast past the layered notes
     end
