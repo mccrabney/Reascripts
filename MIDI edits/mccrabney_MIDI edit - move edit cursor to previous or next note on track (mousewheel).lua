@@ -4,11 +4,14 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.2
+ * Version: 1.3
 --]]
  
 --[[
  * Changelog:
+ * v1.3 (2023-1-4)
+   + fixed another nil comparison
+
  * v1.2 (2023-1-3)
    + fixed nil comparisons
  
@@ -69,7 +72,7 @@ for i = 0, CountTrItem-1 do
       tallyNotes = tallyNotes+1
       startPosTable[tallyNotes] = reaper.MIDI_GetProjTimeFromPPQPos(take, startppqposOut) -- prj time of noteon ^
       endPosTable[tallyNotes] = reaper.MIDI_GetProjTimeFromPPQPos(take, endppqposOut) -- prj time of noteoff ^
-      notePitchTable[tallyNotes] = pitch     -- pitch of current note
+      --notePitchTable[tallyNotes] = pitch     -- pitch of current note, unused for now
                                              -- if cursor is in current note
       if cursPos >= startPosTable[tallyNotes] and cursPos < endPosTable[tallyNotes] then 
         cursNote = tallyNotes                -- get the note the cursor is in
@@ -102,7 +105,7 @@ end
 
 --------------------------forwards-----------------------
 if incr == 1 then  
-  if cursNote + incr <= tallyNotes then -- if cursor+1 won't exceed total number of notes, 
+  if cursNote ~= nil and cursNote + incr <= tallyNotes then -- if cursor+1 won't exceed total number of notes, 
     while startPosTable[cursNote] == startPosTable[cursNote + incr] do  -- if next note is in same place as note,
       incr = incr - 1                                  -- add another tick to incr to blast past the layered notes
     end
