@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="9b2f5ddb0f25226fda0390e978aae3adc2ff7743">
+<index version="1" name="mccrabney Reascripts" commit="4310e1db978612a1400bc22d8b9abbdf64bbfe7f">
   <category name="MIDI edits">
     <reapack name="mccrabney_MIDI edit - adjust length of note under mouse cursor (mousewheel).lua" type="script" desc="Delete notes under mouse cursor">
       <version name="1.0" author="mccrabney" time="2023-01-02T19:17:22Z">
@@ -171,6 +171,12 @@
         <changelog><![CDATA[+ fixed add fx by js filename
 ]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/5705a1ceafdfbb3fd85f01301b7290c5fb5f2019/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.09" author="mccrabney" time="2023-01-05T19:04:55Z">
+        <changelog><![CDATA[+ fixed MIDI scripts trying to work on audio items and creating unwanted REs
++ 
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4310e1db978612a1400bc22d8b9abbdf64bbfe7f/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Razor Edit MIDI - copy selected notes in RE.lua" type="script" desc="copy notes whose note-ons are contained in Razor Edit">
