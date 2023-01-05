@@ -4,12 +4,16 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.08
+ * Version: 1.09
  * donation link: 
 --]]
 
 --[[
  * Changelog:
+ * v1.09 (2023-1-5)
+    + fixed MIDI scripts trying to work on audio items and creating unwanted REs
+    + 
+ 
  * v1.08 (2023-1-1)
     + fixed add fx by js filename
  
@@ -102,6 +106,8 @@ function SetGlobalParam(job, task, clear, val)   -- get job and details from chi
   
 end
 
+
+
 ---------------------------------------------------------------------
     --[[------------------------------[[--
           do edits to notes in RE   -- mccrabney        
@@ -115,15 +121,16 @@ function MIDINotesInRE(task)
   local mouseTake                 -- take under mouse
   local mouseItem                 -- item under mouse
   local mouse_position_ppq        -- ppq pos of mouse at function call
-
+  
   reaper.PreventUIRefresh(1)
   
-  if RazorEditSelectionExists(1) then      -- if no razor edit, create one out of selected item
-                                           -- if no item is selected, select item under mouse 
-    if task == 9 or 10 then                -- if task is mouse-related,
-      mouseNote, mouseTake, mouseItem, mouse_position_ppq = getMouseInfo()
-    end
-    
+  if task == 9 or 10 then                -- if task is mouse-related,
+    mouseNote, mouseTake, mouseItem, mouse_position_ppq = getMouseInfo()
+  end
+                  -- if it's not MIDI, or of there's no item under cursor, quit everything
+  if mouseTake ~= nil and reaper.TakeIsMIDI(mouseTake) == 0 then return end      
+  
+  if RazorEditSelectionExists(1, 1) then      -- if no razor edit, create one out of selected item                                         -- if no item is selected, select item under mouse 
     local areas = GetRazorEdits()          -- get all areas 
     for i = 1, #areas do                   -- for each razor edit, get each item
       local areaData = areas[i]
@@ -430,7 +437,7 @@ end        -- function
 function copySelectedMIDIinRE()
   reaper.PreventUIRefresh(1)
   MIDINotesInRE(5)                            -- select RE-enclosed notes
-  if RazorEditSelectionExists(0) then         -- if RE exists -- unnecessary?
+  if RazorEditSelectionExists(0,1) then       -- if RE exists (don't make if not) -- unnecessary?
     local areas = GetRazorEdits()             -- get all areas 
     local areaData = areas[1]                 -- look at the first area
     if not areaData.isEnvelope then           -- if not envelope
@@ -927,12 +934,14 @@ end
           RE exist? if not/if desired, create them  -- thanks, sonictim and julian sader!          
     --]]------------------------------]]--
 
-function RazorEditSelectionExists(make)
+function RazorEditSelectionExists(make,itemType)    ---itemType: 0 for audio, 1 for MIDI
   
   reaper.Undo_BeginBlock2(0)          -- make them from selected items.
-  
+
+  local midiFlag = 0
   local itemUnderMouse
   local itemCount = reaper.CountSelectedMediaItems(0)  -- how many items are selected
+
   if itemCount == 0 then                               -- if none,
     _, _, itemUnderMouse, _ = getMouseInfo()           -- get item under mouse
     if itemUnderMouse ~= nil then 
@@ -947,11 +956,13 @@ function RazorEditSelectionExists(make)
     if x ~= "" then return true end            -- if present, return true
   end                                          -- end for each track
     
-  if x == nil and make == 1 and itemCount ~= 0 then       -- if no RE, but one is needed,
+  if x == nil and make == 1 and itemCount ~= 0 then  -- if no RE, but one is needed,
     --if itemUnderMouse ~= nil then
       tS = {}
       for i = 0, itemCount -1 do               -- for each selected item
         item = reaper.GetSelectedMediaItem(0, i)      -- get its dimensions
+        take = reaper.GetActiveTake(item)
+        if reaper.TakeIsMIDI(take) then midiFlag = 1 end
         left = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
         right = left + reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
         track = reaper.GetMediaItemTrack(item)
@@ -959,9 +970,16 @@ function RazorEditSelectionExists(make)
       end
     
       for track, str in pairs(tS) do
-        reaper.GetSetMediaTrackInfo_String(track, "P_RAZOREDITS", str, true)
+        if itemType == 1 and midiFlag == 1 then          -- if MIDI and MIDI is present
+          reaper.GetSetMediaTrackInfo_String(track, "P_RAZOREDITS", str, true)
+        end
+        if itemType == 0 and midiFlag == 0 then          -- if audio and MIDI is not present
+          reaper.GetSetMediaTrackInfo_String(track, "P_RAZOREDITS", str, true)
+        end
+        if itemType == 0 and midiFlag == 1 then return false end     -- if audio and MIDI is present
+        if itemType == 1 and midiFlag == 0 then return false end     -- if MIDI and MIDI not present
+
       end
-    --end
     reaper.UpdateArrange()
     reaper.Undo_EndBlock2(0, "Enclose items in minimal razor areas", -1)
     return true                    -- return that yes, RE exists now
