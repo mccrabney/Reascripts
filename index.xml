@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="5aa13343959ded9984aa28667964058faf35855b">
+<index version="1" name="mccrabney Reascripts" commit="9b2f5ddb0f25226fda0390e978aae3adc2ff7743">
   <category name="MIDI edits">
     <reapack name="mccrabney_MIDI edit - adjust length of note under mouse cursor (mousewheel).lua" type="script" desc="Delete notes under mouse cursor">
       <version name="1.0" author="mccrabney" time="2023-01-02T19:17:22Z">
@@ -23,6 +23,9 @@
       <version name="1.0" author="mccrabney" time="2022-12-30T23:44:15Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/ac0efe72b90900edaaafb0b96fe150b7e09c8d4c/MIDI%20edits/mccrabney_MIDI%20edit%20-%20delete%20notes%20under%20mouse%20cursor,%20closest%20first.lua</source>
+      </version>
+      <version name="1.3" author="mccrabney" time="2023-01-05T13:28:09Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/9b2f5ddb0f25226fda0390e978aae3adc2ff7743/MIDI%20edits/mccrabney_MIDI%20edit%20-%20delete%20notes%20under%20mouse%20cursor,%20closest%20first.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - delete notes under mouse cursor.lua" type="script" desc="Delete notes under mouse cursor">
