@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="fccae451d85fd48d1b535d0e9fa65de23a04510d">
+<index version="1" name="mccrabney Reascripts" commit="ef8acd2eb071942e09d8a429b2f2748d554afe43">
+  <category name="Audio">
+    <reapack name="mccrabney_find items without fades in track (after edit cursor).lua" type="script" desc="find items without fades in track">
+      <version name="1.0" author="mccrabney" time="2023-01-08T20:31:05Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/ba73762cf18a1950d4a3645418cf0483a0aa89ab/Audio/mccrabney_find%20items%20without%20fades%20in%20track%20(after%20edit%20cursor).lua</source>
+      </version>
+    </reapack>
+  </category>
   <category name="MIDI edits">
     <reapack name="mccrabney_MIDI edit - adjust length of note under mouse cursor (mousewheel).lua" type="script" desc="Delete notes under mouse cursor">
       <version name="1.0" author="mccrabney" time="2023-01-02T19:17:22Z">
