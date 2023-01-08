@@ -43,7 +43,6 @@ function getMouseInfo()
   return note, take, item, position_ppq
 end
 
-reaper.Undo_BeginBlock()
 local cursorPos = reaper.GetCursorPosition()
 local note, take, selectedItem, position_ppq = getMouseInfo()
 
