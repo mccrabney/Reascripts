@@ -1,5 +1,5 @@
 --[[
- * ReaScript Name: duplicate notes under mouse cursor at edit cursor
+ * ReaScript Name: duplicate notes under edit cursor at mouse cursor
  * Author: mccrabney
  * Licence: GPL v3
  * REAPER: 6.0
@@ -17,9 +17,7 @@
 --]]
 
 
-------------------------------------------------------
-local function no_undo()reaper.defer(function()end)end
--------------------------------------------------------
+
 ---------------------------------------------------------------------
     --[[------------------------------[[--
           get note and item under mouse   -- mccrabney      
@@ -39,6 +37,7 @@ function getMouseInfo()
         _, _, _, startppq, endppq, _, pitch, _ = reaper.MIDI_GetNote(take, n) -- get note start/end position              
         if startppq <= position_ppq and endppq >= position_ppq then 
           note = pitch
+
         end
       end
     end 
@@ -56,12 +55,12 @@ if selectedItem ~= nil then
       notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take
       for n = notesCount-1, 0, -1 do
         _, selected, muted, startppqposOut, endppqposOut, chan, pitch, vel = reaper.MIDI_GetNote(take, n) -- get note start/end position
-        if startppqposOut <= position_ppq and endppqposOut >= position_ppq then -- is current note the note under the cursor?
-          reaper.MIDI_InsertNote( take, selected, muted, cursorPosppq, cursorPosppq + (endppqposOut-startppqposOut), chan, pitch, vel, noSortIn )
+        if startppqposOut <= cursorPosppq and endppqposOut >= cursorPosppq then -- is current note the note under the edit cursor?
+          reaper.MIDI_InsertNote( take, selected, muted, position_ppq, position_ppq + (endppqposOut-startppqposOut), chan, pitch, vel, noSortIn )
         end
       end
     end
   end
-end
+end  
   reaper.Undo_OnStateChange( 'duplicate notes under mouse cursor at edit cursor' )
   reaper.UpdateArrange()
