@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="4310e1db978612a1400bc22d8b9abbdf64bbfe7f">
+<index version="1" name="mccrabney Reascripts" commit="fccae451d85fd48d1b535d0e9fa65de23a04510d">
   <category name="MIDI edits">
     <reapack name="mccrabney_MIDI edit - adjust length of note under mouse cursor (mousewheel).lua" type="script" desc="Delete notes under mouse cursor">
       <version name="1.0" author="mccrabney" time="2023-01-02T19:17:22Z">
@@ -32,6 +32,12 @@
       <version name="1.0" author="mccrabney" time="2022-12-29T14:28:33Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/4ebc8b14e2f176307febf397395d2b943a17d9c3/MIDI%20edits/mccrabney_MIDI%20edit%20-%20delete%20notes%20under%20mouse%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - duplicate notes under mouse cursor at edit cursor.lua" type="script" desc="duplicate notes under mouse cursor at edit cursor">
+      <version name="1.0" author="mccrabney" time="2023-01-08T18:52:58Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/fccae451d85fd48d1b535d0e9fa65de23a04510d/MIDI%20edits/mccrabney_MIDI%20edit%20-%20duplicate%20notes%20under%20mouse%20cursor%20at%20edit%20cursor.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - insert last-received CC message at edit cursor.lua" type="script" desc="Insert last-received CC in selected item under edit cursor">
