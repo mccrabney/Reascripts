@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="e2dd2f1c386e2c16d69b65e5e1fc5fa8eb7548ed">
+<index version="1" name="mccrabney Reascripts" commit="cd9e0a76ff114d13bdf5092ede3d8620fba82ee0">
   <category name="Audio">
-    <reapack name="mccrabney_find items without fades in track (after edit cursor).lua" type="script" desc="find items without fades in track">
-      <version name="1.0" author="mccrabney" time="2023-01-08T20:31:05Z">
+    <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
+      <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/fccb14151ca03e3cdde1133f299b608acd93ccee/Audio/mccrabney_find%20tiny%20items%20and%20items%20without%20fades%20in%20track.lua</source>
+      </version>
+      <version name="1.0" author="mccrabney" time="2023-01-09T15:15:33Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/ba73762cf18a1950d4a3645418cf0483a0aa89ab/Audio/mccrabney_find%20items%20without%20fades%20in%20track%20(after%20edit%20cursor).lua</source>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/cd9e0a76ff114d13bdf5092ede3d8620fba82ee0/Audio/mccrabney_find%20tiny%20items%20and%20items%20without%20fades%20in%20track.lua</source>
       </version>
     </reapack>
   </category>
