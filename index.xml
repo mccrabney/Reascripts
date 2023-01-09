@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="5a619b8c7b72b93c734f2a0d18c41b2177856b23">
+<index version="1" name="mccrabney Reascripts" commit="e2dd2f1c386e2c16d69b65e5e1fc5fa8eb7548ed">
   <category name="Audio">
     <reapack name="mccrabney_find items without fades in track (after edit cursor).lua" type="script" desc="find items without fades in track">
       <version name="1.0" author="mccrabney" time="2023-01-08T20:31:05Z">
@@ -293,6 +293,13 @@
       <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20nudge%20notes%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - nudge notes, note under mouse if no RE present (mousewheel).lua" type="script" desc="nudge notes whose note-ons are contained in Razor Edit (mousewheel)">
+      <version name="1.1" author="mccrabney" time="2023-01-09T12:08:40Z">
+        <changelog><![CDATA[+ nudge notes under mouse if no RE is present
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/e2dd2f1c386e2c16d69b65e5e1fc5fa8eb7548ed/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20nudge%20notes,%20note%20under%20mouse%20if%20no%20RE%20present%20(mousewheel).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Razor Edit MIDI - RE contents - mute.lua" type="script" desc="toggle mute RE contents or selected items">
