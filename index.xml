@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="30194892a8a3787d4c5d2cc17d69b4897a1d95cb">
+<index version="1" name="mccrabney Reascripts" commit="b725a19fbbd00958f8f54e427e33148b189c83fc">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -81,6 +81,11 @@
 + added better undo messaging
 ]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/a5ebc2d1b14021a5bc5115a5c179703f2305fda5/MIDI%20edits/mccrabney_MIDI%20edit%20-%20insert%20last-received%20CC%20message%20at%20edit%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - insert note-length-dependent CC messages at note position (articulation).lua" type="script" desc="insert note-length-dependent CC messages at note position (articulation)">
+      <version name="1.0" author="mccrabney" time="2023-01-14T23:05:12Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/b725a19fbbd00958f8f54e427e33148b189c83fc/MIDI%20edits/mccrabney_MIDI%20edit%20-%20insert%20note-length-dependent%20CC%20messages%20at%20note%20position%20(articulation).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - move edit cursor to next note on track.lua" type="script" desc="move edit cursor to next MIDI note in track">
