@@ -1,5 +1,5 @@
 --[[
- * ReaScript Name: move edit cursor to next or prev visible grid (mousewheel)
+ * ReaScript Name: move edit cursor to next or prev visible grid (mousewheel or relative CC)
  * Author: mccrabney
  * Licence: GPL v3
  * REAPER: 6.0
