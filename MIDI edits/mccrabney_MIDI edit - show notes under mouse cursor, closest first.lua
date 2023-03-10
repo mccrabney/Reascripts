@@ -9,30 +9,34 @@
  
 --[[
  * Changelog:
+ + v1.2 (2023-03-10
+   + used mouseposition to limit calls to BR_GetMouseCursorContext to prevent UI jerkiness
  + v1.1 (2023-03-10)
-   + limited calls to BR_GetMouseCursorContext to prevent UI jerkiness
+   + used a delay to limit calls to BR_GetMouseCursorContext to prevent UI jerkiness
  * v1.0 (2023-02-01)
    + Initial Release
 --]]
 
 
 ---------------------------------------------------------------------
-
 dofile(reaper.GetResourcePath().."/UserPlugins/ultraschall_api.lua")
 dofile(reaper.GetResourcePath() .. '/Scripts/ReaTeam Extensions/API/imgui.lua')('0.8')
 
 loopCount = 0 
+lastX = 0
+mousecall = 0
 
 local pitchList = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"}
 local showNotes = {}
 local channel
-
 local ctx = reaper.ImGui_CreateContext('crabvision')
 local sans_serif = reaper.ImGui_CreateFont('sans_serif', 15)
 reaper.ImGui_Attach(ctx, sans_serif)
 
 -----------------------------------------------------------
 function getMouseInfo()
+  --mousecall = mousecall + 1
+  --reaper.ShowConsoleMsg(mousecall .. "\n")
   local trackHeight
   local takes, channel
   local pitchUnderCursor = {}    -- pitches of notes under the cursor (for undo)
@@ -44,8 +48,9 @@ function getMouseInfo()
   local hZoom = reaper.GetHZoomLevel()
  
   if window ~= "midi editor" and hZoom > 8 then   -- ifn't ME, and if slightly zoomed in
+ 
     if track ~= nil then                      -- if there is a track
-      trackHeight = reaper.GetMediaTrackInfo_Value( track, "I_TCPH")  -- get trackheight
+      trackHeight = reaper.GetMediaTrackInfo_Value( track, "I_TCPH")
     end
     
     local mouse_pos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position
@@ -129,12 +134,13 @@ local function loop()
   x, y = reaper.GetMousePosition()
   _, info = reaper.GetThingFromPoint( x, y )
   
-  if loopCount >= 5 and info == "arrange" then 
+  if loopCount >= 5 and info == "arrange" and lastX ~= x then 
     showNotes, cursorNote, take, targetNote, targetPitch = getMouseInfo()
     loopCount = 0
-  end                             -- defer delay
+    lastX = x
+  end                     -- optimizer 
   
-  if cursorNote ~= nil and info == "arrange" then       -- if mouseover note,
+  if cursorNote ~= nil and info == "arrange" then
     if take ~= nil and reaper.TakeIsMIDI(take) then 
       local x, y = reaper.ImGui_PointConvertNative(ctx, reaper.GetMousePosition())
       reaper.ImGui_SetNextWindowPos(ctx, x - 11, y + 25)
@@ -160,22 +166,17 @@ local function loop()
             end
           end
         end
-        
         reaper.ImGui_End(ctx)
       end
-      
       reaper.ImGui_PopStyleColor(ctx)
       reaper.ImGui_PopFont(ctx)
       reaper.ImGui_PopStyleVar(ctx)
     end
-  else
-    lastNote = -1
+  else                  -- if take and cursornote are nil, then
+  
   end                   -- if take and cursornote ain't nil 
-
   reaper.defer(loop)
 end
 
 --------------------------------------------
 reaper.defer(loop)
-
-
