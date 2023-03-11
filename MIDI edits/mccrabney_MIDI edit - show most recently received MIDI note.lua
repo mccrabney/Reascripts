@@ -1,5 +1,5 @@
 --[[
- * ReaScript Name: show most recently received MIDI notes
+ * ReaScript Name: show most recently received MIDI note
  * Author: mccrabney
  * Licence: GPL v3
  * REAPER: 6.0
