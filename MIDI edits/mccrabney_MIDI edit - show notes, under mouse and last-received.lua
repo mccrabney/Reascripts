@@ -20,7 +20,6 @@ dofile(reaper.GetResourcePath() .. '/Scripts/ReaTeam Extensions/API/imgui.lua')(
 
 loopCount = 0 
 lastX = 0
-task = -1
 
 local pitchList = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"}
 local showNotes = {}
@@ -199,7 +198,7 @@ local function loop()
     note = getLastNoteHit()   
   end                     -- optimizer, stops checking for last note if idle
 
-  if note ~= -1 and note ~= nil and pop == 0 then
+  if note ~= -1 and note ~= nil and take ~= nil and pop == 0 then
     pop = 1
     table.insert(showNotes, 1, note)
     table.sort(showNotes)
