@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.0
+ * Version: 1.1
 --]]
  
 --[[
  * Changelog:
+ * v1.1 (2023-03-12)
+   + fixed retriggering upon new MIDI notes
  * v1.0 (2023-03-12)
    + Initial Release -- "Crab Vision" (combined previous scripts)
 --]]
