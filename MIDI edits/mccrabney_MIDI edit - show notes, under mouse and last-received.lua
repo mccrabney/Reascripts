@@ -176,9 +176,8 @@ end
     --[[------------------------------[[--
           loop and show tooltips as necessary  -- mccrabney        
     --]]------------------------------]]--
-pop = 0 
 local function loop()
-
+  pop = 0 
   if reaper.HasExtState('mccrabney_MIDI edit - show notes, under mouse and last-received.lua', 'DoRefresh') then
     reaper.DeleteExtState('mccrabney_MIDI edit - show notes, under mouse and last-received.lua', 'DoRefresh', false)
     lastX = -1   -- use to fool the optimizer into resetting
@@ -231,8 +230,6 @@ local function loop()
         if note ~= -1 and note ~= nil then
           octaveNote = math.floor(note/12)-1
           noteSymbol = (note - 12*(octaveNote+1)+1) 
-          --table.insert(showNotes, 1, note)
-          --reaper.ImGui_TextColored(ctx, 0x00F992FF, note .. " (" ..  pitchList[noteSymbol] .. octaveNote  .. ")")
         else pop = 0 end
         
         local color
