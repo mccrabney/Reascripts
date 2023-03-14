@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="1c68fbbdf7d3a659435648c12159f6ae3f6c76a8">
+<index version="1" name="mccrabney Reascripts" commit="15741cad38b780a3fe155ee5ab985e9ee14b1372">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -392,6 +392,7 @@
 
 {\pard \ql \f0 \sa180 \li0 \fi0 welcome to mccrabney's repo - -\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 here you will find some scripts that i have created to fulfill some MIDI editing needs i had in REAPER.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 discussion thread: https://forum.cockos.com/showthread.php?t=274257\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 the Razor Edit-MIDI editing scripts are meant to be run from the main screen, and can work on multiple items/REs. they are inspired by grid-editing in JJOS 128XL, a third party OS for the MPC1000/2500 sequencers.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 the goal is to spend less time in the MIDI editor, so that users can delete/nudge MIDI from the main screen, using their MIDI hardware to dictate which notes are deleted by means of monitoring the "last note hit." for example, delete the last note hit from a set of RE selections, or delete notes higher/lower and equal to the last hit note - or the note under the mouse cursor, or insert last-received CC messages at edit cursor position, etc\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 multiple notes in multiple items can be enclosed in REs and copied/pasted directly from the main screen. REs can also be used to select MIDI notes (must enclose notes' NoteOns) for deeper editing in the MIDI editor.\par}
