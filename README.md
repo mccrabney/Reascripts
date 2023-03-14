@@ -2,6 +2,8 @@ welcome to mccrabney's repo - -
 
 here you will find some scripts that i have created to fulfill some MIDI editing needs i had in REAPER.
 
+discussion thread: https://forum.cockos.com/showthread.php?t=274257
+
 the Razor Edit-MIDI editing scripts are meant to be run from the main screen, and can work on multiple items/REs.
 they are inspired by grid-editing in JJOS 128XL, a third party OS for the MPC1000/2500 sequencers.
 
