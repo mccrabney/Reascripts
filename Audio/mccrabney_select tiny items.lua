@@ -9,8 +9,9 @@
  
 --[[
  * Changelog:
-   
- * v1.0 (2022-03-11)
+ * v1.1 (2023-03-17)
+   + do nothing if no track is selected
+ * v1.0 (2023-03-11)
    + Initial Release
 --]]
 
@@ -18,12 +19,16 @@
 ------------------------------------------------------
 local function no_undo()reaper.defer(function()end)end
 -------------------------------------------------------
+
 local CountTrack =  reaper.CountSelectedTracks(0)
+if CountTrack == 0 then no_undo() return end  
+
 local track = reaper.GetSelectedTrack( 0, CountTrack-1 )
+if track == 0 then no_undo() return end  
+
 local CountTrItem = reaper.CountTrackMediaItems(track)
----------------------------------------------------------------------
-if CountTrack   == 0 then no_undo() return end  -- if no tracks or items, just give it up and quit
 if CountTrItems == 0 then no_undo() return end  
+
 local cursorPos = reaper.GetCursorPosition()
 
 local namedCommand = reaper.NamedCommandLookup("_SWS_UNSELONTRACKS")  -- unselect all item
