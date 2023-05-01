@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.1
+ * Version: 1.2
 --]]
  
 --[[
  * Changelog:
+ * v1.2 (2023-5-01)
+   + fixed error message on MIDI item glue
  * v1.1 (2023-03-12)
    + fixed retriggering upon new MIDI notes
  * v1.0 (2023-03-12)
@@ -20,7 +22,8 @@
 dofile(reaper.GetResourcePath().."/UserPlugins/ultraschall_api.lua")
 dofile(reaper.GetResourcePath() .. '/Scripts/ReaTeam Extensions/API/imgui.lua')('0.8')
 
-loopCount = 0 
+loopCount = 0
+loopReset = 0
 lastX = 0
 
 local pitchList = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"}
@@ -176,8 +179,10 @@ end
     --[[------------------------------[[--
           loop and show tooltips as necessary  -- mccrabney        
     --]]------------------------------]]--
+pop = 0 
+
 local function loop()
-  pop = 0 
+
   if reaper.HasExtState('mccrabney_MIDI edit - show notes, under mouse and last-received.lua', 'DoRefresh') then
     reaper.DeleteExtState('mccrabney_MIDI edit - show notes, under mouse and last-received.lua', 'DoRefresh', false)
     lastX = -1   -- use to fool the optimizer into resetting
@@ -186,13 +191,16 @@ local function loop()
   reaper.ImGui_GetFrameCount(ctx) -- a fast & inoffensive function
    
   loopCount = loopCount+1
+  
   x, y = reaper.GetMousePosition()
   _, info = reaper.GetThingFromPoint( x, y )
    
   if loopCount >= 5 and info == "arrange" and lastX ~= x and pop == 0 then 
     showNotes, cursorNote, take, targetNote, targetPitch = getMouseInfo()
-    loopCount = 0
-    lastX = x
+    if take ~= nil and reaper.TakeIsMIDI(take) then
+      loopCount = 0
+      lastX = x
+    end
   end                     -- optimizer, must meet criteria in order to call getMouseInfo
   
   if loopCount < 500 then
@@ -210,7 +218,7 @@ local function loop()
   end
   
   if cursorNote ~= nil and info == "arrange" then
-    if take ~= nil and reaper.TakeIsMIDI(take) then 
+    if take ~= nil then
       local x, y = reaper.ImGui_PointConvertNative(ctx, reaper.GetMousePosition())
       reaper.ImGui_SetNextWindowPos(ctx, x - 11, y + 25)
       reaper.ImGui_PushFont(ctx, sans_serif)  
@@ -230,6 +238,8 @@ local function loop()
         if note ~= -1 and note ~= nil then
           octaveNote = math.floor(note/12)-1
           noteSymbol = (note - 12*(octaveNote+1)+1) 
+          --table.insert(showNotes, 1, note)
+          --reaper.ImGui_TextColored(ctx, 0x00F992FF, note .. " (" ..  pitchList[noteSymbol] .. octaveNote  .. ")")
         else pop = 0 end
         
         local color
@@ -268,7 +278,8 @@ local function loop()
       reaper.ImGui_PopFont(ctx)
       reaper.ImGui_PopStyleVar(ctx)
     end 
-  end                   -- if take and cursornote ain't nil 
+  end                   -- if take, cursornote, and loopReset conditions are met
+  
   reaper.defer(loop)
 end
 
