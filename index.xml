@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="a771525966c7fb48beb852a84eb5201419e483e3">
+<index version="1" name="mccrabney Reascripts" commit="fd495cbb73eee9857bc289f4f892ff6d96411b37">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -170,6 +170,12 @@
       <version name="1.2" author="mccrabney" time="2023-05-01T20:21:39Z">
         <changelog><![CDATA[+ fixed error message on MIDI item glue]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/c84584237ab42804e2b6ac631e73dccf4d7baaa2/MIDI%20edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20mouse%20and%20last-received.lua</source>
+      </version>
+      <version name="1.3" author="mccrabney" time="2023-05-03T20:35:45Z">
+        <changelog><![CDATA[+ added velocity readout for target note only
+- note, readout for all notes unlikely due to (necessarily) sorted pitchUnderCursor[]
++ misc cleanup]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/fd495cbb73eee9857bc289f4f892ff6d96411b37/MIDI%20edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20mouse%20and%20last-received.lua</source>
       </version>
     </reapack>
   </category>
