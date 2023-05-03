@@ -4,11 +4,15 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.2
+ * Version: 1.3
 --]]
  
 --[[
  * Changelog:
+ * v1.3 (2023-5-03)
+   + added velocity readout for target note only
+      - note, readout for all notes unlikely due to (necessarily) sorted pitchUnderCursor[]
+   + misc cleanup
  * v1.2 (2023-5-01)
    + fixed error message on MIDI item glue
  * v1.1 (2023-03-12)
@@ -86,10 +90,13 @@ end                                             -- end function
     --]]------------------------------]]--
     
 function getMouseInfo()
+  local pitchUnderCursor = {}    -- pitches of notes under the cursor (for undo)
+  local notesUnderCursor = {}    -- item notecount numbers under the cursor
+  local velUnderCursor = {}      -- ... vel
+  
   local trackHeight
   local takes, channel
-  local pitchUnderCursor = {}    -- pitches of notes under the cursor (for undo)
-  local targetNote, targetPitch              -- initialize target variable
+  local targetNote, targetPitch  -- initialize target variable
   local numberNotes = 0
   local item, position_ppq, take, note
   window, _, _ = reaper.BR_GetMouseCursorContext() -- initialize cursor context
@@ -106,10 +113,8 @@ function getMouseInfo()
     if take ~= nil and trackHeight > 25 then      -- if track height isn't tiny
       if reaper.TakeIsMIDI(take) then 
         local pitchSorted = {}                  -- pitches under cursor to be sorted
-        local notesUnderCursor = {}             -- item notecount numbers under the cursor
         local distanceFromMouse = {}            -- corresponding distances of notes from mouse
         local distanceSorted = {}               -- ^ same, but to be sorted
-  
         item = reaper.BR_GetMouseCursorContext_Item() -- get item under mouse
         position_ppq = reaper.MIDI_GetPPQPosFromProjTime(take, mouse_pos) -- convert to PPQ
         local notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take
@@ -120,6 +125,7 @@ function getMouseInfo()
           if startppq <= position_ppq and endppq >= position_ppq then -- is current note the note under the cursor?
             note = pitch
             numberNotes = numberNotes+1                           -- add to count of how many notes are under mouse cursor
+            velUnderCursor[numberNotes] = vel            
             pitchUnderCursor[numberNotes] = pitch                 -- get the pitch to reference for undo message
             pitchSorted[numberNotes] = pitch
             notesUnderCursor[numberNotes] = n                     -- add the notecount number to the array
@@ -131,7 +137,7 @@ function getMouseInfo()
         table.sort(distanceSorted)  -- sort the note table so the closest noteon is at index position 1
         table.sort(pitchSorted)     -- sort the pitch table so the lowest pitch is at index position 1
                
-        local targetNoteDistance = distanceSorted[1]                 -- find the distance from mouse cursor of the closest noteon
+        local targetNoteDistance = distanceSorted[1]                  -- find the distance from mouse cursor of the closest noteon
         local lowestPitch = pitchSorted[1]                            -- find the lowest pitch in array
         local sameDistance = 0                                        -- initialize the sameDistance variable
         local sameLowest
@@ -141,19 +147,19 @@ function getMouseInfo()
             sameDistance = sameDistance+1
             
             for p = 1, #distanceFromMouse do                          -- for each entry in the distancefrommouse array
-              if distanceFromMouse[p] == distanceSorted[1] then      -- if distFromMouse index = closest note entry,
+              if distanceFromMouse[p] == distanceSorted[1] then       -- if distFromMouse index = closest note entry,
                 sameLowest = p                                        -- get the index 
               end
             end 
           end
         end
-               
+
         --~~~~~~~  closest note
         for i = 1, #distanceFromMouse do                        -- for each entry in the unsorted distance array
           if targetNoteDistance == distanceFromMouse[i] and sameDistance == 0 then   
             targetPitch = pitchUnderCursor[i]                -- get the pitch value of the closest note
             targetNote = notesUnderCursor[i]
-            
+            targetVel = velUnderCursor[i]
           end                                     
         end                                                         -- end for each entry in array
                
@@ -163,14 +169,16 @@ function getMouseInfo()
             if lowestPitch == pitchUnderCursor[t] then    -- if the entry matchest the closest note distance from mouse cursor
               targetPitch = lowestPitch
               targetNote = notesUnderCursor[sameLowest]
+              targetVel = velUnderCursor[sameLowest]
             end
           end
         end
       end           -- if take is MIDI
     end             -- if take not nil
          
-    table.sort(pitchUnderCursor)
-    return pitchUnderCursor, note, take, targetNote, targetPitch
+    table.sort(pitchUnderCursor) 
+    return pitchUnderCursor, note, take, targetNote, targetPitch, targetVel
+    
   end
 end
 
@@ -179,6 +187,7 @@ end
     --[[------------------------------[[--
           loop and show tooltips as necessary  -- mccrabney        
     --]]------------------------------]]--
+    
 pop = 0 
 
 local function loop()
@@ -196,7 +205,8 @@ local function loop()
   _, info = reaper.GetThingFromPoint( x, y )
    
   if loopCount >= 5 and info == "arrange" and lastX ~= x and pop == 0 then 
-    showNotes, cursorNote, take, targetNote, targetPitch = getMouseInfo()
+    showNotes, cursorNote, take, targetNote, targetPitch, showVel = getMouseInfo()
+    
     if take ~= nil and reaper.TakeIsMIDI(take) then
       loopCount = 0
       lastX = x
@@ -233,47 +243,42 @@ local function loop()
       
         local octaveNote 
         local noteSymbol
-        local notePresent = 0
         
         if note ~= -1 and note ~= nil then
           octaveNote = math.floor(note/12)-1
           noteSymbol = (note - 12*(octaveNote+1)+1) 
-          --table.insert(showNotes, 1, note)
-          --reaper.ImGui_TextColored(ctx, 0x00F992FF, note .. " (" ..  pitchList[noteSymbol] .. octaveNote  .. ")")
         else pop = 0 end
         
         local color
         local spacing
         
         for i = #showNotes, 1, -1 do
-          if showNotes[i] ~= nil and targetPitch ~= nil then
-            
+          if showNotes[i] ~= nil and targetPitch ~= nil then            
             octave = math.floor(showNotes[i]/12)-1
             cursorNoteSymbol = (showNotes[i] - 12*(octave+1)+1) 
             
             if showNotes[i] == targetPitch then
               color = 0xFF8383FF
               spacing = ""
---              reaper.ImGui_TextColored(ctx, 0xFF8383FF, showNotes[i] .. " (" .. pitchList[cursorNoteSymbol] .. octave  .. ")")
-            elseif showNotes[i] == note and notePresent == 0 then
-              notePresent = 1
-              color = 0x00F992FF
-              spacing = " " 
             else
               color = 0xFFFFFFFF
-              spacing = "  "
---              reaper.ImGui_TextColored(ctx, 0xFFFFFFFF, "  " .. showNotes[i] .. " (" .. pitchList[cursorNoteSymbol] .. octave  .. ")")
+              spacing = " "
             end  -- if match
             
             if i-1 ~= nil and showNotes[i] ~= showNotes[i+1] then
-              reaper.ImGui_TextColored(ctx, color, spacing .. showNotes[i] .. " (" .. pitchList[cursorNoteSymbol] .. octave  .. ")")
+              if showNotes[i] == targetPitch then 
+                --showVel = tostring(showVel)
+                reaper.ImGui_TextColored(ctx, color, spacing .. "#" .. showNotes[i] .. " (" .. pitchList[cursorNoteSymbol] .. octave  .. "), "  .. showVel)
+              elseif showNotes[i] ~= targetPitch then 
+                reaper.ImGui_TextColored(ctx, color, spacing .. "#" .. showNotes[i] .. " (" .. pitchList[cursorNoteSymbol] .. octave  .. ") ")
+              end
             end              
           end    -- if not nil
         end      -- for each shown note
          
-        reaper.ImGui_End(ctx)
+      reaper.ImGui_End(ctx)
       end        -- if imgui begin
-      
+    
       reaper.ImGui_PopStyleColor(ctx)
       reaper.ImGui_PopFont(ctx)
       reaper.ImGui_PopStyleVar(ctx)
@@ -292,4 +297,3 @@ end
 ----------------------------
 
 main()
-
