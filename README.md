@@ -1,14 +1,9 @@
-welcome to mccrabney's repo - - 
-
-here you will find some scripts that i have created to fulfill some MIDI editing needs i had in REAPER.
-
 discussion thread: https://forum.cockos.com/showthread.php?t=274257
 
-the Razor Edit-MIDI editing scripts are meant to be run from the main screen, and can work on multiple items/REs.
-they are inspired by grid-editing in JJOS 128XL, a third party OS for the MPC1000/2500 sequencers.
+mccrabney scripts - MIDI editing from the main screen, inspired by grid-editing in JJOS 128XL, a third party OS for the MPC1000/2500 sequencers.
 
-the goal is to spend less time in the MIDI editor, so that users can delete/nudge MIDI from the main screen,
-using their MIDI hardware to dictate which notes are deleted by means of monitoring the "last note hit."
+the goal is to spend less time in the MIDI editor. use these scripts to edit MIDI from the main screen,
+referencing MIDI hardware to dictate which notes are deleted by means of monitoring the "last note hit."
     for example, delete the last note hit from a set of RE selections, 
     or delete notes higher/lower and equal to the last hit note - or the note under the mouse cursor,
     or insert last-received CC messages at edit cursor position,
