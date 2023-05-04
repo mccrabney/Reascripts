@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.41
+ * Version: 1.42
 --]]
  
 --[[
  * Changelog:
+ + v1.42 (2023-5-04)
+   + added note duration display, changed readout to conform to conventional MPC step edit screen
  * v1.41 (2023-5-04)
    + fixed show last-hit MIDI note, appears in green, replacing existing readout if present
  * v1.4 (2023-5-04)
@@ -35,12 +37,12 @@ loopCount = 0
 loopReset = 0
 lastX = 0
 
-local pitchList = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"}
+local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"}
 local pitchUnderCursor = {}
 local channel
 local ctx = reaper.ImGui_CreateContext('crabvision')
-local sans_serif = reaper.ImGui_CreateFont('sans_serif', 15)
-reaper.ImGui_Attach(ctx, sans_serif)
+local monospace = reaper.ImGui_CreateFont('courier_new', 18)
+reaper.ImGui_Attach(ctx, monospace)
 
 
 ---------------------------------------------------------------------
@@ -100,7 +102,7 @@ end                                             -- end function
     
 function getMouseInfo()
   local pitchUnderCursor = {}    -- pitches of notes under the cursor (for undo)
-  local pitchWithVel = {}    -- table consisting of sub-tables grouping Pitch and Vel
+  local showNotes = {}    -- table consisting of sub-tables grouping Pitch and Vel
   
   local trackHeight
   local takes, channel
@@ -128,13 +130,13 @@ function getMouseInfo()
         local notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take
         
         for n = notesCount-1, 0, -1 do
-          _, selected, _, startppq, endppq, _, pitch, vel = reaper.MIDI_GetNote(take, n) -- get note start/end position              
+          _, selected, _, startppq, endppq, ch, pitch, vel = reaper.MIDI_GetNote(take, n) -- get note start/end position              
           
           if startppq <= position_ppq and endppq >= position_ppq then -- is current note the note under the cursor?
             note = pitch
             numberNotes = numberNotes+1                           -- add to count of how many notes are under mouse cursor
-            
-            pitchWithVel[numberNotes] = {pitch, vel}              -- get the pitch and corresponding velocity as table-in-table
+            noteLength = math.floor(endppq - startppq)
+            showNotes[numberNotes] = {pitch, vel, noteLength, ch+1}              -- get the pitch and corresponding velocity as table-in-table
             pitchUnderCursor[numberNotes] = pitch                 -- get the pitch to reference for undo message
             pitchSorted[numberNotes] = pitch
             distanceFromMouse[numberNotes] = position_ppq - startppq       -- put distance to cursor in index position reference table
@@ -165,14 +167,14 @@ function getMouseInfo()
         --~~~~~~~  closest note
         for i = 1, #distanceFromMouse do                        -- for each entry in the unsorted distance array
           if targetNoteDistance == distanceFromMouse[i] and sameDistance == 0 then   
-            targetPitch = pitchWithVel[i][1]                -- get the pitch value of the closest note
+            targetPitch = showNotes[i][1]                -- get the pitch value of the closest note
           end                                     
         end                                                         -- end for each entry in array
                
         --~~~~~~~  multiple equidistant notes
         if sameDistance > 0 then                          -- if there are notes that are the same distance from mouse
           for t = 1, #distanceFromMouse do                 -- for each entry in the unsorted pitch array
-            if lowestPitch == pitchWithVel[t][1] then    -- if the entry matchest the closest note distance from mouse cursor
+            if lowestPitch == showNotes[t][1] then    -- if the entry matchest the closest note distance from mouse cursor
               targetPitch = lowestPitch
             end
           end
@@ -180,11 +182,11 @@ function getMouseInfo()
       end           -- if take is MIDI
     end             -- if take not nil
          
-    table.sort(pitchWithVel, function(a, b)
+    table.sort(showNotes, function(a, b)
       return a[1] < b[1]
     end)
     
-    return take, targetPitch, pitchWithVel
+    return take, targetPitch, showNotes
     
   end
 end
@@ -213,7 +215,7 @@ local function loop()
   _, info = reaper.GetThingFromPoint( x, y )                    -- mousedetails
                                                                 -- optimizer to reduce calls to getMouseInfo
   if loopCount >= 5 and info == "arrange" and lastX ~= x and pop == 0 then 
-    take, targetPitch, pitchWithVel = getMouseInfo()
+    take, targetPitch, showNotes = getMouseInfo()
     if take ~= nil and reaper.TakeIsMIDI(take) then             -- if take is MIDI
       loopCount = 0                                             -- reset loopcount
       lastX = x                                                 -- set lastX mouse position
@@ -231,20 +233,20 @@ local function loop()
     pop = 1                                                     -- MIDI is being received
                           -- package the pitch/vel info
     local currentVel
-    for i = 1, #pitchWithVel do                                 -- check each note to see if it is already present
-      if lastNote == pitchWithVel[i][1] then 
-        currentVel = pitchWithVel[i][2]
+    for i = 1, #showNotes do                                 -- check each note to see if it is already present
+      if lastNote == showNotes[i][1] then 
+        currentVel = showNotes[i][2]
         skip = 1
       end  
     end    
     
     if skip ~= 1 then
-      lastMIDI[1] = {lastNote, lastVel} 
-      table.insert(pitchWithVel, 1, lastMIDI[1]) 
+      lastMIDI[1] = {lastNote, lastVel, 0, 0} 
+      table.insert(showNotes, 1, lastMIDI[1]) 
     else
       --lastMIDI[1] = {lastNote, currentVel} 
-      --table.remove(pitchWithVel, 1)
-      --table.insert(pitchWithVel, 1, lastMIDI[1])
+      --table.remove(showNotes, 1)
+      --table.insert(showNotes, 1, lastMIDI[1])
     end   
 
     octaveNote = math.floor(lastNote/12)-1                      -- get symbols for last-received MIDI
@@ -269,31 +271,49 @@ local function loop()
       local octaveNote                                  -- variables for readout
       local noteSymbol                                  
       local color = 0x00F992FF
-      local spacing = ""
+      local spacingV = ""
+      local spacingD = ""
+      local spacingCH = ""
+                
+      for i = #showNotes, 1, -1 do                   -- for each top-level entry in the showNotes table,
+        if showNotes[1] ~= nil and targetPitch ~= nil then
+        
+          octave = math.floor(showNotes[i][1]/12)-1                    -- establish the octave for readout
+          cursorNoteSymbol = (showNotes[i][1] - 12*(octave+1)+1)       -- establish the note symbol for readout
           
-      for i = #pitchWithVel, 1, -1 do                   -- for each top-level entry in the pitchWithVel table,
-        if pitchWithVel[1] ~= nil and targetPitch ~= nil then
-        
-          octave = math.floor(pitchWithVel[i][1]/12)-1                    -- establish the octave for readout
-          cursorNoteSymbol = (pitchWithVel[i][1] - 12*(octave+1)+1)       -- establish the note symbol for readout
-        
-          if pitchWithVel[i][1] == targetPitch and pitchWithVel[i][1] ~= lastNote then  -- color red if entry matches the target note & no lastNote
+          if     showNotes[i][2] > 0  and showNotes[i][2] <  10 then spacingV = "  "         -- spacingV for the velocity readout
+          elseif showNotes[i][2] > 9  and showNotes[i][2] < 100 then spacingV = " " 
+          elseif showNotes[i][2] > 99                           then spacingV = "" 
+          end
+
+          if     showNotes[i][3] > 0    and showNotes[i][3] <    10 then spacingD = "    "         -- spacing for the velocity readout
+          elseif showNotes[i][3] > 9    and showNotes[i][3] <   100 then spacingD = "   " 
+          elseif showNotes[i][3] > 99   and showNotes[i][3] <  1000 then spacingD = "  " 
+          elseif showNotes[i][3] > 999  and showNotes[i][3] < 10000 then spacingD = " " 
+          elseif showNotes[i][3] > 9999                             then spacingD = ""
+          end
+          
+          if     showNotes[i][4] > 0    and showNotes[i][4] <    10 then spacingCH = " " end  
+          
+          if showNotes[i][1] == targetPitch and showNotes[i][1] ~= lastNote then  -- color red if entry matches the target note & no lastNote
             color = 0xFF8383FF                             -- red                        
-            spacing = ""                                  -- no indentation
-          elseif pitchWithVel[i][1] == lastNote and pop == 1 then      -- if 
+          elseif showNotes[i][1] == lastNote and pop == 1 then      -- if 
             notePresent = 1
-            pitchWithVel[i][2] = lastVel
+            showNotes[i][2] = lastVel
+            showNotes[i][3] = 9999
+            showNotes[i][4] = "in"
             color = 0x00F992FF                            -- green
-            spacing = "" 
-          elseif pitchWithVel[i][1] ~= lastNote then 
+          elseif showNotes[i][1] ~= lastNote then 
             color = 0xFFFFFFFF                            -- white
-            spacing = " "                                 -- slight indentation
           end                                             -- end color readout red if entry matches the target note
           
-          table.sort(pitchWithVel, function(a, b) return a[1] < b[1] end)
+          table.sort(showNotes, function(a, b) return a[1] < b[1] end)
         
-          if i-1 ~= nil and pitchWithVel[i] ~= pitchWithVel[i+1] then
-            reaper.ImGui_TextColored(ctx, color, spacing .. pitchWithVel[i][1] .. " " .. pitchList[cursorNoteSymbol] .. octave .. " " .. pitchWithVel[i][2])
+          if i-1 ~= nil and showNotes[i] ~= showNotes[i+1] then
+            reaper.ImGui_TextColored(ctx, color, "n: " .. showNotes[i][1] .. 
+              "(" .. pitchList[cursorNoteSymbol] .. octave .. ") " ..
+               "ch:" .. spacingCH .. showNotes[i][4] ..   "  v:" .. spacingV .. showNotes[i][2] .. " D:" .. spacingD .. showNotes[i][3]
+              )
           end
         end
       end                                               -- for each shown note
