@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.4
+ * Version: 1.41
 --]]
  
 --[[
  * Changelog:
+ * v1.41 (2023-5-04)
+   + fixed show last-hit MIDI note, appears in green, replacing existing readout if present
  * v1.4 (2023-5-04)
    + added velocity readout for all notes, despite last comment. thanks, cfillion!
    + more cleanup
@@ -209,11 +211,9 @@ local function loop()
   
   x, y = reaper.GetMousePosition()                              -- mousepos
   _, info = reaper.GetThingFromPoint( x, y )                    -- mousedetails
-   
                                                                 -- optimizer to reduce calls to getMouseInfo
   if loopCount >= 5 and info == "arrange" and lastX ~= x and pop == 0 then 
     take, targetPitch, pitchWithVel = getMouseInfo()
-    
     if take ~= nil and reaper.TakeIsMIDI(take) then             -- if take is MIDI
       loopCount = 0                                             -- reset loopcount
       lastX = x                                                 -- set lastX mouse position
@@ -224,23 +224,36 @@ local function loop()
     lastNote, lastVel = getLastNoteHit()   
   end                                                           -- end optimizer2
 
-  
+  if lastNote == -1 then pop = 0 end
+
   local skip = 0                                                -- insert last-received MIDI into table
   if lastNote ~= -1 and lastNote ~= nil and take ~= nil and pop == 0 then
     pop = 1                                                     -- MIDI is being received
-    lastMIDI[1] = {lastNote, lastVel}                           -- package the pitch/vel info
+                          -- package the pitch/vel info
+    local currentVel
     for i = 1, #pitchWithVel do                                 -- check each note to see if it is already present
-      if lastNote == pitchWithVel[i][1] then skip = 1 end       -- if it is, flag it to be skipped
-    end                                                         
+      if lastNote == pitchWithVel[i][1] then 
+        currentVel = pitchWithVel[i][2]
+        skip = 1
+      end  
+    end    
     
-    if skip ~= 1 then table.insert(pitchWithVel, 1, lastMIDI[1]) end    -- enter the last-received MIDI if not already present
-    
+    if skip ~= 1 then
+      lastMIDI[1] = {lastNote, lastVel} 
+      table.insert(pitchWithVel, 1, lastMIDI[1]) 
+    else
+      --lastMIDI[1] = {lastNote, currentVel} 
+      --table.remove(pitchWithVel, 1)
+      --table.insert(pitchWithVel, 1, lastMIDI[1])
+    end   
+
     octaveNote = math.floor(lastNote/12)-1                      -- get symbols for last-received MIDI
     noteSymbol = (lastNote - 12*(octaveNote+1)+1) 
     lastX = -1                                                  -- reset optimzer to update display
   end
-
-  if targetPitch ~= nil and info == "arrange" and take ~= nil then              -- if mousing over a note in a MIDI item in arrange
+  
+  
+  if targetPitch ~= nil and info == "arrange" and take ~= nil then  -- if mousing over a note in a MIDI item in arrange
     local x, y = reaper.ImGui_PointConvertNative(ctx, reaper.GetMousePosition())
     reaper.ImGui_SetNextWindowPos(ctx, x - 11, y + 25)
     reaper.ImGui_PushFont(ctx, sans_serif)  
@@ -257,11 +270,6 @@ local function loop()
       local noteSymbol                                  
       local color = 0x00F992FF
       local spacing = ""
-      
-      
-      if lastNote ~= -1 and lastNote ~= nil then        -- if a note is being sent from controller
-        
-      else pop = 0 end                                  -- turn off pop
           
       for i = #pitchWithVel, 1, -1 do                   -- for each top-level entry in the pitchWithVel table,
         if pitchWithVel[1] ~= nil and targetPitch ~= nil then
@@ -274,8 +282,9 @@ local function loop()
             spacing = ""                                  -- no indentation
           elseif pitchWithVel[i][1] == lastNote and pop == 1 then      -- if 
             notePresent = 1
+            pitchWithVel[i][2] = lastVel
             color = 0x00F992FF                            -- green
-            spacing = "   " 
+            spacing = "" 
           elseif pitchWithVel[i][1] ~= lastNote then 
             color = 0xFFFFFFFF                            -- white
             spacing = " "                                 -- slight indentation
@@ -284,7 +293,7 @@ local function loop()
           table.sort(pitchWithVel, function(a, b) return a[1] < b[1] end)
         
           if i-1 ~= nil and pitchWithVel[i] ~= pitchWithVel[i+1] then
-            reaper.ImGui_TextColored(ctx, color, spacing .. "#" .. pitchWithVel[i][1] .. " " .. pitchList[cursorNoteSymbol] .. octave .. " " .. pitchWithVel[i][2])
+            reaper.ImGui_TextColored(ctx, color, spacing .. pitchWithVel[i][1] .. " " .. pitchList[cursorNoteSymbol] .. octave .. " " .. pitchWithVel[i][2])
           end
         end
       end                                               -- for each shown note
