@@ -428,11 +428,9 @@
 {\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
 \widowctrl\hyphauto
 
-{\pard \ql \f0 \sa180 \li0 \fi0 welcome to mccrabney's repo - -\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 here you will find some scripts that i have created to fulfill some MIDI editing needs i had in REAPER.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 discussion thread: https://forum.cockos.com/showthread.php?t=274257\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 the Razor Edit-MIDI editing scripts are meant to be run from the main screen, and can work on multiple items/REs. they are inspired by grid-editing in JJOS 128XL, a third party OS for the MPC1000/2500 sequencers.\par}
-{\pard \ql \f0 \sa180 \li0 \fi0 the goal is to spend less time in the MIDI editor, so that users can delete/nudge MIDI from the main screen, using their MIDI hardware to dictate which notes are deleted by means of monitoring the "last note hit." for example, delete the last note hit from a set of RE selections, or delete notes higher/lower and equal to the last hit note - or the note under the mouse cursor, or insert last-received CC messages at edit cursor position, etc\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 mccrabney scripts - MIDI editing from the main screen, inspired by grid-editing in JJOS 128XL, a third party OS for the MPC1000/2500 sequencers.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 the goal is to spend less time in the MIDI editor. use these scripts to edit MIDI from the main screen, referencing MIDI hardware to dictate which notes are deleted by means of monitoring the "last note hit." for example, delete the last note hit from a set of RE selections, or delete notes higher/lower and equal to the last hit note - or the note under the mouse cursor, or insert last-received CC messages at edit cursor position, etc\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 multiple notes in multiple items can be enclosed in REs and copied/pasted directly from the main screen. REs can also be used to select MIDI notes (must enclose notes' NoteOns) for deeper editing in the MIDI editor.\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 the select/copy scripts will operate most predictably using these MIDI editor settings:\par}
 {\pard \ql \f0 \sa180 \li0 \fi0 -- One MIDI editor per track/project\par}
