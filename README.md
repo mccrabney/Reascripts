@@ -2,26 +2,17 @@ discussion thread: https://forum.cockos.com/showthread.php?t=274257
 
 mccrabney scripts - MIDI editing from the main screen, inspired by grid-editing in JJOS 128XL, a third party OS for the MPC1000/2500 sequencers.
 
-the goal is to spend less time in the MIDI editor. use these scripts to edit MIDI from the main screen,
-referencing MIDI hardware to dictate which notes are deleted by means of monitoring the "last note hit."
-    for example, delete the last note hit from a set of RE selections, 
-    or delete notes higher/lower and equal to the last hit note - or the note under the mouse cursor,
-    or insert last-received CC messages at edit cursor position,
-    etc
-    
-multiple notes in multiple items can be enclosed in REs and copied/pasted directly from the main screen.
-REs can also be used to select MIDI notes (must enclose notes' NoteOns) for deeper editing in the MIDI editor.
+the goal of these scripts is to spend less time in the MIDI editor.
+
+start with "mccrabney_MIDI edit - show notes, under mouse and last-received" 
+this will give a readout of notes under the mouse cursor in Arrange, including the last MIDI note currently received by your controller.
 
 the select/copy scripts will operate most predictably using these MIDI editor settings:
 
- -- One MIDI editor per track/project
-
+-- One MIDI editor per track/project
 -- Open all MIDI in the track/project
-
 -- media item selection is linked to visibility OFF
-
 -- selection is linked to editability OFF
-
 -- Make secondary items editable by default
 
 
