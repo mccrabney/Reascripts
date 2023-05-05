@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.42
+ * Version: 1.43
 --]]
  
 --[[
  * Changelog:
+ + v1.43 (2023-5-05)
+   + fixed error message, improved spacing on readout
  + v1.42 (2023-5-04)
    + added note duration display, changed readout to conform to conventional MPC step edit screen
  * v1.41 (2023-5-04)
@@ -271,36 +273,58 @@ local function loop()
       local octaveNote                                  -- variables for readout
       local noteSymbol                                  
       local color = 0x00F992FF
+      local spacingO = ""
+      local spacingN = ""
       local spacingV = ""
       local spacingD = ""
-      local spacingCH = ""
+      local spacingCH = " "
+      local postNote = "  "
                 
       for i = #showNotes, 1, -1 do                   -- for each top-level entry in the showNotes table,
         if showNotes[1] ~= nil and targetPitch ~= nil then
-        
           octave = math.floor(showNotes[i][1]/12)-1                    -- establish the octave for readout
-          cursorNoteSymbol = (showNotes[i][1] - 12*(octave+1)+1)       -- establish the note symbol for readout
+          cursorNoteSymbol = pitchList[(showNotes[i][1] - 12*(octave+1)+1)]       -- establish the note symbol for readout
+                   
+          if octave < 0 then 
+            spacingO = " " 
+            cursorNoteSymbol = cursorNoteSymbol:gsub('_', '') 
+            postNote = postNote:gsub('  ', ' ') 
+          end
           
+          if     showNotes[i][1] > 0  and showNotes[i][1] <  10 then spacingN = "  "     -- spacingN for the note readout
+          elseif showNotes[i][1] > 9  and showNotes[i][1] < 100 then spacingN = " " 
+          elseif showNotes[i][1] > 99                           then spacingN = "" 
+          end
+          
+          if showNotes[i][4] ~= "in" then                             -- spacingCH for channel readout
+            if showNotes[i][4] <    10 then 
+              spacingCH = "  " 
+            else  
+              spacingCH = " "
+            end
+          else
+            spacingCH = " "
+          end
+            
           if     showNotes[i][2] > 0  and showNotes[i][2] <  10 then spacingV = "  "         -- spacingV for the velocity readout
           elseif showNotes[i][2] > 9  and showNotes[i][2] < 100 then spacingV = " " 
           elseif showNotes[i][2] > 99                           then spacingV = "" 
           end
 
-          if     showNotes[i][3] > 0    and showNotes[i][3] <    10 then spacingD = "    "         -- spacing for the velocity readout
+          if     showNotes[i][3] > 0    and showNotes[i][3] <    10 then spacingD = "    "   -- spacing for the duration readout
           elseif showNotes[i][3] > 9    and showNotes[i][3] <   100 then spacingD = "   " 
           elseif showNotes[i][3] > 99   and showNotes[i][3] <  1000 then spacingD = "  " 
           elseif showNotes[i][3] > 999  and showNotes[i][3] < 10000 then spacingD = " " 
           elseif showNotes[i][3] > 9999                             then spacingD = ""
           end
           
-          if     showNotes[i][4] > 0    and showNotes[i][4] <    10 then spacingCH = " " end  
           
           if showNotes[i][1] == targetPitch and showNotes[i][1] ~= lastNote then  -- color red if entry matches the target note & no lastNote
             color = 0xFF8383FF                             -- red                        
-          elseif showNotes[i][1] == lastNote and pop == 1 then      -- if 
+          elseif showNotes[i][1] == lastNote and pop == 1 then      -- if note is received from controller
             notePresent = 1
-            showNotes[i][2] = lastVel
-            showNotes[i][3] = 9999
+            showNotes[i][2] = lastVel                               -- set incoming velocity
+            showNotes[i][3] = 99999                                  -- max out duration
             showNotes[i][4] = "in"
             color = 0x00F992FF                            -- green
           elseif showNotes[i][1] ~= lastNote then 
@@ -310,9 +334,9 @@ local function loop()
           table.sort(showNotes, function(a, b) return a[1] < b[1] end)
         
           if i-1 ~= nil and showNotes[i] ~= showNotes[i+1] then
-            reaper.ImGui_TextColored(ctx, color, "n: " .. showNotes[i][1] .. 
-              "(" .. pitchList[cursorNoteSymbol] .. octave .. ") " ..
-               "ch:" .. spacingCH .. showNotes[i][4] ..   "  v:" .. spacingV .. showNotes[i][2] .. " D:" .. spacingD .. showNotes[i][3]
+            reaper.ImGui_TextColored(ctx, color, "n: " .. spacingN .. showNotes[i][1] .. postNote ..
+              "(" .. cursorNoteSymbol .. octave .. ")  " ..
+               "ch:" .. spacingCH .. showNotes[i][4] ..   "  v: " .. spacingV .. showNotes[i][2] .. "  D: " .. spacingD .. showNotes[i][3]
               )
           end
         end
