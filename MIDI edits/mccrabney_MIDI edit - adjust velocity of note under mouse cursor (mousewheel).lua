@@ -1,30 +1,19 @@
 --[[
- * ReaScript Name: Delete notes under mouse cursor, closest first
+ * ReaScript Name: adjust velocity of note under mouse cursor
  * Author: mccrabney
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.3
+ * Version: 1.0
 --]]
  
 --[[
  * Changelog:
- 
- * v1.3 (2023-5-07)
-    + major simplification using extstate from 'mccrabney_MIDI edit - show notes, under mouse and last-received.lua'
- 
- * v1.2 (2023-1-05)
-   + removed errant console message
- 
- * v1.1 (2023-01-02)
-   + fix for multiple notes
-   + if multiple notes exist equidistant from mouse cursor, delete highest first
-   
- * v1.0 (2023-01-01)
-   + Initial Release
+ * v1.0 (2023-05-08)
+   + requires extstates from mccrabney_MIDI edit - show notes, under mouse and last-received.lua
 --]]
 
-
+---------------------------------------------------------------------
 extName = "mccrabney_MIDI edit - show notes, under mouse and last-received.lua"  
 
 ---------------------------------------------------------------------
@@ -57,19 +46,31 @@ end
 function main()
   reaper.PreventUIRefresh(1)
   
+   _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
+  if mouse_scroll > 0 then 
+    incr = 1                            -- how many ticks to move noteoff forwards, adjust as desired
+  elseif mouse_scroll < 0 then 
+    incr = -1                          -- how many ticks to move noteoff backwards, adjust as desired
+  end
+  
   take, targetNoteNumber, targetNoteIndex = getNotesUnderMouseCursor()
 
   local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"}
 
   if take ~= nil and targetNoteIndex ~= -1 then
-    reaper.MIDI_DeleteNote(take, targetNoteIndex)
+    _, _, _, _, _, _, _, vel = reaper.MIDI_GetNote( take, targetNoteIndex )
+
+    vel = vel+incr
+    if vel > 127 then vel = 127 end
+    if vel < 1 then vel = 1 end
+     
+    reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, nil, nil, nil, nil, vel)
     reaper.MIDI_Sort(take)
-    
     reaper.SetExtState(extName, 'DoRefresh', '1', false)
     
     octave = math.floor(targetNoteNumber/12)-1                               -- establish the octave for readout
     cursorNoteSymbol = pitchList[(targetNoteNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
-    reaper.Undo_OnStateChange2(proj, "deleted note " .. targetNoteNumber .. ", (" .. cursorNoteSymbol .. octave .. ")")
+    reaper.Undo_OnStateChange2(proj, "changed velocity of note " .. targetNoteNumber .. ", (" .. cursorNoteSymbol .. octave .. ")")
   end
   
   reaper.PreventUIRefresh(-1)
@@ -79,3 +80,7 @@ end
  
 main()
 
+  
+
+  
+  

@@ -9,6 +9,8 @@
  
 --[[
  * Changelog:
+ + v1.44 (2023-5-07)
+   + added extstates to output notes under mouse to other scripts
  + v1.43 (2023-5-05)
    + fixed error message, improved spacing on readout
  + v1.42 (2023-5-04)
@@ -108,7 +110,7 @@ function getMouseInfo()
   
   local trackHeight
   local takes, channel
-  local targetPitch  -- initialize target variable
+  local targetNoteIndex, targetPitch  -- initialize target variable
   local numberNotes = 0
   local item, position_ppq, take, note
   window, _, _ = reaper.BR_GetMouseCursorContext() -- initialize cursor context
@@ -138,7 +140,7 @@ function getMouseInfo()
             note = pitch
             numberNotes = numberNotes+1                           -- add to count of how many notes are under mouse cursor
             noteLength = math.floor(endppq - startppq)
-            showNotes[numberNotes] = {pitch, vel, noteLength, ch+1}              -- get the pitch and corresponding velocity as table-in-table
+            showNotes[numberNotes] = {pitch, vel, noteLength, ch+1, n}              -- get the pitch and corresponding velocity as table-in-table
             pitchUnderCursor[numberNotes] = pitch                 -- get the pitch to reference for undo message
             pitchSorted[numberNotes] = pitch
             distanceFromMouse[numberNotes] = position_ppq - startppq       -- put distance to cursor in index position reference table
@@ -157,7 +159,7 @@ function getMouseInfo()
         for j = 1, #distanceSorted do                                 -- for each entry in the sorted distance array
           if distanceSorted[j] == distanceSorted[j+1] then            -- if entries are equal
             sameDistance = sameDistance+1
-            
+             
             for p = 1, #distanceFromMouse do                          -- for each entry in the distancefrommouse array
               if distanceFromMouse[p] == distanceSorted[1] then       -- if distFromMouse index = closest note entry,
                 sameLowest = p                                        -- get the index 
@@ -165,10 +167,11 @@ function getMouseInfo()
             end 
           end
         end
-
+        
         --~~~~~~~  closest note
         for i = 1, #distanceFromMouse do                        -- for each entry in the unsorted distance array
           if targetNoteDistance == distanceFromMouse[i] and sameDistance == 0 then   
+            targetNoteIndex = showNotes[i][5]
             targetPitch = showNotes[i][1]                -- get the pitch value of the closest note
           end                                     
         end                                                         -- end for each entry in array
@@ -177,17 +180,37 @@ function getMouseInfo()
         if sameDistance > 0 then                          -- if there are notes that are the same distance from mouse
           for t = 1, #distanceFromMouse do                 -- for each entry in the unsorted pitch array
             if lowestPitch == showNotes[t][1] then    -- if the entry matchest the closest note distance from mouse cursor
+              targetNoteIndex = showNotes[t][5]              
               targetPitch = lowestPitch
             end
           end
         end
+             
       end           -- if take is MIDI
     end             -- if take not nil
          
     table.sort(showNotes, function(a, b)
       return a[1] < b[1]
     end)
+
+    local extName = 'mccrabney_MIDI edit - show notes, under mouse and last-received.lua'
+
+    reaper.SetExtState(extName, 1, #showNotes, false)             -- how many notes are under mouse
+    guidString = reaper.BR_GetMediaItemTakeGUID( take )           -- get guidString from take
+    reaper.SetExtState(extName, 2, tostring(guidString), false)   -- what take is under mouse
     
+    if targetNoteIndex ~= nil and targetPitch ~= nil then    
+      reaper.SetExtState(extName, 3, targetPitch, false)            -- what is the target pitch under mouse
+      reaper.SetExtState(extName, 4, targetNoteIndex, false)            -- what is the target index under mouse
+    elseif targetNoteIndex == nil then 
+      targetNoteIndex = -1
+      reaper.SetExtState(extName, 4, targetNoteIndex, false)            -- what is the target index under mouse
+    end
+    
+    for i = 1, #showNotes do
+      reaper.SetExtState('mccrabney_MIDI edit - show notes, under mouse and last-received.lua', i+4, table.concat(showNotes[i],","), false)
+    end
+  
     return take, targetPitch, showNotes
     
   end
@@ -245,10 +268,6 @@ local function loop()
     if skip ~= 1 then
       lastMIDI[1] = {lastNote, lastVel, 0, 0} 
       table.insert(showNotes, 1, lastMIDI[1]) 
-    else
-      --lastMIDI[1] = {lastNote, currentVel} 
-      --table.remove(showNotes, 1)
-      --table.insert(showNotes, 1, lastMIDI[1])
     end   
 
     octaveNote = math.floor(lastNote/12)-1                      -- get symbols for last-received MIDI
