@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="e232c561794d8e52896af6c44512af561551868d">
+<index version="1" name="mccrabney Reascripts" commit="0f163c2dc3d29876a265e70d1fdbe4ba74347385">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -28,10 +28,20 @@
     </reapack>
   </category>
   <category name="MIDI edits">
-    <reapack name="mccrabney_MIDI edit - adjust length of note under mouse cursor (mousewheel).lua" type="script" desc="Delete notes under mouse cursor">
+    <reapack name="mccrabney_MIDI edit - adjust length of note under mouse cursor (mousewheel).lua" type="script" desc="adjust length of note under mouse cursor">
       <version name="1.0" author="mccrabney" time="2023-01-02T19:17:22Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/685d3de6ebbb00ab8f7a64b389cceb092657d127/MIDI%20edits/mccrabney_MIDI%20edit%20-%20adjust%20length%20of%20note%20under%20mouse%20cursor%20(mousewheel).lua</source>
+      </version>
+      <version name="1.1" author="mccrabney" time="2023-05-08T13:02:57Z">
+        <changelog><![CDATA[+ requires extstates from mccrabney_MIDI edit - show notes, under mouse and last-received.lua]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/0f163c2dc3d29876a265e70d1fdbe4ba74347385/MIDI%20edits/mccrabney_MIDI%20edit%20-%20adjust%20length%20of%20note%20under%20mouse%20cursor%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - adjust velocity of note under mouse cursor (mousewheel).lua" type="script" desc="adjust velocity of note under mouse cursor">
+      <version name="1.0" author="mccrabney" time="2023-05-08T13:02:57Z">
+        <changelog><![CDATA[+ requires extstates from mccrabney_MIDI edit - show notes, under mouse and last-received.lua]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/0f163c2dc3d29876a265e70d1fdbe4ba74347385/MIDI%20edits/mccrabney_MIDI%20edit%20-%20adjust%20velocity%20of%20note%20under%20mouse%20cursor%20(mousewheel).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - delete notes that start at edit cursor.lua" type="script" desc="Delete notes that start at edit cursor">
@@ -191,6 +201,12 @@
       </version>
       <version name="1.43" author="mccrabney" time="2023-05-05T11:24:57Z">
         <source main="main">https://github.com/mccrabney/Reascripts/raw/e232c561794d8e52896af6c44512af561551868d/MIDI%20edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20mouse%20and%20last-received.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - transpose note under mouse cursor (mousewheel).lua" type="script" desc="transpose note under mouse cursor">
+      <version name="1.0" author="mccrabney" time="2023-05-08T13:02:57Z">
+        <changelog><![CDATA[+ requires extstates from mccrabney_MIDI edit - show notes, under mouse and last-received.lua]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/0f163c2dc3d29876a265e70d1fdbe4ba74347385/MIDI%20edits/mccrabney_MIDI%20edit%20-%20transpose%20note%20under%20mouse%20cursor%20(mousewheel).lua</source>
       </version>
     </reapack>
   </category>
