@@ -23,7 +23,7 @@
   function main()
     incr = 1
     job = 3
-    SetGlobalParam(job, _, _, incr)
+    SetGlobalParam(job, _, _, _, incr)
   end
   ----------------------------
   main()
