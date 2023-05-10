@@ -15,10 +15,36 @@
    + Initial Release
 --]]
 
+---------------------------------------------------------------------
 extName = "mccrabney_MIDI edit - show notes, under mouse and last-received.lua"  
 
----------------------------------------------------------------------
+local script_folder = debug.getinfo(1).source:match("@?(.*[\\|/])")
+script_folder = string.gsub(script_folder, "MIDI edits\\", "")
+for key in pairs(reaper) do _G[key]=reaper[key]  end 
+local info = debug.getinfo(1,'S');
+dofile(script_folder .. "Razor Edits/mccrabney_Razor Edit Control Functions.lua")   
 
+
+-----------------------------------------------------------
+    --[[------------------------------[[--
+          check for razor edit 
+    --]]------------------------------]]--
+    
+function RazorEditSelectionExists()
+ 
+  for i = 0, reaper.CountTracks(0)-1 do          -- for each track, check if RE is present
+    local retval, x = reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(0,i), "P_RAZOREDITS", "string", false)
+    if x ~= "" then return true end              -- if present, return true 
+    if x == nil then return false end            -- return that no RE exists
+  end
+end                                 
+  
+
+---------------------------------------------------------------------
+    --[[------------------------------[[--
+          refer to extstates to get MIDI under mouse
+    --]]------------------------------]]--
+    
 function getNotesUnderMouseCursor()
   
   showNotes = {}
@@ -43,31 +69,43 @@ function getNotesUnderMouseCursor()
 end
 
 ---------------------------------------------------------------------
+    --[[------------------------------[[--
+          nudge notes whose ons are in RE if present, else nudge note under mouse, closest first
+    --]]------------------------------]]--
+
 
 function main()
   reaper.PreventUIRefresh(1)
   
-   _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
+  _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
   if mouse_scroll > 0 then 
-    ppqIncr =100                            -- how many ticks to move noteoff forwards, adjust as desired
+    incr = 100                           -- how many ticks to move noteoff forwards, adjust as desired
+    task = 19
+    job = 1
   elseif mouse_scroll < 0 then 
-    ppqIncr = -100                          -- how many ticks to move noteoff backwards, adjust as desired
+    incr = -100                          -- how many ticks to move noteoff backwards, adjust as desired
+    task = 18
+    job = 1
   end
   
-  take, targetNoteNumber, targetNoteIndex = getNotesUnderMouseCursor()
-
-  local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"}
-
-  if take ~= nil and targetNoteIndex ~= -1 then
-    _, _, _, _, endppqpos, _, _, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
-    reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, nil, endppqpos + ppqIncr, nil, nil, nil, nil)
-    reaper.MIDI_Sort(take)
-    
-    reaper.SetExtState(extName, 'DoRefresh', '1', false)
-    
-    octave = math.floor(targetNoteNumber/12)-1                               -- establish the octave for readout
-    cursorNoteSymbol = pitchList[(targetNoteNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
-    reaper.Undo_OnStateChange2(proj, "changed length of note " .. targetNoteNumber .. ", (" .. cursorNoteSymbol .. octave .. ")")
+  if RazorEditSelectionExists() then
+    SetGlobalParam(job, task, _)
+  else
+    take, targetNoteNumber, targetNoteIndex = getNotesUnderMouseCursor()
+  
+    local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"}
+  
+    if take ~= nil and targetNoteIndex ~= -1 then
+      _, _, _, _, endppqpos, _, _, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
+      reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, nil, endppqpos + incr, nil, nil, nil, nil)
+      reaper.MIDI_Sort(take)
+      
+      reaper.SetExtState(extName, 'DoRefresh', '1', false)
+      
+      octave = math.floor(targetNoteNumber/12)-1                               -- establish the octave for readout
+      cursorNoteSymbol = pitchList[(targetNoteNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
+      reaper.Undo_OnStateChange2(proj, "changed length of note " .. targetNoteNumber .. ", (" .. cursorNoteSymbol .. octave .. ")")
+    end
   end
   
   reaper.PreventUIRefresh(-1)

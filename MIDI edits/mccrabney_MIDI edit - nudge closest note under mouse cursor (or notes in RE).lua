@@ -1,15 +1,15 @@
 --[[
- * ReaScript Name: transpose note under mouse cursor
+ * ReaScript Name: nudge closest note under mouse cursor (or notes in RE)
  * Author: mccrabney
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.0
+ * Version: 1.1
 --]]
  
 --[[
  * Changelog:
- * v1.0 (2023-05-08)
+ * v1.1 (2023-05-09)
    + requires extstates from mccrabney_MIDI edit - show notes, under mouse and last-received.lua
 --]]
 
@@ -77,39 +77,37 @@ function main()
   
   _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
   if mouse_scroll > 0 then 
-    incr = 1                           -- how many vels to up notes
+    incr = 100                           -- how many ticks to move noteoff forwards, adjust as desired
+    task = 6
+    job = 1
   elseif mouse_scroll < 0 then 
-    incr = -1                          -- how many vels to down notes
+    incr = -100                          -- how many ticks to move noteoff backwards, adjust as desired
+    task = 7
+    job = 1
   end
   
   if RazorEditSelectionExists() then
-    job = 1
-    task = 21  
-    SetGlobalParam(job, task, _, _, incr)
-  else
-    
+    SetGlobalParam(job, task, _)
+    else
     take, targetNoteNumber, targetNoteIndex = getNotesUnderMouseCursor()
+  
     local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"}
   
     if take ~= nil and targetNoteIndex ~= -1 then
-      _, _, _, _, _, _, pitch, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
-      
-      pitch = pitch + incr
-      if pitch > 127 then pitch = 127 end
-      if pitch < 0 then pitch = 0 end  
-      
-      reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, nil, nil, nil, pitch, nil)
+      _, _, _, startppqpos, endposppqpos, _, _, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
+      reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppqpos + incr, nil, nil, nil, nil)
       reaper.MIDI_Sort(take)
+      
       reaper.SetExtState(extName, 'DoRefresh', '1', false)
       
       octave = math.floor(targetNoteNumber/12)-1                               -- establish the octave for readout
       cursorNoteSymbol = pitchList[(targetNoteNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
-      reaper.Undo_OnStateChange2(proj, "transposed " .. targetNoteNumber .. "(" .. cursorNoteSymbol .. octave .. ")" .. " to " .. targetNoteNumber+incr .. "(" .. cursorNoteSymbol .. octave .. ")")
+      reaper.Undo_OnStateChange2(proj, "nudged note " .. targetNoteNumber .. "(" .. cursorNoteSymbol .. octave .. ")")
     end
+    
+    reaper.PreventUIRefresh(-1)
+    reaper.UpdateArrange()
   end
-  reaper.PreventUIRefresh(-1)
-  reaper.UpdateArrange()
-
 end
  
 main()

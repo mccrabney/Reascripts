@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.43
+ * Version: 1.45
 --]]
  
 --[[
  * Changelog:
+ + v1.45 (2023-5-09)
+   + added muted note coloration
  + v1.44 (2023-5-07)
    + added extstates to output notes under mouse to other scripts
  + v1.43 (2023-5-05)
@@ -18,12 +20,9 @@
  * v1.41 (2023-5-04)
    + fixed show last-hit MIDI note, appears in green, replacing existing readout if present
  * v1.4 (2023-5-04)
-   + added velocity readout for all notes, despite last comment. thanks, cfillion!
-   + more cleanup
- * v1.3 (2023-5-03)
+   + added velocity readout for all notes
+* v1.3 (2023-5-03)
    + added velocity readout for target note only
-      - note, readout for all notes unlikely due to (necessarily) sorted pitchUnderCursor[]
-   + misc cleanup
  * v1.2 (2023-5-01)
    + fixed error message on MIDI item glue
  * v1.1 (2023-03-12)
@@ -101,7 +100,7 @@ end                                             -- end function
 
 -----------------------------------------------------------
     --[[------------------------------[[--
-          sparingly call GetMouseCursorContext for some under-mouse details -- mccrabney        
+          get details of MIDI notes under mouse -- mccrabney        
     --]]------------------------------]]--
     
 function getMouseInfo()
@@ -112,12 +111,12 @@ function getMouseInfo()
   local takes, channel
   local targetNoteIndex, targetPitch  -- initialize target variable
   local numberNotes = 0
-  local item, position_ppq, take, note
+  local item, position_ppq, take
   window, _, _ = reaper.BR_GetMouseCursorContext() -- initialize cursor context
   local track = reaper.BR_GetMouseCursorContext_Track()
   local hZoom = reaper.GetHZoomLevel()
- 
-  if window ~= "midi editor" and hZoom > 8 then   -- ifn't ME, and if slightly zoomed in
+
+  if window ~= "midi editor" and hZoom > 2 then   -- ifn't ME, and if slightly zoomed in
     if track ~= nil then                      -- if there is a track
       trackHeight = reaper.GetMediaTrackInfo_Value( track, "I_TCPH")
     end
@@ -134,13 +133,12 @@ function getMouseInfo()
         local notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take
         
         for n = notesCount-1, 0, -1 do
-          _, selected, _, startppq, endppq, ch, pitch, vel = reaper.MIDI_GetNote(take, n) -- get note start/end position              
+          _, selected, muted, startppq, endppq, ch, pitch, vel = reaper.MIDI_GetNote(take, n) -- get note start/end position              
           
           if startppq <= position_ppq and endppq >= position_ppq then -- is current note the note under the cursor?
-            note = pitch
             numberNotes = numberNotes+1                           -- add to count of how many notes are under mouse cursor
             noteLength = math.floor(endppq - startppq)
-            showNotes[numberNotes] = {pitch, vel, noteLength, ch+1, n}              -- get the pitch and corresponding velocity as table-in-table
+            showNotes[numberNotes] = {pitch, vel, noteLength, ch+1, n, tostring(muted)}              -- get the pitch and corresponding velocity as table-in-table
             pitchUnderCursor[numberNotes] = pitch                 -- get the pitch to reference for undo message
             pitchSorted[numberNotes] = pitch
             distanceFromMouse[numberNotes] = position_ppq - startppq       -- put distance to cursor in index position reference table
@@ -200,11 +198,11 @@ function getMouseInfo()
     reaper.SetExtState(extName, 2, tostring(guidString), false)   -- what take is under mouse
     
     if targetNoteIndex ~= nil and targetPitch ~= nil then    
-      reaper.SetExtState(extName, 3, targetPitch, false)            -- what is the target pitch under mouse
-      reaper.SetExtState(extName, 4, targetNoteIndex, false)            -- what is the target index under mouse
+      reaper.SetExtState(extName, 3, targetPitch, false)          -- what is the target pitch under mouse
+      reaper.SetExtState(extName, 4, targetNoteIndex, false)      -- what is the target index under mouse
     elseif targetNoteIndex == nil then 
       targetNoteIndex = -1
-      reaper.SetExtState(extName, 4, targetNoteIndex, false)            -- what is the target index under mouse
+      reaper.SetExtState(extName, 4, targetNoteIndex, false)      -- what is the target index under mouse
     end
     
     for i = 1, #showNotes do
@@ -238,8 +236,9 @@ local function loop()
   
   x, y = reaper.GetMousePosition()                              -- mousepos
   _, info = reaper.GetThingFromPoint( x, y )                    -- mousedetails
+  
                                                                 -- optimizer to reduce calls to getMouseInfo
-  if loopCount >= 5 and info == "arrange" and lastX ~= x and pop == 0 then 
+  if loopCount >= 3 and info == "arrange" and lastX ~= x and pop == 0 then 
     take, targetPitch, showNotes = getMouseInfo()
     if take ~= nil and reaper.TakeIsMIDI(take) then             -- if take is MIDI
       loopCount = 0                                             -- reset loopcount
@@ -337,7 +336,6 @@ local function loop()
           elseif showNotes[i][3] > 9999                             then spacingD = ""
           end
           
-          
           if showNotes[i][1] == targetPitch and showNotes[i][1] ~= lastNote then  -- color red if entry matches the target note & no lastNote
             color = 0xFF8383FF                             -- red                        
           elseif showNotes[i][1] == lastNote and pop == 1 then      -- if note is received from controller
@@ -350,13 +348,14 @@ local function loop()
             color = 0xFFFFFFFF                            -- white
           end                                             -- end color readout red if entry matches the target note
           
+          if showNotes[i][6] == "true" then color = 0xA8A8A8 end
+          
           table.sort(showNotes, function(a, b) return a[1] < b[1] end)
         
           if i-1 ~= nil and showNotes[i] ~= showNotes[i+1] then
             reaper.ImGui_TextColored(ctx, color, "n: " .. spacingN .. showNotes[i][1] .. postNote ..
               "(" .. cursorNoteSymbol .. octave .. ")  " ..
-               "ch:" .. spacingCH .. showNotes[i][4] ..   "  v: " .. spacingV .. showNotes[i][2] .. "  D: " .. spacingD .. showNotes[i][3]
-              )
+               "ch:" .. spacingCH .. showNotes[i][4] ..   "  v: " .. spacingV .. showNotes[i][2] .. "  D: " .. spacingD .. showNotes[i][3])
           end
         end
       end                                               -- for each shown note
