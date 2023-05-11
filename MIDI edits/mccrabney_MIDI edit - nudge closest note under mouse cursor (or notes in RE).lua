@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.1
+ * Version: 1.2
 --]]
  
 --[[
  * Changelog:
+ * v1.2 (2023-05-11)
+   + updated to prevent notes from escaping RE bounds
  * v1.1 (2023-05-09)
    + requires extstates from mccrabney_MIDI edit - show notes, under mouse and last-received.lua
 --]]
@@ -78,17 +80,16 @@ function main()
   _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
   if mouse_scroll > 0 then 
     incr = 100                           -- how many ticks to move noteoff forwards, adjust as desired
-    task = 6
-    job = 1
   elseif mouse_scroll < 0 then 
     incr = -100                          -- how many ticks to move noteoff backwards, adjust as desired
-    task = 7
-    job = 1
   end
   
   if RazorEditSelectionExists() then
-    SetGlobalParam(job, task, _)
-    else
+    job = 1
+    task = 6
+    SetGlobalParam(job, task, _, _, incr)
+  
+  else
     take, targetNoteNumber, targetNoteIndex = getNotesUnderMouseCursor()
   
     local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"}
