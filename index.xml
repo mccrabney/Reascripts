@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="35a72fdb4200ff1baf7179bcd9b38563b3ccb0a2">
+<index version="1" name="mccrabney Reascripts" commit="d94d47fcba3d2e57f7b826cf49eb9ba9de0113ce">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -172,6 +172,10 @@
         <changelog><![CDATA[+ requires extstates from mccrabney_MIDI edit - show notes, under mouse and last-received.lua]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/0282da29eb1abc78254f1e6c090d304bb29ff149/MIDI%20edits/mccrabney_MIDI%20edit%20-%20nudge%20closest%20note%20under%20mouse%20cursor%20(or%20notes%20in%20RE).lua</source>
       </version>
+      <version name="1.2" author="mccrabney" time="2023-05-11T18:54:38Z">
+        <changelog><![CDATA[+ updated to prevent notes from escaping RE bounds]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d94d47fcba3d2e57f7b826cf49eb9ba9de0113ce/MIDI%20edits/mccrabney_MIDI%20edit%20-%20nudge%20closest%20note%20under%20mouse%20cursor%20(or%20notes%20in%20RE).lua</source>
+      </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - show most recently received MIDI note.lua" type="script" desc="show most recently received MIDI note">
       <version name="1.1" author="mccrabney" time="2023-03-11T15:57:09Z">
@@ -336,6 +340,14 @@
 + 
 ]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/4310e1db978612a1400bc22d8b9abbdf64bbfe7f/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.1" author="mccrabney" time="2023-05-11T18:54:23Z">
+        <changelog><![CDATA[+ updated to prevent notes from escaping RE bounds
++ improved communication with other scripts
++ began cleanup of inexperienced, verbose code
++ needs further integration with "show notes, closest first etc"
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/0e5e1f8639798c5eeae737542fa1a9d7bf65aa7a/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Razor Edit MIDI - copy selected notes in RE.lua" type="script" desc="copy notes whose note-ons are contained in Razor Edit">
