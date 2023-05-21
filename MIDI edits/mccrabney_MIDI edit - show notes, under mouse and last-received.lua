@@ -4,13 +4,14 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.50
+ * Version: 1.51
 --]]
  
 --[[
  * Changelog:
  + v1.51 (2023-5-21)
    + now reports toolbar button toggle state
+   + improved pause system - tooltip follows mouse, nudge not limited to OG mouse pos
  + v1.50 (2023-5-20)
    + added secondary script "pause show notes" to "hold" a target note in yellow
    + issue, mouse must still be over target Take, fix eventually? 
@@ -258,9 +259,8 @@ local function loop()
     reaper.DeleteExtState('mccrabney_MIDI edit - show notes, under mouse and last-received.lua', 'DoRefresh', false)
     lastX = -1                                                  -- fools the optimizer into resetting
   end
-  
                                                                 -- optimizer to reduce calls to getMouseInfo
-  if loopCount >= 3 and info == "arrange" and lastX ~= x and pop == 0 then 
+  if loopCount >= 3 and info == "arrange" and lastX ~= x and pause == 0 and pop == 0 then 
     take, targetPitch, showNotes = getMouseInfo() 
     if take ~= nil and reaper.TakeIsMIDI(take) then             -- if take is MIDI
       loopCount = 0                                             -- reset loopcount
@@ -285,9 +285,9 @@ local function loop()
  local skip = 0                                                -- insert last-received MIDI into table
   if lastNote ~= -1 and lastNote ~= nil and take ~= nil and pop == 0 then
     pop = 1                                                     -- MIDI is being received
-                          -- package the pitch/vel info
+                                                                -- package the pitch/vel info
     local currentVel
-    for i = 1, #showNotes do                                 -- check each note to see if it is already present
+    for i = 1, #showNotes do                   -- check each note to see if it is already present
       if lastNote == showNotes[i][1] then 
         currentVel = showNotes[i][2]
         skip = 1
