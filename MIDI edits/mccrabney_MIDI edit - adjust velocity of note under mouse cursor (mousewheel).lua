@@ -77,9 +77,9 @@ function main()
   
   _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
   if mouse_scroll > 0 then 
-    incr = 1                           -- how many vels to up notes
+    incr = 2                           -- how many vels to up notes
   elseif mouse_scroll < 0 then 
-    incr = -1                          -- how many vels to down notes
+    incr = -2                          -- how many vels to down notes
   end
   
   if RazorEditSelectionExists() then

@@ -4,11 +4,14 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.45
+ * Version: 1.50
 --]]
  
 --[[
  * Changelog:
+ + v1.50 (2023-5-20)
+   + added secondary script "pause show notes" to "hold" a target note in yellow
+   + issue, mouse must still be over target Take, fix eventually? 
  + v1.45 (2023-5-09)
    + added muted note coloration
  + v1.44 (2023-5-07)
@@ -39,6 +42,7 @@ dofile(reaper.GetResourcePath() .. '/Scripts/ReaTeam Extensions/API/imgui.lua')(
 loopCount = 0
 loopReset = 0
 lastX = 0
+pause = 0
 
 local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"}
 local pitchUnderCursor = {}
@@ -95,18 +99,20 @@ function getLastNoteHit()
     reaper.ShowMessageBox("A folder has been created to watch your MIDI controllers.\n", "No MIDI reference", 0)  
   end
   return lastNote, lastVel         -- lastNoteHit is a referenced variable for edits
-end                                             -- end function
+
+end
+                                           -- end function
 
 
 -----------------------------------------------------------
     --[[------------------------------[[--
           get details of MIDI notes under mouse -- mccrabney        
     --]]------------------------------]]--
-    
+   
 function getMouseInfo()
+  
   local pitchUnderCursor = {}    -- pitches of notes under the cursor (for undo)
   local showNotes = {}    -- table consisting of sub-tables grouping Pitch and Vel
-  
   local trackHeight
   local takes, channel
   local targetNoteIndex, targetPitch  -- initialize target variable
@@ -121,8 +127,15 @@ function getMouseInfo()
       trackHeight = reaper.GetMediaTrackInfo_Value( track, "I_TCPH")
     end
     
-    local mouse_pos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position
-    take = reaper.BR_GetMouseCursorContext_Take() -- get take under mouse
+    if pause == 1 then
+      mouse_pos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position once
+      pause = -1
+    elseif pause == 0 then 
+      mouse_pos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position
+    end
+      
+    take = reaper.BR_GetMouseCursorContext_Take() -- get take under mouse    
+
     if take ~= nil and trackHeight > 25 then      -- if track height isn't tiny
       if reaper.TakeIsMIDI(take) then 
         local pitchSorted = {}                  -- pitches under cursor to be sorted
@@ -208,8 +221,8 @@ function getMouseInfo()
     for i = 1, #showNotes do
       reaper.SetExtState('mccrabney_MIDI edit - show notes, under mouse and last-received.lua', i+4, table.concat(showNotes[i],","), false)
     end
-  
-    return take, targetPitch, showNotes
+    
+  return take, targetPitch, showNotes
     
   end
 end
@@ -223,23 +236,30 @@ end
 pop = 0 
 
 local function loop()
+
+  --reaper.ShowConsoleMsg(reaper.GetHZoomLevel() .. "\n")
   local lastMIDI = {}
                                                                 -- reset loop from external scripts
+  reaper.ImGui_GetFrameCount(ctx)                               -- "a fast & inoffensive function"
+  loopCount = loopCount+1                                       -- advance loopcount
+  
+  if reaper.HasExtState('mccrabney_MIDI edit - show notes, under mouse and last-received.lua', 'Pause') then
+    reaper.DeleteExtState('mccrabney_MIDI edit - show notes, under mouse and last-received.lua', 'Pause', false)
+    if pause == 1 or pause == -1 then 
+      pause = 0 
+    else 
+      pause = 1 
+    end 
+  end
+  
   if reaper.HasExtState('mccrabney_MIDI edit - show notes, under mouse and last-received.lua', 'DoRefresh') then
     reaper.DeleteExtState('mccrabney_MIDI edit - show notes, under mouse and last-received.lua', 'DoRefresh', false)
     lastX = -1                                                  -- fools the optimizer into resetting
   end
- 
-  reaper.ImGui_GetFrameCount(ctx)                               -- "a fast & inoffensive function"
-   
-  loopCount = loopCount+1                                       -- advance loopcount
-  
-  x, y = reaper.GetMousePosition()                              -- mousepos
-  _, info = reaper.GetThingFromPoint( x, y )                    -- mousedetails
   
                                                                 -- optimizer to reduce calls to getMouseInfo
   if loopCount >= 3 and info == "arrange" and lastX ~= x and pop == 0 then 
-    take, targetPitch, showNotes = getMouseInfo()
+    take, targetPitch, showNotes = getMouseInfo() 
     if take ~= nil and reaper.TakeIsMIDI(take) then             -- if take is MIDI
       loopCount = 0                                             -- reset loopcount
       lastX = x                                                 -- set lastX mouse position
@@ -250,9 +270,17 @@ local function loop()
     lastNote, lastVel = getLastNoteHit()   
   end                                                           -- end optimizer2
 
+  if pause == 1 then
+    x, y = reaper.GetMousePosition()                            -- mousepos
+    info = "arrange"                                            -- mousedetails
+  elseif pause == 0 then
+    x, y = reaper.GetMousePosition()                            -- mousepos
+    _, info = reaper.GetThingFromPoint( x, y )                  -- mousedetails
+  end
+
   if lastNote == -1 then pop = 0 end
 
-  local skip = 0                                                -- insert last-received MIDI into table
+ local skip = 0                                                -- insert last-received MIDI into table
   if lastNote ~= -1 and lastNote ~= nil and take ~= nil and pop == 0 then
     pop = 1                                                     -- MIDI is being received
                           -- package the pitch/vel info
@@ -276,7 +304,8 @@ local function loop()
   
   
   if targetPitch ~= nil and info == "arrange" and take ~= nil then  -- if mousing over a note in a MIDI item in arrange
-    local x, y = reaper.ImGui_PointConvertNative(ctx, reaper.GetMousePosition())
+    
+    --local x, y = reaper.ImGui_PointConvertNative(ctx, reaper.GetMousePosition())
     reaper.ImGui_SetNextWindowPos(ctx, x - 11, y + 25)
     reaper.ImGui_PushFont(ctx, sans_serif)  
     reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_WindowBg(), 0x0F0F0FD8)
@@ -341,21 +370,23 @@ local function loop()
           elseif showNotes[i][1] == lastNote and pop == 1 then      -- if note is received from controller
             notePresent = 1
             showNotes[i][2] = lastVel                               -- set incoming velocity
-            showNotes[i][3] = 99999                                  -- max out duration
+            showNotes[i][3] = 0                                  -- max out duration
             showNotes[i][4] = "in"
             color = 0x00F992FF                            -- green
           elseif showNotes[i][1] ~= lastNote then 
             color = 0xFFFFFFFF                            -- white
-          end                                             -- end color readout red if entry matches the target note
+          end
           
           if showNotes[i][6] == "true" then color = 0xA8A8A8 end
           
           table.sort(showNotes, function(a, b) return a[1] < b[1] end)
         
           if i-1 ~= nil and showNotes[i] ~= showNotes[i+1] then
-            reaper.ImGui_TextColored(ctx, color, "n: " .. spacingN .. showNotes[i][1] .. postNote ..
+            if pause ~= 0 then color = 0xffff00ff end
+              reaper.ImGui_TextColored(ctx, color, "n: " .. spacingN .. showNotes[i][1] .. postNote ..
               "(" .. cursorNoteSymbol .. octave .. ")  " ..
-               "ch:" .. spacingCH .. showNotes[i][4] ..   "  v: " .. spacingV .. showNotes[i][2] .. "  D: " .. spacingD .. showNotes[i][3])
+              "ch:" .. spacingCH .. showNotes[i][4] ..   "  v: " .. spacingV .. showNotes[i][2] .. "  D: " .. spacingD .. showNotes[i][3])
+            
           end
         end
       end                                               -- for each shown note

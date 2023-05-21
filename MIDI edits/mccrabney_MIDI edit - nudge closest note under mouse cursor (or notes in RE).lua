@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.2
+ * Version: 1.3
 --]]
  
 --[[
  * Changelog:
+ * v1.3 (2023-05-19)
+   + added hzoom dependent increment
  * v1.2 (2023-05-11)
    + updated to prevent notes from escaping RE bounds
  * v1.1 (2023-05-09)
@@ -77,11 +79,12 @@ end
 function main()
   reaper.PreventUIRefresh(1)
   
+  incr = 24
   _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
   if mouse_scroll > 0 then 
-    incr = 100                           -- how many ticks to move noteoff forwards, adjust as desired
-  elseif mouse_scroll < 0 then 
-    incr = -100                          -- how many ticks to move noteoff backwards, adjust as desired
+    incr = incr     
+    elseif mouse_scroll < 0 then 
+    incr = incr * -1                          -- how many ticks to move noteoff backwards, adjust as desired
   end
   
   if RazorEditSelectionExists() then
@@ -96,6 +99,7 @@ function main()
   
     if take ~= nil and targetNoteIndex ~= -1 then
       _, _, _, startppqpos, endposppqpos, _, _, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
+      
       reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppqpos + incr, nil, nil, nil, nil)
       reaper.MIDI_Sort(take)
       

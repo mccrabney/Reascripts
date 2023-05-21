@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.1
+ * Version: 1.2
 --]]
  
 --[[
  * Changelog:
+ * v1.2 (2023-05-19)
+   + added hzoom dependent increment
  * v1.1 (2023-05-08)
    + requires extstates from mccrabney_MIDI edit - show notes, under mouse and last-received.lua
  * v1.0 (2023-01-01)
@@ -77,27 +79,47 @@ end
 function main()
   reaper.PreventUIRefresh(1)
   
+  local hZoom = reaper.GetHZoomLevel()
+    
+ --[[ if hZoom > 1 then incr = 1000 end
+  if hZoom > 40 then incr = 500 end
+  if hZoom > 100 then incr = 100 end
+  if hZoom > 150 then incr = 50 end
+  if hZoom > 200 then incr = 25 end
+  if hZoom > 300 then incr = 10 end
+  if hZoom > 400 then incr = 5 end--]]
+
+  incr = 24
+  task = 18
+  job = 1  
+  
   _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
   if mouse_scroll > 0 then 
-    incr = 100                           -- how many ticks to move noteoff forwards, adjust as desired
-    task = 19
-    job = 1
   elseif mouse_scroll < 0 then 
-    incr = -100                          -- how many ticks to move noteoff backwards, adjust as desired
-    task = 18
-    job = 1
+    incr = incr * -1                          -- how many ticks to move noteoff backwards, adjust as desired
   end
   
   if RazorEditSelectionExists() then
-    SetGlobalParam(job, task, _)
+    SetGlobalParam(job, task, _, _, incr)
   else
     take, targetNoteNumber, targetNoteIndex = getNotesUnderMouseCursor()
   
     local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"}
   
     if take ~= nil and targetNoteIndex ~= -1 then
-      _, _, _, _, endppqpos, _, _, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
-      reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, nil, endppqpos + incr, nil, nil, nil, nil)
+      _, _, _, startppqpos, endppqpos, _, pitch, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
+      _, _, _, startppqposNext, _, _, pitchNext, _ = reaper.MIDI_GetNote( take, targetNoteIndex+1 )
+      
+      if endppqpos-startppqpos + incr > 10 then 
+        if pitch ~= pitchNext then
+            reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, nil, endppqpos + incr, nil, nil, nil, nil)
+        else 
+          if endppqpos + incr > startppqpos and endppqpos + incr < startppqposNext then
+            reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, nil, endppqpos + incr, nil, nil, nil, nil)
+          end
+        end
+      end
+
       reaper.MIDI_Sort(take)
       
       reaper.SetExtState(extName, 'DoRefresh', '1', false)
