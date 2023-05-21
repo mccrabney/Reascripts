@@ -87,6 +87,7 @@ TODO:
 --]]
 
 -- dofile(reaper.GetResourcePath().."/UserPlugins/ultraschall_api.lua")
+extName = "mccrabney_MIDI edit - show notes, under mouse and last-received.lua"  
 
 ---------------------------------------------------------------------
     --[[------------------------------[[--
@@ -266,18 +267,11 @@ function MIDINotesInRE(task)
                   end
 
 
-                -- EDIT: nudge last-hit notes whose noteons exist within Razor Edit forwards
+                -- EDIT: nudge last-hit notes whose noteons exist within Razor Edit forwards and backwards
                 elseif task == 13 then
                   if lastNoteHit == pitch and startppqposOut+incr >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
                     reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
                     if n == 0 then undoMessage = "nudge last-hit notes in RE forwards" end
-                  end
-              
-                -- EDIT: nudge last-hit notes whose noteons exist within Razor Edit backwards
-                elseif task == 14 then  
-                  if lastNoteHit == pitch and startppqposOut+incr >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
-                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut-incr, endppqposOut-incr, nil, nil, nil, nil)
-                    if n == 0 then undoMessage = "nudge last-hit notes in RE backwards" end
                   end
                   
                 -- EDIT: nudge noteoffs whose noteons exist within Razor Edit forwards and backwards
