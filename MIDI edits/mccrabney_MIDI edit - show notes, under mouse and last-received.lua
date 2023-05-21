@@ -9,6 +9,8 @@
  
 --[[
  * Changelog:
+ + v1.51 (2023-5-21)
+   + now reports toolbar button toggle state
  + v1.50 (2023-5-20)
    + added secondary script "pause show notes" to "hold" a target note in yellow
    + issue, mouse must still be over target Take, fix eventually? 
@@ -410,4 +412,26 @@ function main()
 end
 ----------------------------
 
-main()
+--main()
+
+-----------------------------------------------
+
+function SetButtonON()
+  reaper.SetToggleCommandState( sec, cmd, 1 ) -- Set ON
+  reaper.RefreshToolbar2( sec, cmd )
+  main()
+end
+
+-----------------------------------------------
+
+function SetButtonOFF()
+  reaper.SetToggleCommandState( sec, cmd, 0 ) -- Set OFF
+  reaper.RefreshToolbar2( sec, cmd ) 
+end
+
+-----------------------------------------------
+
+
+_, _, sec, cmd = reaper.get_action_context()
+SetButtonON()
+reaper.atexit(SetButtonOFF)
