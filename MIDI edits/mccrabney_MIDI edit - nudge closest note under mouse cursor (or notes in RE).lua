@@ -4,11 +4,14 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.3
+ * Version: 1.31
 --]]
  
 --[[
  * Changelog:
+ * v1.31 (2023-05-21)
+   + removed hzoom dependent increment
+   + fixed note overwrite bug
  * v1.3 (2023-05-19)
    + added hzoom dependent increment
  * v1.2 (2023-05-11)
@@ -98,11 +101,27 @@ function main()
     local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"}
   
     if take ~= nil and targetNoteIndex ~= -1 then
-      _, _, _, startppqpos, endposppqpos, _, _, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
+      _, _, _, startppqpos, endposppq, _, pitch, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
       
-      reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppqpos + incr, nil, nil, nil, nil)
+      if incr > 0 then 
+        _, _, _, startppqposNext, _, _, pitch2, _ = reaper.MIDI_GetNote( take, targetNoteIndex +1 )      
+        if pitch == pitch2 and endposppq+incr < startppqposNext then 
+          reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
+        end
+      end
+      
+      if incr < 0 then
+        _, _, _, _, endposppqPrev, _, pitch2, _ = reaper.MIDI_GetNote( take, targetNoteIndex -1 )      
+        if pitch == pitch2 and startppqpos+incr > endposppqPrev then 
+          reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
+        end
+      end
+
+      if pitch ~= pitch2 then
+        reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
+      end
+      
       reaper.MIDI_Sort(take)
-      
       reaper.SetExtState(extName, 'DoRefresh', '1', false)
       
       octave = math.floor(targetNoteNumber/12)-1                               -- establish the octave for readout
