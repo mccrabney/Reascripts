@@ -51,23 +51,22 @@ end
 -----------------------------
   
 function RazorEditSelectionExists()
-    local itemUnderMouse
-    local itemCount = reaper.CountSelectedMediaItems(0)  -- how many items are selected
+  local itemUnderMouse
+  local itemCount = reaper.CountSelectedMediaItems(0)  -- how many items are selected
+
+  if itemCount == 0 then                               -- if none,
+    _, _, itemUnderMouse, _ = getMouseInfo()           -- get item under mouse
+    if itemUnderMouse ~= nil then 
+      itemCount = 1
+    end                                            -- update item count
+  end
   
-    if itemCount == 0 then                               -- if none,
-      _, _, itemUnderMouse, _ = getMouseInfo()           -- get item under mouse
-      if itemUnderMouse ~= nil then 
-        itemCount = 1
-      end
-                                            -- update item count
-    end
-    
-    for i = 0, reaper.CountTracks(0)-1 do          -- for each track, check if RE is present
-      local retval, x = reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(0,i), "P_RAZOREDITS", "string", false)
-      if x ~= "" then return true end            -- if present, return true 
-      if x == nil then return false end            -- return that no RE exists
-    end
-  end                                 -- end RazorEditSelectionExists()
+  for i = 0, reaper.CountTracks(0)-1 do          -- for each track, check if RE is present
+    local retval, x = reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(0,i), "P_RAZOREDITS", "string", false)
+    if x ~= "" then return true end            -- if present, return true 
+    if x == nil then return false end            -- return that no RE exists
+  end
+end                                 -- end RazorEditSelectionExists()
   
   
 ----------------------------------------------  
@@ -91,9 +90,7 @@ function main()
         job = 1
         SetGlobalParam(job, task, _)
       end     -- mouse scroll
-
     else            -- if no RE, then nudge the note under the mouse
-      
       reaper.Undo_BeginBlock()
       if mouse_scroll > 0 then ppqIncr = 50 elseif mouse_scroll < 0 then ppqIncr = -50 end
     
@@ -110,16 +107,12 @@ function main()
         end  -- if midi
       end   -- for t = 0  
       reaper.Undo_EndBlock('nudge notes under mouse cursor', -1)
-        
-    
     end   -- if RE exists/doesn't exist
   
     reaper.PreventUIRefresh(-1)
     reaper.UpdateArrange()
     
   end  -- if selected item not nil
-
-  
 end  -- main function
   
 main()

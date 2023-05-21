@@ -120,8 +120,6 @@ end
 
 function MIDINotesInRE(task)
 
-  local ppqIncr = 100              -- how many ppq to nudge MIDI notes
-  
   local mouseNote                 -- note under mouse cursor
   local mouseTake                 -- take under mouse
   local mouseItem                 -- item under mouse
@@ -264,38 +262,31 @@ function MIDINotesInRE(task)
                elseif task == 6 then
                   if startppqposOut+incr > razorStart_ppq_pos and startppqposOut+incr < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
                     reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
-                    if n == 0 then undoMessage = "nudge notes in RE forwards" end
+                    if n == 0 then undoMessage = "nudge notes in REs" end
                   end
 
 
-                
                 -- EDIT: nudge last-hit notes whose noteons exist within Razor Edit forwards
                 elseif task == 13 then
-                  if lastNoteHit == pitch and startppqposOut+ppqIncr >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
-                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+ppqIncr, endppqposOut+ppqIncr, nil, nil, nil, nil) 
+                  if lastNoteHit == pitch and startppqposOut+incr >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
+                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
                     if n == 0 then undoMessage = "nudge last-hit notes in RE forwards" end
                   end
               
                 -- EDIT: nudge last-hit notes whose noteons exist within Razor Edit backwards
                 elseif task == 14 then  
-                  if lastNoteHit == pitch and startppqposOut+ppqIncr >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
-                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut-ppqIncr, endppqposOut-ppqIncr, nil, nil, nil, nil)
+                  if lastNoteHit == pitch and startppqposOut+incr >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
+                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut-incr, endppqposOut-incr, nil, nil, nil, nil)
                     if n == 0 then undoMessage = "nudge last-hit notes in RE backwards" end
                   end
                   
-                -- EDIT: nudge noteoffs whose noteons exist within Razor Edit backwards
+                -- EDIT: nudge noteoffs whose noteons exist within Razor Edit forwards and backwards
                 elseif task == 18 then  
-                  if startppqposOut+ppqIncr >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_SetNote( take, n, nil, nil, nil, endppqposOut-ppqIncr, nil, nil, nil, nil)
-                    if n == 0 then undoMessage = "nudge notes in RE backwards" end
+                  --reaper.ShowConsoleMsg(incr .. "\n")
+                  if startppqposOut+incr >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
+                    reaper.MIDI_SetNote( take, n, nil, nil, nil, endppqposOut+incr, nil, nil, nil, nil)
+                    if n == 0 then undoMessage = "adjust length of notes in RE" end
                   end
-                  
-                -- EDIT: nudge noteoffs whose noteons exist within Razor Edit forwards
-                elseif task == 19 then  
-                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_SetNote( take, n, nil, nil, nil, endppqposOut+ppqIncr, nil, nil, nil, nil)
-                    if n == 0 then undoMessage = "nudge notes in RE backwards" end
-                  end                  
                   
               -- toggle mute notes with razor edits:
                 elseif task == 17 then  
