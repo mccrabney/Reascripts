@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="239d227964da419bdfcacde3cc1fab4491c7a962">
+<index version="1" name="mccrabney Reascripts" commit="16d8db9f9c711091f4e2e7d44748a191e24c3570">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -183,6 +183,11 @@
       <version name="1.3" author="mccrabney" time="2023-05-21T12:27:24Z">
         <changelog><![CDATA[+ added hzoom dependent increment]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/771ee82bc6efbf0d803843c12c1abb3e97c1f3e9/MIDI%20edits/mccrabney_MIDI%20edit%20-%20nudge%20closest%20note%20under%20mouse%20cursor%20(or%20notes%20in%20RE).lua</source>
+      </version>
+      <version name="1.31" author="mccrabney" time="2023-05-21T19:52:58Z">
+        <changelog><![CDATA[+ removed hzoom dependent increment
++ fixed note overwrite bug]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/16d8db9f9c711091f4e2e7d44748a191e24c3570/MIDI%20edits/mccrabney_MIDI%20edit%20-%20nudge%20closest%20note%20under%20mouse%20cursor%20(or%20notes%20in%20RE).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - pause show notes script.lua" type="script" desc="pause show notes script">
