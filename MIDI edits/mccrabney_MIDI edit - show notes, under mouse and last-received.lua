@@ -4,12 +4,14 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.51
+ * Version: 1.511
 --]]
  
 --[[
  * Changelog:
- + v1.51 (2023-5-21)
++ v1.511 (2023-5-22)
+   + minor typo fix
++ v1.51 (2023-5-21)
    + now reports toolbar button toggle state
    + improved pause system - tooltip follows mouse, nudge not limited to OG mouse pos
  + v1.50 (2023-5-20)
@@ -260,7 +262,7 @@ local function loop()
     lastX = -1                                                  -- fools the optimizer into resetting
   end
                                                                 -- optimizer to reduce calls to getMouseInfo
-  if loopCount >= 3 and info == "arrange" and lastX ~= x and pause == 0 and pop == 0 then 
+  if loopCount >= 3 and info == "arrange" and lastX ~= x and pop == 0 then 
     take, targetPitch, showNotes = getMouseInfo() 
     if take ~= nil and reaper.TakeIsMIDI(take) then             -- if take is MIDI
       loopCount = 0                                             -- reset loopcount
@@ -273,16 +275,16 @@ local function loop()
   end                                                           -- end optimizer2
 
   if pause == 1 then
-    x, y = reaper.GetMousePosition()                            -- mousepos
+    lastX, lastY = reaper.GetMousePosition()                    -- mousepos
     info = "arrange"                                            -- mousedetails
   elseif pause == 0 then
     x, y = reaper.GetMousePosition()                            -- mousepos
     _, info = reaper.GetThingFromPoint( x, y )                  -- mousedetails
   end
-
+  
   if lastNote == -1 then pop = 0 end
 
- local skip = 0                                                -- insert last-received MIDI into table
+  local skip = 0                                                -- insert last-received MIDI into table
   if lastNote ~= -1 and lastNote ~= nil and take ~= nil and pop == 0 then
     pop = 1                                                     -- MIDI is being received
                                                                 -- package the pitch/vel info
@@ -308,6 +310,16 @@ local function loop()
   if targetPitch ~= nil and info == "arrange" and take ~= nil then  -- if mousing over a note in a MIDI item in arrange
     
     --local x, y = reaper.ImGui_PointConvertNative(ctx, reaper.GetMousePosition())
+    if pause == 1 then 
+      reaper.ImGui_SetNextWindowPos(ctx, lastX - 11, lastY + 25)
+      -- trying to set window position to x position of note
+      --_, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, showNotes[1][5]) 
+      --reaper.ShowConsoleMsg(pitch .. "\n")
+    else
+      reaper.ImGui_SetNextWindowPos(ctx, x - 11, y + 25)
+      
+    end
+    
     reaper.ImGui_SetNextWindowPos(ctx, x - 11, y + 25)
     reaper.ImGui_PushFont(ctx, sans_serif)  
     reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_WindowBg(), 0x0F0F0FD8)
@@ -430,7 +442,6 @@ function SetButtonOFF()
 end
 
 -----------------------------------------------
-
 
 _, _, sec, cmd = reaper.get_action_context()
 SetButtonON()
