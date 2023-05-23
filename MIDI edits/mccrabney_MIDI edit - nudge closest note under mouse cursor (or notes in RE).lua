@@ -53,17 +53,18 @@ end
 function getNotesUnderMouseCursor()
   
   showNotes = {}
-  tableSize = tonumber(reaper.GetExtState(extName, 1 ))
-  guidString = reaper.GetExtState(extName, 2 )
+  numVars = tonumber(reaper.GetExtState(extName, 1 ))
+  tableSize = tonumber(reaper.GetExtState(extName, 2 ))
+  guidString = reaper.GetExtState(extName, 3 )
   take = reaper.SNM_GetMediaItemTakeByGUID( 0, guidString )
-  targetNoteNumber = tonumber(reaper.GetExtState(extName, 3 ))
-  targetNoteIndex = tonumber(reaper.GetExtState(extName, 4 ))
+  targetNoteNumber = tonumber(reaper.GetExtState(extName, 4 ))
+  targetNoteIndex = tonumber(reaper.GetExtState(extName, 5 ))
   
   if tableSize ~= nil then 
     for t = 1, tableSize do
       showNotes[t] = {}
       if reaper.HasExtState(extName, t+4) then
-        for i in string.gmatch(reaper.GetExtState(extName, t+4), "-?%d+,?") do
+        for i in string.gmatch(reaper.GetExtState(extName, t+numVars), "-?%d+,?") do
           table.insert(showNotes[t], tonumber(string.match(i, "-?%d+")))
         end
       end
@@ -77,7 +78,6 @@ end
     --[[------------------------------[[--
           nudge notes whose ons are in RE if present, else nudge note under mouse, closest first
     --]]------------------------------]]--
-
 
 function main()
   reaper.PreventUIRefresh(1)
@@ -105,14 +105,16 @@ function main()
       
       if incr > 0 then 
         _, _, _, startppqposNext, _, _, pitch2, _ = reaper.MIDI_GetNote( take, targetNoteIndex +1 )      
-        if pitch == pitch2 and endposppq+incr < startppqposNext then 
+        _, _, _, startppqposPrev, endposppqPrev, _, _, _ = reaper.MIDI_GetNote( take, targetNoteIndex -1 )
+        if pitch == pitch2 and endposppq + incr < startppqposNext then 
           reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
         end
       end
       
       if incr < 0 then
-        _, _, _, _, endposppqPrev, _, pitch2, _ = reaper.MIDI_GetNote( take, targetNoteIndex -1 )      
-        if pitch == pitch2 and startppqpos+incr > endposppqPrev then 
+        _, _, _, startppqposPrev, endposppqPrev, _, pitch2, _ = reaper.MIDI_GetNote( take, targetNoteIndex -1 ) 
+        _, _, _, startppqposNext, _, _, _, _ = reaper.MIDI_GetNote( take, targetNoteIndex +1 )
+        if pitch == pitch2 and startppqpos + incr > endposppqPrev then 
           reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
         end
       end
@@ -121,8 +123,9 @@ function main()
         reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
       end
       
-      reaper.MIDI_Sort(take)
       reaper.SetExtState(extName, 'DoRefresh', '1', false)
+      reaper.MIDI_Sort(take)
+    
       
       octave = math.floor(targetNoteNumber/12)-1                               -- establish the octave for readout
       cursorNoteSymbol = pitchList[(targetNoteNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
@@ -135,6 +138,7 @@ function main()
 end
  
 main()
+
 
   
 

@@ -56,17 +56,18 @@ end
 function getNotesUnderMouseCursor()
   
   showNotes = {}
-  tableSize = tonumber(reaper.GetExtState(extName, 1 ))
-  guidString = reaper.GetExtState(extName, 2 )
+  numVars = tonumber(reaper.GetExtState(extName, 1 ))
+  tableSize = tonumber(reaper.GetExtState(extName, 2 ))
+  guidString = reaper.GetExtState(extName, 3 )
   take = reaper.SNM_GetMediaItemTakeByGUID( 0, guidString )
-  targetNoteNumber = tonumber(reaper.GetExtState(extName, 3 ))
-  targetNoteIndex = tonumber(reaper.GetExtState(extName, 4 ))
+  targetNoteNumber = tonumber(reaper.GetExtState(extName, 4 ))
+  targetNoteIndex = tonumber(reaper.GetExtState(extName, 5 ))
   
   if tableSize ~= nil then 
     for t = 1, tableSize do
       showNotes[t] = {}
       if reaper.HasExtState(extName, t+4) then
-        for i in string.gmatch(reaper.GetExtState(extName, t+4), "-?%d+,?") do
+        for i in string.gmatch(reaper.GetExtState(extName, t+numVars), "-?%d+,?") do
           table.insert(showNotes[t], tonumber(string.match(i, "-?%d+")))
         end
       end
