@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.1
+ * Version: 1.2
 --]]
  
 --[[
  * Changelog:
+ * v1.2 (2023-05-26)
+   + implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts"
  * v1.1 (2023-05-21)
    + bring up to date with other scripts
  * v1.0 (2023-01-01)
@@ -25,17 +27,18 @@
  
  
 function main()
+  reaper.PreventUIRefresh(1)
+  
+  incr = tonumber(reaper.GetExtState(extName, 7 ))
   _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
-  task = 13
-  job = 1
-
+  
   if mouse_scroll > 0 then 
-    incr = 50
-  elseif mouse_scroll < 0 then 
-    incr = -50
+    incr = incr     
+    elseif mouse_scroll < 0 then 
+    incr = incr * -1                          -- how many ticks to move noteoff backwards, adjust as desired
   end
   
-  SetGlobalParam(job, task, _, _, incr)
+  SetGlobalParam(1, 13, _, _, incr)
 
 end
   

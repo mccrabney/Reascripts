@@ -4,34 +4,32 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.1
+ * Version: 1.11
  * donation link: 
 --]]
 
 --[[
  * Changelog:
+ * v1.11 (2023-5-26)
+    + re-allowed nudged notes to escape RE bounds
+    + implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts"
  * v1.1 (2023-5-11)
-    + updated to prevent notes from escaping RE bounds
+    + prevent nudged notes from escaping RE bounds
     + improved communication with other scripts
     + began cleanup of inexperienced, verbose code
     + needs further integration with "show notes, closest first etc"
- 
  * v1.09 (2023-1-5)
     + fixed MIDI scripts trying to work on audio items and creating unwanted REs
- 
  * v1.08 (2023-1-1)
     + fixed add fx by js filename
- 
  * v1.07 (2022-12-28)
     + fixes to RazorEditSelectionExists(make) to prevent error when no item is present
-     
  * v1.06 (2022-12-19)
     + RE dimension functions are now up to date
     + changed child scripts from deferred to one-offs (duh)
     + moved (get mouse note, item, take, position) info to dedicated function
     + updated RazorEditSelectionExists(1) to select item under mouse if no item is selected
     + mute: if no RE, mute item under mouse cursor instead
-     
  * v1.05 (2022-12-17)
     + general cleanup, excessive comments in code
     + an attempt to use MIDI_Sort properly
@@ -39,21 +37,16 @@
     + MIDI edits: added "select last hit notes in RE"
     + MIDI edits: if no REs exist, enclose selected items in RE then run edit
     + MIDI edits: nudge last-hit note in RE 
-    
  * v1.04 (2022-12-16)
     + added "lastnote" reference function
-
  * v1.03 (2022-12-14)
     + edit MIDI with REs
-    
  * v1.02 (2021-04-03)
    + more cleanup and attribution
    + fixed "toggle mute RE contents or selected items"
- 
  * v1.01 (2021-04-02)
    + cleanup, slight nod toward documentation
    + added "toggle mute RE contents or selected items"
-   
  * v1.0 (2021-03-22)
    + Initial Release
 --]]
@@ -78,11 +71,6 @@ ISSUES:
     
 TODO: 
     see if the MIDI editor flash that occurs during "Copy Notes in REs" can be suppressed
-    nudge: resize REs to include new note positions?
-    ppqIncr: used for nudge. make this grid-size dependent?
-    mute/unmute/toggle mute actions MIDINotesInRE tasks?
-      maybe not, as muted notes are invisible from Main screen.
-      prevent RE MIDI edits from working on muted notes?
 
 --]]
 
@@ -261,7 +249,7 @@ function MIDINotesInRE(task)
               
                 -- EDIT: nudge notes whose noteons exist within Razor Edit forwards or backwards
                elseif task == 6 then
-                  if startppqposOut+incr > razorStart_ppq_pos and startppqposOut+incr < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
+                  if startppqposOut > razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
                     reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
                     if n == 0 then undoMessage = "nudge notes in REs" end
                   end
@@ -269,7 +257,7 @@ function MIDINotesInRE(task)
 
                 -- EDIT: nudge last-hit notes whose noteons exist within Razor Edit forwards and backwards
                 elseif task == 13 then
-                  if lastNoteHit == pitch and startppqposOut+incr >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
+                  if lastNoteHit == pitch and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
                     reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
                     if n == 0 then undoMessage = "nudge last-hit notes in RE forwards" end
                   end
@@ -277,7 +265,7 @@ function MIDINotesInRE(task)
                 -- EDIT: nudge noteoffs whose noteons exist within Razor Edit forwards and backwards
                 elseif task == 18 then  
                   --reaper.ShowConsoleMsg(incr .. "\n")
-                  if startppqposOut+incr >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
+                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
                     reaper.MIDI_SetNote( take, n, nil, nil, nil, endppqposOut+incr, nil, nil, nil, nil)
                     if n == 0 then undoMessage = "adjust length of notes in RE" end
                   end
