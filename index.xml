@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="62b77e19ebd6a1c112437fda9877995e9505679c">
+<index version="1" name="mccrabney Reascripts" commit="7e71c29aaf552453207292bd6c705d2d752e792a">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -41,11 +41,19 @@
         <changelog><![CDATA[+ added hzoom dependent increment]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/771ee82bc6efbf0d803843c12c1abb3e97c1f3e9/MIDI%20edits/mccrabney_MIDI%20edit%20-%20adjust%20length%20of%20note%20under%20mouse%20cursor%20(mousewheel).lua</source>
       </version>
+      <version name="1.3" author="mccrabney" time="2023-05-26T13:14:53Z">
+        <changelog><![CDATA[+ implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts" ]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/a5b30601440ed9e254e744a74dcd4eccf0265cb9/MIDI%20edits/mccrabney_MIDI%20edit%20-%20adjust%20length%20of%20note%20under%20mouse%20cursor%20(mousewheel).lua</source>
+      </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - adjust velocity of note under mouse cursor (mousewheel).lua" type="script" desc="adjust velocity of note under mouse cursor">
       <version name="1.0" author="mccrabney" time="2023-05-08T13:02:57Z">
         <changelog><![CDATA[+ requires extstates from mccrabney_MIDI edit - show notes, under mouse and last-received.lua]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/0f163c2dc3d29876a265e70d1fdbe4ba74347385/MIDI%20edits/mccrabney_MIDI%20edit%20-%20adjust%20velocity%20of%20note%20under%20mouse%20cursor%20(mousewheel).lua</source>
+      </version>
+      <version name="1.1" author="mccrabney" time="2023-05-26T13:14:53Z">
+        <changelog><![CDATA[+ implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts"]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/a5b30601440ed9e254e744a74dcd4eccf0265cb9/MIDI%20edits/mccrabney_MIDI%20edit%20-%20adjust%20velocity%20of%20note%20under%20mouse%20cursor%20(mousewheel).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - delete notes that start at edit cursor.lua" type="script" desc="Delete notes that start at edit cursor">
@@ -189,6 +197,10 @@
 + fixed note overwrite bug]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/16d8db9f9c711091f4e2e7d44748a191e24c3570/MIDI%20edits/mccrabney_MIDI%20edit%20-%20nudge%20closest%20note%20under%20mouse%20cursor%20(or%20notes%20in%20RE).lua</source>
       </version>
+      <version name="1.32" author="mccrabney" time="2023-05-26T13:14:53Z">
+        <changelog><![CDATA[+ implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts" ]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/a5b30601440ed9e254e744a74dcd4eccf0265cb9/MIDI%20edits/mccrabney_MIDI%20edit%20-%20nudge%20closest%20note%20under%20mouse%20cursor%20(or%20notes%20in%20RE).lua</source>
+      </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - show most recently received MIDI note.lua" type="script" desc="show most recently received MIDI note">
       <version name="1.1" author="mccrabney" time="2023-03-11T15:57:09Z">
@@ -248,6 +260,9 @@
       </version>
       <version name="1.6" author="mccrabney" time="2023-05-23T19:01:31Z">
         <source main="main">https://github.com/mccrabney/Reascripts/raw/62b77e19ebd6a1c112437fda9877995e9505679c/MIDI%20edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20mouse%20and%20last-received.lua</source>
+      </version>
+      <version name="1.61" author="mccrabney" time="2023-05-26T13:14:53Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/a5b30601440ed9e254e744a74dcd4eccf0265cb9/MIDI%20edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20mouse%20and%20last-received.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - split notes at edit cursor.lua" type="script" desc="split notes at edit cursor">
@@ -384,6 +399,11 @@
 ]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/0e5e1f8639798c5eeae737542fa1a9d7bf65aa7a/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
       </version>
+      <version name="1.11" author="mccrabney" time="2023-05-26T13:15:10Z">
+        <changelog><![CDATA[+ re-allowed nudged notes to escape RE bounds
++ implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts"]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/7e71c29aaf552453207292bd6c705d2d752e792a/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
     </reapack>
     <reapack name="mccrabney_Razor Edit MIDI - copy selected notes in RE.lua" type="script" desc="copy notes whose note-ons are contained in Razor Edit">
       <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
@@ -471,6 +491,10 @@
       <version name="1.1" author="mccrabney" time="2023-05-21T16:02:04Z">
         <changelog><![CDATA[+ bring up to date with other scripts]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/239d227964da419bdfcacde3cc1fab4491c7a962/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20nudge%20last-hit%20notes%20(mousewheel).lua</source>
+      </version>
+      <version name="1.2" author="mccrabney" time="2023-05-26T13:15:10Z">
+        <changelog><![CDATA[+ implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts"]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/7e71c29aaf552453207292bd6c705d2d752e792a/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20nudge%20last-hit%20notes%20(mousewheel).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Razor Edit MIDI - nudge notes (mousewheel).lua" type="script" desc="nudge notes whose note-ons are contained in Razor Edit (mousewheel)">
