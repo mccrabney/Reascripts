@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.31
+ * Version: 1.32
 --]]
  
 --[[
  * Changelog:
+ * v1.32 (2023-05-26)
+   + implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts" 
  * v1.31 (2023-05-21)
    + removed hzoom dependent increment
    + fixed note overwrite bug
@@ -29,7 +31,7 @@ for key in pairs(reaper) do _G[key]=reaper[key]  end
 local info = debug.getinfo(1,'S');
 dofile(script_folder .. "Razor Edits/mccrabney_Razor Edit Control Functions.lua")   
 
-
+incr = 0
 -----------------------------------------------------------
     --[[------------------------------[[--
           check for razor edit 
@@ -60,6 +62,7 @@ function getNotesUnderMouseCursor()
   targetNoteNumber = tonumber(reaper.GetExtState(extName, 4 ))
   targetNoteIndex = tonumber(reaper.GetExtState(extName, 5 ))
   
+  
   if tableSize ~= nil then 
     for t = 1, tableSize do
       showNotes[t] = {}
@@ -82,8 +85,9 @@ end
 function main()
   reaper.PreventUIRefresh(1)
   
-  incr = 24
+  incr = tonumber(reaper.GetExtState(extName, 7 ))
   _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
+  
   if mouse_scroll > 0 then 
     incr = incr     
     elseif mouse_scroll < 0 then 
@@ -94,7 +98,6 @@ function main()
     job = 1
     task = 6
     SetGlobalParam(job, task, _, _, incr)
-  
   else
     take, targetNoteNumber, targetNoteIndex = getNotesUnderMouseCursor()
   

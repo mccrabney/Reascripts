@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.2
+ * Version: 1.3
 --]]
  
 --[[
  * Changelog:
+ * v1.3 (2023-05-26)
+   + implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts" 
  * v1.2 (2023-05-19)
    + added hzoom dependent increment
  * v1.1 (2023-05-08)
@@ -80,27 +82,18 @@ end
 function main()
   reaper.PreventUIRefresh(1)
   
-  local hZoom = reaper.GetHZoomLevel()
-    
- --[[ if hZoom > 1 then incr = 1000 end
-  if hZoom > 40 then incr = 500 end
-  if hZoom > 100 then incr = 100 end
-  if hZoom > 150 then incr = 50 end
-  if hZoom > 200 then incr = 25 end
-  if hZoom > 300 then incr = 10 end
-  if hZoom > 400 then incr = 5 end--]]
-
-  incr = 24
-  task = 18
-  job = 1  
-  
+  incr = tonumber(reaper.GetExtState(extName, 7 ))
   _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
+  
   if mouse_scroll > 0 then 
-  elseif mouse_scroll < 0 then 
+    incr = incr     
+    elseif mouse_scroll < 0 then 
     incr = incr * -1                          -- how many ticks to move noteoff backwards, adjust as desired
   end
   
   if RazorEditSelectionExists() then
+    job = 1
+    task = 18
     SetGlobalParam(job, task, _, _, incr)
   else
     take, targetNoteNumber, targetNoteIndex = getNotesUnderMouseCursor()

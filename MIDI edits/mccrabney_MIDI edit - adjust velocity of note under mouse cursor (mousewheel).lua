@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.0
+ * Version: 1.1
 --]]
  
 --[[
  * Changelog:
+ * v1.1 (2023-05-26)
+   + implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts"
  * v1.0 (2023-05-08)
    + requires extstates from mccrabney_MIDI edit - show notes, under mouse and last-received.lua
 --]]
@@ -75,12 +77,22 @@ end
 
 function main()
   reaper.PreventUIRefresh(1)
+   
+  
+  incr = tonumber(reaper.GetExtState(extName, 7 ))
+  if incr == 10 then incr = 2
+  elseif incr == 24 then incr = 4
+  elseif incr == 48 then incr = 8
+  elseif incr == 96 then incr = 16
+  elseif incr >= 240 then incr = 32
+  end
   
   _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
+  
   if mouse_scroll > 0 then 
-    incr = 2                           -- how many vels to up notes
+    incr = incr                          -- how many vels to up notes
   elseif mouse_scroll < 0 then 
-    incr = -2                          -- how many vels to down notes
+    incr = incr*-1                        -- how many vels to down notes
   end
   
   if RazorEditSelectionExists() then

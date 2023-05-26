@@ -63,7 +63,7 @@ for i = 0, CountTrItem-1 do
   local take = reaper.GetActiveTake(item)
   local IsMIDI = reaper.TakeIsMIDI(take)
     
-  if IsMIDI then                 -- if take is MIDI
+  if IsMIDI then                                   -- if take is MIDI
     notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take
     if notesCount == 0  then no_undo() return end  -- if no notes, give up and quit
  
