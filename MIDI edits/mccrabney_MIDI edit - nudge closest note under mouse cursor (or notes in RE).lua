@@ -31,7 +31,6 @@ for key in pairs(reaper) do _G[key]=reaper[key]  end
 local info = debug.getinfo(1,'S');
 dofile(script_folder .. "Razor Edits/mccrabney_Razor Edit Control Functions.lua")   
 
-incr = 0
 -----------------------------------------------------------
     --[[------------------------------[[--
           check for razor edit 
@@ -82,10 +81,18 @@ end
           nudge notes whose ons are in RE if present, else nudge note under mouse, closest first
     --]]------------------------------]]--
 
+local cursorSource
 function main()
+  
   reaper.PreventUIRefresh(1)
   
   incr = tonumber(reaper.GetExtState(extName, 7 ))
+  cursorSource = tonumber(reaper.GetExtState(extName, 8 ))
+  
+  if cursorSource == nil then cursorSource = 1 end
+  
+  --reaper.ShowConsoleMsg(cursorSource .. "\n")
+  
   _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
   
   if mouse_scroll > 0 then 
@@ -99,12 +106,18 @@ function main()
     task = 6
     SetGlobalParam(job, task, _, _, incr)
   else
+  
     take, targetNoteNumber, targetNoteIndex = getNotesUnderMouseCursor()
   
     local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"}
   
     if take ~= nil and targetNoteIndex ~= -1 then
       _, _, _, startppqpos, endposppq, _, pitch, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
+      
+      if cursorSource ~= 1 then 
+        local newTime = reaper.MIDI_GetProjTimeFromPPQPos(take, startppqpos + incr)
+        reaper.SetEditCurPos( newTime, 1, 0)
+      end
       
       if incr > 0 then 
         _, _, _, startppqposNext, _, _, pitch2, _ = reaper.MIDI_GetNote( take, targetNoteIndex +1 )      
@@ -134,6 +147,9 @@ function main()
       cursorNoteSymbol = pitchList[(targetNoteNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
       reaper.Undo_OnStateChange2(proj, "nudged note " .. targetNoteNumber .. "(" .. cursorNoteSymbol .. octave .. ")")
     end
+    
+    --reaper.DeleteExtState(extName, 8, false)
+    
     
     reaper.PreventUIRefresh(-1)
     reaper.UpdateArrange()

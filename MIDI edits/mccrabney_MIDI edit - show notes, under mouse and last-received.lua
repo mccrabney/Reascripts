@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.61
+ * Version: 1.62
 --]]
  
 --[[
  * Changelog:
++ v1.62 (2023-5-26)
+  + added "edit cursor mode" where edit cursor provides note data rather than mouse cursor
 + v1.61 (2023-5-25)
   + implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts"
   + added note position readout, where time 1.1.000 begins at a marker named "start"
@@ -56,6 +58,7 @@ loopCount = 0
 loopReset = 0
 lastX = 0
 
+local cursorSource = 0
 local pitchList = {"C ", "C#", "D ", "D#", "E ", "F ", "F#", "G ", "G#", "A ", "A#", "B "}
 local pitchUnderCursor = {}
 local channel
@@ -138,8 +141,26 @@ function getMouseInfo()
       trackHeight = r.GetMediaTrackInfo_Value( track, "I_TCPH")
     end
     
-    mouse_pos = r.BR_GetMouseCursorContext_Position() -- get mouse position
-    take = r.BR_GetMouseCursorContext_Take() -- get take under mouse once 
+    if cursorSource == 1 then
+      cursorPos = r.BR_GetMouseCursorContext_Position() -- get mouse position
+      take = r.BR_GetMouseCursorContext_Take() -- get take under mouse 
+    else
+      cursorPos = reaper.GetCursorPosition()   -- get pos at edit cursor
+      itemnumbers = reaper.CountMediaItems()
+      
+      local item = {}
+      for i = 0, itemnumbers-1 do
+        item[i] = reaper.GetMediaItem(0, i)
+        item_pos = reaper.GetMediaItemInfo_Value(item[i], "D_POSITION")
+        item_length = reaper.GetMediaItemInfo_Value(item[i], "D_LENGTH")
+        if item_pos <= cursorPos and item_pos + item_length > cursorPos then
+          take = reaper.GetTake( item[i], 0 )
+        end
+      end
+    
+      take = r.BR_GetMouseCursorContext_Take() -- get take under mouse -- to-do: replace with under edit cursor!!!!
+    end
+            
     local firstMarkerPos = -1
     local firstMarkerMeasure = 0
     local firstMarkerQN = 0     
@@ -162,13 +183,13 @@ function getMouseInfo()
       end
     end
 
-    if take ~= nil and trackHeight > 25 then      -- if track height isn't tiny
+    if take ~= nil and trackHeight > 25 or take ~= nil and cursorSource == 0 then      -- if track height isn't tiny
       if r.TakeIsMIDI(take) then 
         local pitchSorted = {}                  -- pitches under cursor to be sorted
         local distanceFromMouse = {}            -- corresponding distances of notes from mouse
         local distanceSorted = {}               -- ^ same, but to be sorted
         item = r.BR_GetMouseCursorContext_Item() -- get item under mouse
-        position_ppq = r.MIDI_GetPPQPosFromProjTime(take, mouse_pos) -- convert to PPQ
+        position_ppq = r.MIDI_GetPPQPosFromProjTime(take, cursorPos) -- convert to PPQ
         local notesCount, _, _ = r.MIDI_CountEvts(take) -- count notes in current take
         
         for n = notesCount-1, 0, -1 do
@@ -268,7 +289,7 @@ function getMouseInfo()
     
     -------------------------------------------- set up extstate to communicate with other scripts
 
-    local numVars = 7                                             -- see below
+    local numVars = 8                                             -- see below
     r.SetExtState(extName, 1, numVars, false)                -- how many variables are we sending via extstates
     r.SetExtState(extName, 2, #showNotes, false)             -- how many notes are under mouse
     guidString = r.BR_GetMediaItemTakeGUID( take )           -- get guidString from take
@@ -282,7 +303,6 @@ function getMouseInfo()
       r.SetExtState(extName, 5, targetNoteIndex, false)      -- what is the target index under mouse
     end
     
-    --r.SetExtState(extName, 6, incr[incrIndex], false)
 
     for i = 1, #showNotes do                             -- send off the table after all of the other variables
       r.SetExtState('extName', i + numVars, table.concat(showNotes[i],","), false)
@@ -304,8 +324,7 @@ incrIndex = 2
 lastIndex = 2
 incr = {1, 10, 24, 48, 96, 240, 480, 960}
 local function loop()
-
-  --r.ShowConsoleMsg(r.GetHZoomLevel() .. "\n")
+  
   local lastMIDI = {}
                                                                 -- reset loop from external scripts
   r.ImGui_GetFrameCount(ctx)                               -- "a fast & inoffensive function"
@@ -322,13 +341,26 @@ local function loop()
       incrIndex = incrIndex + q 
     end
     --reaper.ShowConsoleMsg(incr[incrIndex] .. "\n")
-    r.SetExtState(extName, 7, incr[incrIndex], false)
+    r.SetExtState(extName, 7, incr[incrIndex], true)
     r.DeleteExtState(extName, 6, false)
   end   
     
+  if r.HasExtState(extName, 'toggleCursor') then                -- toggle edit or mouse cursor                                        -- fools the optimizer into resetting
+    if cursorSource == 0 then 
+      cursorSource = 1 
+    elseif cursorSource == 1 
+      then cursorSource = 0  
+    end
+    r.SetExtState(extName, 8, cursorSource, true)
+    r.DeleteExtState(extName, 'toggleCursor', false)
     
+    --reaper.ShowConsoleMsg(cursorSource .. "\n")
+    --lastX = -1
+  end         
+  
+  
                                                                 -- optimizer to reduce calls to getMouseInfo
-  if loopCount >= 3 and info == "arrange" and lastX ~= x and pop == 0 then 
+  if loopCount >= 3 and info == "arrange" and lastX ~= x and pop == 0 or loopCount >= 3 and cursorSource == 0  then 
     take, targetPitch, showNotes = getMouseInfo() 
     if take ~= nil and r.TakeIsMIDI(take) then             -- if take is MIDI
       loopCount = 0                                             -- reset loopcount
@@ -340,7 +372,13 @@ local function loop()
     lastNote, lastVel = getLastNoteHit()   
   end                                                           -- end optimizer2
 
-  x, y = r.GetMousePosition()                            -- mousepos
+  if cursorSource == 1 then 
+    x, y = r.GetMousePosition()         -- mousepos
+  else 
+    _, y = r.GetMousePosition() 
+    x = 1000
+  end
+  
   _, info = r.GetThingFromPoint( x, y )                  -- mousedetails
   
   if lastNote == -1 then pop = 0 end
@@ -370,9 +408,9 @@ local function loop()
   end
   
   
-  if targetPitch ~= nil and info == "arrange" and take ~= nil then  -- if mousing over a note in a MIDI item in arrange
+  if targetPitch ~= nil and info == "arrange" and take ~= nil 
+  or targetPitch ~= nil and info == "arrange" and cursorSource == 0 then  -- if mousing over a note in a MIDI item in arrange
     
-    --local x, y = r.ImGui_PointConvertNative(ctx, r.GetMousePosition())
     r.ImGui_SetNextWindowPos(ctx, x - 11, y + 25)
     r.ImGui_PushFont(ctx, sans_serif)  
     r.ImGui_PushStyleColor(ctx, r.ImGui_Col_WindowBg(), 0x0F0F0FD8)
