@@ -4,13 +4,14 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.62
+ * Version: 1.63
 --]]
  
 --[[
  * Changelog:
 * v1.63 (2023-5-27)
   + updated name of script, extstate 
+  + changed display for edit cursor mode: blue, vs red, and non-rounded tooltip corners
 + v1.62 (2023-5-26)
   + added "edit cursor mode" where edit cursor provides note data rather than mouse cursor
 + v1.61 (2023-5-25)
@@ -141,6 +142,8 @@ function getMouseInfo()
   if window ~= "midi editor" and hZoom > 2 then   -- ifn't ME, and if slightly zoomed in
     if track ~= nil then                      -- if there is a track
       trackHeight = r.GetMediaTrackInfo_Value( track, "I_TCPH")
+      --trackY = r.GetMediaTrackInfo_Value( track, "I_TCPY")
+      --reaper.ShowConsoleMsg(trackY .. "\n")
     end
     
     if cursorSource == 1 then
@@ -198,6 +201,7 @@ function getMouseInfo()
           _, selected, muted, startppq, endppq, ch, pitch, vel = r.MIDI_GetNote(take, n) -- get note start/end position              
           
           if startppq <= position_ppq and endppq >= position_ppq then  -- is current note the note under the cursor?
+            
             notePos = reaper.MIDI_GetProjTimeFromPPQPos( take, startppq)
             
             if firstMarkerPos ~= -1 and notePos >= firstMarkerPos then 
@@ -211,7 +215,6 @@ function getMouseInfo()
                 if bpi == -1 then bpi = 4 end
               end
               
-              --notePos = notePos - firstMarkerPos
               noteQN = reaper.TimeMap_timeToQN( notePos )
               noteQN = noteQN - firstMarkerQN
               _, remainder = math.modf(noteQN)
@@ -373,14 +376,9 @@ local function loop()
     lastNote, lastVel = getLastNoteHit()   
   end                                                           -- end optimizer2
 
-  if cursorSource == 1 then 
-    x, y = r.GetMousePosition()         -- mousepos
-  else 
-    _, y = r.GetMousePosition() 
-    x = 1000
-  end
-  
+  x, y = r.GetMousePosition()         -- mousepos
   _, info = r.GetThingFromPoint( x, y )                  -- mousedetails
+  
   
   if lastNote == -1 then pop = 0 end
 
@@ -414,8 +412,16 @@ local function loop()
     
     r.ImGui_SetNextWindowPos(ctx, x - 11, y + 25)
     r.ImGui_PushFont(ctx, sans_serif)  
+    
+    local rounding
+    if cursorSource == 1 then 
+      rounding = 12
+    else 
+      rounding = 0
+    end
+    
     r.ImGui_PushStyleColor(ctx, r.ImGui_Col_WindowBg(), 0x0F0F0FD8)
-    r.ImGui_PushStyleVar(ctx, r.ImGui_StyleVar_WindowRounding(), 12)
+    r.ImGui_PushStyleVar(ctx, r.ImGui_StyleVar_WindowRounding(), rounding)
 
     if r.ImGui_Begin(ctx, 'Tooltip', false,
     r.ImGui_WindowFlags_NoFocusOnAppearing() |
@@ -488,26 +494,34 @@ local function loop()
             end
           end
           
-          if showNotes[i][1] == targetPitch and showNotes[i][1] ~= lastNote then  -- color red if entry matches the target note & no lastNote
-            color = 0xFF8383FF                             -- red                        
+          if showNotes[i][1] == targetPitch and showNotes[i][1] ~= lastNote then  -- color if entry matches the target note & no lastNote
+            if cursorSource == 1 then 
+              color = 0xFF8383FF                             
+            else 
+              color = 0x97B1FFFF
+            end
+            increment = "*" .. incr[incrIndex]
+                           
           elseif showNotes[i][1] == lastNote and pop == 1 then      -- if note is received from controller
             notePresent = 1
             showNotes[i][2] = lastVel                               -- set incoming velocity
-            showNotes[i][3] = ""                                  -- duration
+            showNotes[i][3] = ""                                    -- duration
             showNotes[i][4] = "in"
-            --incr[incrIndex] = ""
+            increment = "" --incr[incrIndex] = ""
             color = 0x00F992FF                            -- green for incoming
           elseif showNotes[i][1] ~= lastNote then 
             color = 0xFFFFFFFF                            -- white for non-target
+            increment = ""
           end
+          
           
           table.sort(showNotes, function(a, b) return a[1] < b[1] end)
           
           if i-1 ~= nil and showNotes[i] ~= showNotes[i+1] then
-            r.ImGui_TextColored(ctx, color, "" .. showNotes[i][7] .. "n:" .. spacingN .. showNotes[i][1] .. 
+          r.ImGui_TextColored(ctx, color, showNotes[i][7] .. "n:" .. spacingN .. showNotes[i][1] .. 
             spacingO .. "(" .. cursorNoteSymbol ..  octave .. ")  " ..
             "ch:" .. spacingCH .. showNotes[i][4] ..   "  v: " .. spacingV .. showNotes[i][2] .. 
-            "  d: " .. spacingD .. showNotes[i][3] .. "  *" ..  incr[incrIndex]  )
+            "  d: " .. spacingD .. showNotes[i][3] .. "  " ..  increment  )
           end
         end
       end                                               -- for each shown note
