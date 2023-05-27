@@ -4,13 +4,15 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.33
+ * Version: 1.34
 --]]
  
 --[[
  * Changelog:
+ * v1.34 (2023-5-27)
+   + added relative support
  * v1.33 (2023-5-27)
-  + updated name of parent script extstate 
+   + updated name of parent script extstate 
  * v1.32 (2023-05-26)
    + implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts" 
  * v1.31 (2023-05-21)
@@ -63,7 +65,6 @@ function getNotesUnderMouseCursor()
   targetNoteNumber = tonumber(reaper.GetExtState(extName, 4 ))
   targetNoteIndex = tonumber(reaper.GetExtState(extName, 5 ))
   
-  
   if tableSize ~= nil then 
     for t = 1, tableSize do
       showNotes[t] = {}
@@ -89,20 +90,25 @@ function main()
   reaper.PreventUIRefresh(1)
   
   incr = tonumber(reaper.GetExtState(extName, 7 ))
-  if incr == nil then incr = 24 end
-  
+  if incr == nil then incr = 0 end
   cursorSource = tonumber(reaper.GetExtState(extName, 8 )) 
-  if cursorSource == nil then cursorSource = 1 end
+  if cursorSource == nil then cursorSource = 0 end
   
-  --reaper.ShowConsoleMsg(cursorSource .. "\n")
+  _,_,_,_,_,device,direction  = reaper.get_action_context() 
+  --_,_,a,b,c,device,direction  = reaper.get_action_context() 
+  --reaper.ShowConsoleMsg(a .. " | " .. b .. " | " .. c .. " | " .. device .. " | " .. direction .. "\n")
   
-  _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
-  
-  if mouse_scroll > 0 then 
-    incr = incr     
-    elseif mouse_scroll < 0 then 
-    incr = incr * -1                          -- how many ticks to move noteoff backwards, adjust as desired
+  if device == 16383 and direction == 129      -- for relative 
+  or device == 127 and direction >= 15 then    -- for mousewheel
+    incr = incr
   end
+  
+  if device == 16383 and direction == 16383     -- for relative
+  or device == 127 and direction <= -15 then    -- for mousewheel
+    incr = incr * -1
+  end  
+  
+  --reaper.ShowConsoleMsg(incr .. "\n")
   
   if RazorEditSelectionExists() then
     job = 1
