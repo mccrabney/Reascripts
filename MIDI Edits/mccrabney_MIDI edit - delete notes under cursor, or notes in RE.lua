@@ -59,7 +59,7 @@ function getNotesUnderMouseCursor()
   showNotes = {}
   numVars = tonumber(reaper.GetExtState(extName, 1 ))
   
-  reaper.ShowConsoleMsg(numVars)
+  --reaper.ShowConsoleMsg(numVars)
   tableSize = tonumber(reaper.GetExtState(extName, 2 ))
   guidString = reaper.GetExtState(extName, 3 )
   take = reaper.SNM_GetMediaItemTakeByGUID( 0, guidString )
