@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="e7335b5450e99dc830f0e39c75f76e6a9aa8ac12">
+<index version="1" name="mccrabney Reascripts" commit="6c2562666feebbead23713bcdcabe6d0abe29142">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -109,6 +109,10 @@
       <version name="1.33" author="mccrabney" time="2023-05-27T13:45:45Z">
         <changelog><![CDATA[+ updated name of parent script extstate ]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20nudge%20closest%20note%20under%20cursor,%20or%20notes%20in%20RE%20(mousewheel).lua</source>
+      </version>
+      <version name="1.34" author="mccrabney" time="2023-05-27T18:34:19Z">
+        <changelog><![CDATA[+ added relative support]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/6c2562666feebbead23713bcdcabe6d0abe29142/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20nudge%20closest%20note%20under%20cursor,%20or%20notes%20in%20RE%20(mousewheel).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - show notes, under cursor and last-received.lua" type="script" desc="show notes, under cursor and last-received.lua">
