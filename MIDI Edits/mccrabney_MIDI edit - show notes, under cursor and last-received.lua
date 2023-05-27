@@ -52,7 +52,7 @@
 
 ---------------------------------------------------------------------
 local r = reaper
-dofile(r.GetResourcePath().."/UserPlugins/ultraschall_api.lua")
+--dofile(r.GetResourcePath().."/UserPlugins/ultraschall_api.lua")
 dofile(r.GetResourcePath() .. '/Scripts/ReaTeam Extensions/API/imgui.lua')('0.8')
 extName = 'mccrabney_MIDI edit - show notes, under cursor and last-received.lua'
 
