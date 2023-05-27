@@ -84,6 +84,8 @@ function main()
   reaper.PreventUIRefresh(1)
   
   incr = tonumber(reaper.GetExtState(extName, 7 ))
+  if incr == nil then incr = 24 end
+ 
   _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
   
   if mouse_scroll > 0 then 
