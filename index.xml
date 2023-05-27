@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="4b25e29efee676c52dbd1255827f2365d74a70ff">
+<index version="1" name="mccrabney Reascripts" commit="e7335b5450e99dc830f0e39c75f76e6a9aa8ac12">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -114,6 +114,35 @@
     <reapack name="mccrabney_MIDI edit - show notes, under cursor and last-received.lua" type="script" desc="show notes, under cursor and last-received.lua">
       <version name="1.62" author="mccrabney" time="2023-05-27T13:45:45Z">
         <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.63" author="mccrabney" time="2023-05-27T15:45:40Z">
+        <changelog><![CDATA[+ updated name of script, extstate 
++ changed display for edit cursor mode: blue, vs red, and non-rounded tooltip corners
++ v1.62 (2023-5-26)
++ added "edit cursor mode" where edit cursor provides note data rather than mouse cursor
++ v1.61 (2023-5-25)
++ implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts"
++ added note position readout, where time 1.1.000 begins at a marker named "start"
+if no marker named "start" is present, or if notes begin before "start" marker,
+then no time readout is displayed.
++ v1.6 (2023-5-23)
++ removed pause function, chasing an index as one note is nudged past another proved too difficult
++ v1.511 (2023-5-22)
++ minor typo fix
++ v1.51 (2023-5-21)
++ now reports toolbar button toggle state
++ v1.50 (2023-5-20)
++ added secondary script "pause show notes" to "hold" a target note in yellow
++ issue, mouse must still be over target Take, fix eventually? 
++ v1.45 (2023-5-09)
++ added muted note coloration
++ v1.44 (2023-5-07)
++ added extstates to output notes under mouse to other scripts
++ v1.43 (2023-5-05)
++ fixed error message, improved spacing on readout
++ v1.42 (2023-5-04)
++ added note duration display, changed readout to conform to conventional MPC step edit screen]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/e7335b5450e99dc830f0e39c75f76e6a9aa8ac12/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - split notes at edit cursor.lua" type="script" desc="split notes at edit cursor">
