@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.1
+ * Version: 1.2
 --]]
  
 --[[
  * Changelog:
+ * v1.2 (2023-5-29)
+   + set extstate to persist
  * v1.1 (2023-5-27)
    + updated name of parent script extstate 
  * v1.0 (2023-05-24)
@@ -31,7 +33,7 @@ extName = 'mccrabney_MIDI edit - show notes, under cursor and last-received.lua'
 function main()
   reaper.PreventUIRefresh(1)
 
-  reaper.SetExtState(extName, 'toggleCursor', 1, false)
+  reaper.SetExtState(extName, 'toggleCursor', 1, true)
   
   --reaper.DeleteExtState(extName, 6, false) 
     

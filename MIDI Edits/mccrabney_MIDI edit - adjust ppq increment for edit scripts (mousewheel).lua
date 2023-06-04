@@ -4,11 +4,15 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.1
+ * Version: 1.12
 --]]
  
 --[[
  * Changelog:
+ * v1.12 (2023-6-3)
+   + extstate sync fix
+ * v1.11 (2023-5-27)
+   + added relative support
  * v1.1 (2023-5-27)
    + updated name of parent script extstate 
  * v1.0 (2023-05-24)
@@ -28,19 +32,31 @@ extName = 'mccrabney_MIDI edit - show notes, under cursor and last-received.lua'
           adjust incr
     --]]------------------------------]]--
 
+local incr = {1, 10, 24, 48, 96, 240, 480, 960}
+
 function main()
   reaper.PreventUIRefresh(1)
 
-  local incr = 1
-
-  _,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
-  if mouse_scroll > 0 then 
-    incr = incr     
-    elseif mouse_scroll < 0 then 
-    incr = incr * -1                          -- how many ticks to move noteoff backwards, adjust as desired
+  if reaper.HasExtState(extName, 7) then   
+  else
+    reaper.SetExtState(extName, 7, 2, true)   -- set to 10 ticks (incrIndex pos2)
   end
   
-  reaper.SetExtState(extName, 6, incr, false)
+  _,_,_,_,_,device,direction  = reaper.get_action_context() 
+ 
+  incr = 1
+  
+  if device == 16383 and direction == 129      -- for relative 
+  or device == 127 and direction >= 15 then    -- for mousewheel
+    incr = incr
+  end
+ 
+  if device == 16383 and direction == 16383     -- for relative
+  or device == 127 and direction <= -15 then    -- for mousewheel
+    incr = incr * -1
+  end  
+  
+  reaper.SetExtState(extName, 6, incr, true)
   
   --reaper.DeleteExtState(extName, 6, false) 
     

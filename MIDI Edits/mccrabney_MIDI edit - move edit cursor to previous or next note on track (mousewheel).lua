@@ -9,6 +9,8 @@
  
 --[[
  * Changelog:
+ * v1.3 (2023-6-3)
+   + added extstate refresh support for "show notes"
  * v1.3 (2023-1-4)
    + fixed another nil comparison
  * v1.2 (2023-1-3)
@@ -19,6 +21,13 @@
    + Initial Release
 --]]
 
+local script_folder = debug.getinfo(1).source:match("@?(.*[\\|/])")
+script_folder = string.gsub(script_folder, "MIDI Edits\\", "")
+for key in pairs(reaper) do _G[key]=reaper[key]  end 
+local info = debug.getinfo(1,'S');
+dofile(script_folder .. "Razor Edits/mccrabney_Razor Edit Control Functions.lua")   
+extName = 'mccrabney_MIDI edit - show notes, under cursor and last-received.lua'
+
 ------------------------------------------------------
 local function no_undo()reaper.defer(function()end)end
 -------------------------------------------------------
@@ -26,7 +35,7 @@ local function no_undo()reaper.defer(function()end)end
 reaper.Undo_BeginBlock();
 reaper.PreventUIRefresh(1)
 
-reaper.ClearConsole()
+--reaper.SetExtState(extName, 'DoRefresh', '1', false)
 
 local incr
 local tallyNotes = 0
@@ -37,24 +46,31 @@ local startPosTable = {}
 local endPosTable = {}
 local notePitchTable = {}
 
-local CountTrack =  reaper.CountSelectedTracks(0)
+local track = reaper.BR_GetMouseCursorContext_Track()
+if track == nil then return end
+reaper.SetOnlyTrackSelected( track )
+
 local cursPos = reaper.GetCursorPosition()
-local track = reaper.GetSelectedTrack( 0, CountTrack-1 )
+
 local CountTrItem = reaper.CountTrackMediaItems(track)
 
-_,_,_,_,_,_,mouse_scroll  = reaper.get_action_context() 
-if mouse_scroll > 0 then 
-  incr = 1
+----------------------- this if statement puts all track notes in a big table -------------
+incr = 1
+_,_,_,_,_,device,direction  = reaper.get_action_context() 
+
+if device == 16383 and direction == 129      -- for relative 
+or device == 127 and direction >= 15 then    -- for mousewheel
+  incr = incr
   undoMessage = "move edit cursor to next note"
-elseif mouse_scroll < 0 then 
-  incr = -1
-  undoMessage = "move edit cursor to prev note"
 end
 
-if CountTrack   == 0 then no_undo() return end  -- if no tracks or items, just give it up and quit
-if CountTrItems == 0 then no_undo() return end  
------------------------ this if statement puts all track notes in a big table -------------
-  
+if device == 16383 and direction == 16383     -- for relative
+or device == 127 and direction <= -15 then    -- for mousewheel
+  incr = incr * -1
+  undoMessage = "move edit cursor to prev note"
+end  
+
+
 for i = 0, CountTrItem-1 do                       
   local item = reaper.GetTrackMediaItem(track,i)      
   local take = reaper.GetActiveTake(item)
@@ -122,8 +138,9 @@ elseif incr == -1 then
 end
 
 
+--reaper.SetExtState(extName, 'DoRefresh', '1', false)
 
 
 reaper.PreventUIRefresh(-1)  
-reaper.Undo_EndBlock(undoMessage ,-1)
+if undoMessage ~= nil then reaper.Undo_EndBlock(undoMessage ,-1) end
 reaper.UpdateArrange()
