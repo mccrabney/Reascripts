@@ -120,7 +120,7 @@ function MIDINotesInRE(task)
     mouseNote, mouseTake, mouseItem, mouse_position_ppq = getMouseInfo()
   end
                   -- if it's not MIDI, or of there's no item under cursor, quit everything
-  if mouseTake ~= nil and reaper.TakeIsMIDI(mouseTake) == 0 then return end      
+  --if mouseTake ~= nil and reaper.TakeIsMIDI(mouseTake) == 0 then return end      
   
   if RazorEditSelectionExists(1, 1) then      -- if no razor edit, create one out of selected item                                         -- if no item is selected, select item under mouse 
     local areas = GetRazorEdits()          -- get all areas 
