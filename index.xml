@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="1d6e098585085a16bf47b743358c4ae0d9e8991a">
+<index version="1" name="mccrabney Reascripts" commit="1f83b67df064f74bb237181c7676bf0f7df61396">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -168,6 +168,9 @@ then no time readout is displayed.
       <version name="1.67" author="mccrabney" time="2023-06-08T14:11:50Z">
         <changelog><![CDATA[+ added ghost cursor to show the noteOFF position]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/1d6e098585085a16bf47b743358c4ae0d9e8991a/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.67a" author="mccrabney" time="2023-06-08T16:20:59Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/1f83b67df064f74bb237181c7676bf0f7df61396/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - split notes at edit cursor.lua" type="script" desc="split notes at edit cursor">
