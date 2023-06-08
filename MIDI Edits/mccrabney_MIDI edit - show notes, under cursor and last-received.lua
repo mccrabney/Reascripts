@@ -401,7 +401,7 @@ function loop()
       
         local octaveNote                                  -- variables for readout
         local noteSymbol                                  
-        local color = 0xFFF992FF                          -- offwhite for non-target note readouts
+        local color = 0xFFFFFFFF                          -- offwhite for non-target note readouts
         local spacingO = " "
         local spacingN = ""
         local spacingV = ""
@@ -460,10 +460,14 @@ function loop()
               showNotes[i][3] = ""                                    -- duration
               showNotes[i][4] = "in"
               increment = "" --incr[incrIndex] = ""
-              color = 0x00FF45FF                          -- green for incoming
+              color = 0x00FF45FF                            -- green for incoming
             elseif showNotes[i][1] ~= lastNote then 
               color = 0xFFFFFFFF                            -- white for non-target
               increment = ""
+            end
+            
+            if showNotes[i][6] == "true" then 
+              color = 0x7a7a7aFF
             end
             
             table.sort(showNotes, function(a, b) return a[1] < b[1] end)
