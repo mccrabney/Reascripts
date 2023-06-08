@@ -360,9 +360,8 @@ function loop()
   -------------------------------------------------------------------------------------------------
   ------------------------------GUI ---------------------------------------------------------------
   mouseState = reaper.JS_Mouse_GetState(0xFF)
-  --if mouseState ~= 64 and mouseState ~= 1 then        -- if not left click or middle mouse (hand nav)
+  if mouseState ~= 64 and mouseState ~= 1 then        -- if not left click or middle mouse (hand nav)
             ----------------------------------------------------- draw guideline at target note 
-    --or if editcursorpos ~= lasteditcursorpos
     if targetPitch ~= nil and info == "arrange" and take ~= nil then
       local sysTime = math.floor( reaper.time_precise  ())        -- blink cursor
       if sysTime % 2 ~= 0 then 
@@ -482,9 +481,9 @@ function loop()
       reaper.ImGui_PopStyleColor(ctx)
       reaper.ImGui_PopStyleVar(ctx)
     end           
-  --else                                                    -- if no note under cursor
-  --  reaper.JS_Composite_Unlink(track_window, BM, true)  -- CLEAR
-  --end
+  else                                                    -- if no note under cursor
+    reaper.JS_Composite_Unlink(track_window, BM, true)  -- CLEAR
+  end
   reaper.defer(loop)
   editCurPosLast = reaper.GetCursorPosition()
 end
