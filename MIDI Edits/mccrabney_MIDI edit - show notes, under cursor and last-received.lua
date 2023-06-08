@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.66
+ * Version: 1.67
 --]]
  
 -- HOW TO USE -- 
@@ -234,8 +234,9 @@ function getMouseInfo()
     end)
     
     if targetNoteIndex then 
-      _, _, _, targetPPQ, _, _, _, _= reaper.MIDI_GetNote(take, targetNoteIndex) -- get note start/end position              
+      _, _, _, targetPPQ, targetEndPPQ, _, _, _= reaper.MIDI_GetNote(take, targetNoteIndex) -- get note start/end position              
       targetNotePos = reaper.MIDI_GetProjTimeFromPPQPos( take, targetPPQ)
+      targetEndPos = reaper.MIDI_GetProjTimeFromPPQPos( take, targetEndPPQ)
       track = reaper.GetMediaItemTake_Track( take )
       trPos = reaper.GetMediaTrackInfo_Value( track, 'I_TCPY' )
       tcpHeight = reaper.GetMediaTrackInfo_Value( track, 'I_TCPH')
@@ -262,7 +263,7 @@ function getMouseInfo()
       reaper.SetExtState(extName, i + numVars, table.concat(showNotes[i],","), false)
     end
   
-    return take, targetPitch, showNotes, targetNoteIndex, targetNotePos, track, trPos, tcpHeight
+    return take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight
   end
 end
 
@@ -275,7 +276,7 @@ pop = 0
 editCurPosLast = -1
 local incr = {1, 10, 24, 48, 96, 240, 480, 960}
 BM = reaper.JS_LICE_CreateBitmap(true, 1, 1)
-
+BM2 = reaper.JS_LICE_CreateBitmap(true, 1, 1)
     --[[------------------------------[[--
           loop and show tooltips, cursor as necessary  
     --]]------------------------------]]--
@@ -287,7 +288,7 @@ function loop()
   reaper.ImGui_GetFrameCount(ctx)                               -- "a fast & inoffensive function"
    
   if reaper.HasExtState(extName, 'DoRefresh') then              -- update display, called from child scripts
-    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, track, trPos, tcpHeight = getMouseInfo()
+    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight = getMouseInfo()
     reaper.DeleteExtState(extName, 'DoRefresh', false)
     lastX = -1                                                  -- n/a x val fools the optimizer into resetting
     reset = 1                                                   -- allow nudge
@@ -317,7 +318,7 @@ function loop()
 
   if loopCount >= 3 and info == "arrange" and lastX ~= x and pop == 0  
   or editCurPos ~= editCurPosLast then 
-    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, track, trPos, tcpHeight = getMouseInfo() 
+    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight = getMouseInfo() 
     
     if take ~= nil and reaper.TakeIsMIDI(take) then             -- if take is MIDI
       loopCount = 0                                             -- reset loopcount
@@ -349,8 +350,8 @@ function loop()
     if skip ~= 1 then                                           -- if incoming note is not present in table,
       lastMIDI[1] = {lastNote, lastVel, 0, 0} 
       table.insert(showNotes, 1, lastMIDI[1])                   -- insert it
-      showNotes[1][7] = "    => "                               -- make it obvious that it's incoming MIDI
-    end   
+      showNotes[1][7] = ""                               
+    end    
   
     octaveNote = math.floor(lastNote/12)-1                      -- get symbols for last-received MIDI
     noteSymbol = (lastNote - 12*(octaveNote+1)+1) 
@@ -360,7 +361,8 @@ function loop()
   -------------------------------------------------------------------------------------------------
   ------------------------------GUI ---------------------------------------------------------------
   mouseState = reaper.JS_Mouse_GetState(0xFF)
-  if mouseState ~= 64 and mouseState ~= 1 then        -- if not left click or middle mouse (hand nav)
+  --reaper.ShowConsoleMsg(mouseState .. "\n")
+  if mouseState ~= 1 then                                       -- if not left click 
             ----------------------------------------------------- draw guideline at target note 
     if targetPitch ~= nil and info == "arrange" and take ~= nil then
       local sysTime = math.floor( reaper.time_precise  ())        -- blink cursor
@@ -371,21 +373,25 @@ function loop()
       end
       
       reaper.JS_LICE_Clear(BM, curColor )
+      reaper.JS_LICE_Clear(BM2, curColor )
       
       if targetNotePos then 
         local zoom_lvl = reaper.GetHZoomLevel()
         local Arr_start_time = reaper.GetSet_ArrangeView2(0, false, 0, 0)
         targetNotePixel = math.floor((targetNotePos - Arr_start_time) * zoom_lvl)
+        targetNotePixelEnd = math.floor((targetEndPos - Arr_start_time) * zoom_lvl)
       end
       
       reaper.JS_Composite(track_window, targetNotePixel, trPos, 2, tcpHeight, BM, 0, 0, 1, 1, true) -- DRAW
+      reaper.JS_Composite(track_window, targetNotePixelEnd, trPos, 1, tcpHeight, BM2, 0, 0, 1, 1, true) -- DRAW
       
     else                                                    -- if no note under cursor
       reaper.JS_Composite_Unlink(track_window, BM, true)    -- CLEAR
+      reaper.JS_Composite_Unlink(track_window, BM2, true)    -- CLEAR
     end
     
                        ----------------------------------------- draw the text readout 
-    if targetPitch ~= nil and info == "arrange" and take ~= nil then
+    if targetPitch ~= nil and info == "arrange" and take ~= nil and mouseState ~= 64 then  
       reaper.ImGui_SetNextWindowPos(ctx, x - 11, y + 25)
       local rounding                          -- round window for mouse cursor, square for edit
       if cursorSource == 1 then rounding = 12 else rounding = 0 end
@@ -487,13 +493,26 @@ function loop()
     end           
   else                                                    -- if no note under cursor
     reaper.JS_Composite_Unlink(track_window, BM, true)  -- CLEAR
+    reaper.JS_Composite_Unlink(track_window, BM2, true)    -- CLEAR
   end
+  
+  if mouseState == 64 then 
+    reaper.JS_Composite_Unlink(track_window, BM, true)  -- CLEAR
+    reaper.JS_Composite_Unlink(track_window, BM2, true)    -- CLEAR
+  end
+  
   reaper.defer(loop)
   editCurPosLast = reaper.GetCursorPosition()
+end
+--------------------------------------------
+
+local function Clean()
+  reaper.JS_LICE_DestroyBitmap( bitmap )
 end
 
 --------------------------------------------
 function main()
+  reaper.defer(function() xpcall(Main, Clean) end)
   reaper.defer(loop)
 end
 -----------------------------------------------
@@ -505,6 +524,7 @@ end
 -----------------------------------------------
 function SetButtonOFF()
   reaper.JS_LICE_DestroyBitmap( BM)
+  reaper.JS_LICE_DestroyBitmap( BM2)
   reaper.SetToggleCommandState( sec, cmd, 0 ) -- Set OFF
   reaper.RefreshToolbar2( sec, cmd ) 
 end
@@ -512,9 +532,12 @@ end
 _, _, sec, cmd = reaper.get_action_context()
 SetButtonON()
 reaper.atexit(SetButtonOFF)
+reaper.atexit(Clean)
 
 --[[
  * Changelog:
+* v1.67 (2023-6-8)
+  + added ghost cursor to show the noteOFF position
 * v1.66 (2023-6-7)
   + time display: add support for time signatures other than 4/4
   + disable ghost cursor and text readout while left or middle clicking mouse
