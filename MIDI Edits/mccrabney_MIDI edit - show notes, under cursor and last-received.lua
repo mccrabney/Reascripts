@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.67
+ * Version: 1.67a
 --]]
  
 -- HOW TO USE -- 
@@ -361,7 +361,8 @@ function loop()
   -------------------------------------------------------------------------------------------------
   ------------------------------GUI ---------------------------------------------------------------
   mouseState = reaper.JS_Mouse_GetState(0xFF)
-  --reaper.ShowConsoleMsg(mouseState .. "\n")
+  --reaper.ShowConsoleMsg(mouseState .. "\n") 
+  --if mouseState ~= 1 and mouseState ~= 64 then    -- acknowledging 64 (middlemouse) prevents single click from working.                             -- if not left click 
   if mouseState ~= 1 then                                       -- if not left click 
             ----------------------------------------------------- draw guideline at target note 
     if targetPitch ~= nil and info == "arrange" and take ~= nil then
@@ -391,7 +392,7 @@ function loop()
     end
     
                        ----------------------------------------- draw the text readout 
-    if targetPitch ~= nil and info == "arrange" and take ~= nil and mouseState ~= 64 then  
+    if targetPitch ~= nil and info == "arrange" and take ~= nil  then
       reaper.ImGui_SetNextWindowPos(ctx, x - 11, y + 25)
       local rounding                          -- round window for mouse cursor, square for edit
       if cursorSource == 1 then rounding = 12 else rounding = 0 end
@@ -495,12 +496,6 @@ function loop()
     reaper.JS_Composite_Unlink(track_window, BM, true)  -- CLEAR
     reaper.JS_Composite_Unlink(track_window, BM2, true)    -- CLEAR
   end
-  
-  if mouseState == 64 then 
-    reaper.JS_Composite_Unlink(track_window, BM, true)  -- CLEAR
-    reaper.JS_Composite_Unlink(track_window, BM2, true)    -- CLEAR
-  end
-  
   reaper.defer(loop)
   editCurPosLast = reaper.GetCursorPosition()
 end
@@ -523,6 +518,7 @@ reaper.RefreshToolbar2( sec, cmd )
 end
 -----------------------------------------------
 function SetButtonOFF()
+  Clean()
   reaper.JS_LICE_DestroyBitmap( BM)
   reaper.JS_LICE_DestroyBitmap( BM2)
   reaper.SetToggleCommandState( sec, cmd, 0 ) -- Set OFF
@@ -532,10 +528,11 @@ end
 _, _, sec, cmd = reaper.get_action_context()
 SetButtonON()
 reaper.atexit(SetButtonOFF)
-reaper.atexit(Clean)
 
 --[[
  * Changelog:
+* v1.67a (2023-6-8)
+  + reverted 1.66 ghost cursor disable on middle click, bc it was suppressing middle clicks down w/out middle drag.
 * v1.67 (2023-6-8)
   + added ghost cursor to show the noteOFF position
 * v1.66 (2023-6-7)
