@@ -4,15 +4,16 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.36
+ * Version: 1.37
 --]]
  
 --[[
  * Changelog:
+ * v1.37 (2023-6-3)
+   + fixed equidistant note nudge bug
+   + if negatively nudged note occupies same space as another note, add 1 tick instead of subtracting one tick
  * v1.36 (2023-6-3)
    + reverted to local getCursorInfo function, prevents de-sync with "show notes" script
- * v1.35 (2023-5-28)
-   + disallow nudged note from occupying the same tick position as the next/previous note
  * v1.35 (2023-5-28)
    + disallow nudged note from occupying the same tick position as the next/previous note
  * v1.34 (2023-5-27)
@@ -88,7 +89,7 @@ function getCursorInfo()
     if take and trackHeight > 25 then -- and cursorSource == 0 then      -- if track height isn't tiny
       if reaper.TakeIsMIDI(take) then 
         local pitchSorted = {}                  -- pitches under cursor to be sorted
-        local distanceFromMouse = {}            -- corresponding distances of notes from mouse
+        local distanceFromCursor = {}            -- corresponding distances of notes from mouse
         local distanceSorted = {}               -- ^ same, but to be sorted
         item = reaper.BR_GetMouseCursorContext_Item() -- get item under mouse
         position_ppq = reaper.MIDI_GetPPQPosFromProjTime(take, cursorPos) -- convert to PPQ
@@ -105,14 +106,13 @@ function getCursorInfo()
             showNotes[numberNotes] = {pitch, vel, noteLength, ch+1, n, tostring(muted), posString}   -- get the pitch and corresponding velocity as table-in-table
             pitchUnderCursor[numberNotes] = pitch                 -- get the pitch to reference for undo message
             pitchSorted[numberNotes] = pitch
-            distanceFromMouse[numberNotes] = position_ppq - startppq       -- put distance to cursor in index position reference table
+            distanceFromCursor[numberNotes] = position_ppq - startppq       -- put distance to cursor in index position reference table
             distanceSorted[numberNotes] = position_ppq - startppq          -- put distance to cursor in index position of sorting table
           end
         end
         
         table.sort(distanceSorted)  -- sort the note table so the closest noteon is at index position 1
         table.sort(pitchSorted)     -- sort the pitch table so the lowest pitch is at index position 1
-        
         local targetNoteDistance = distanceSorted[1]                  -- find the distance from cursor of the closest noteon
         local lowestPitch = pitchSorted[1]                            -- find the lowest pitch in array
         local sameDistance = 0                                        -- initialize the sameDistance variable
@@ -120,35 +120,35 @@ function getCursorInfo()
                
         for j = 1, #distanceSorted do                                 -- for each entry in the sorted distance array
           if distanceSorted[j] == distanceSorted[j+1] then            -- if entries are equal
-            sameDistance = sameDistance+1
-             
-            for p = 1, #distanceFromMouse do                          -- for each entry in the distancefrommouse array
-              if distanceFromMouse[p] == distanceSorted[1] then       -- if distFromMouse index = closest note entry,
-                sameLowest = p                                        -- get the index 
+            if j == 1 then sameDistance = sameDistance+1 end 
+            for p = 1, #distanceFromCursor do                          -- for each entry in the distanceFromCursor array
+              if distanceFromCursor[p] == distanceSorted[1] then       -- if distFromMouse index = closest note entry,
+                sameLowest = p                                         -- get the index 
               end
             end 
           end
         end
         
+                  --~~~~~~~  multiple equidistant notes
+        if sameDistance > 0 then                           -- if there are notes that are the same distance from mouse
+          for t = 1, #distanceFromCursor do                 -- for each entry in the unsorted distance array
+            if targetNoteDistance == distanceSorted[t] then         -- if the entry matchest the closest note distance from cursor
+              targetNoteIndex = showNotes[t][5]          
+              targetPitch = showNotes[t][1]
+            end
+          end
+        end
+                 
         --~~~~~~~  closest note
-        for i = 1, #distanceFromMouse do                        -- for each entry in the unsorted distance array
-          if targetNoteDistance == distanceFromMouse[i] and sameDistance == 0 then   
-            
+        for i = 1, #distanceFromCursor do                        -- for each entry in the unsorted distance array
+          if targetNoteDistance == distanceFromCursor[i] and sameDistance == 0 then   
             targetNoteIndex = showNotes[i][5]
             targetPitch = showNotes[i][1]                  -- get the pitch value of the closest note
           end                                     
         end                                                
         
-        --~~~~~~~  multiple equidistant notes
-        if sameDistance > 0 then                           -- if there are notes that are the same distance from mouse
-          for t = 1, #distanceFromMouse do                 -- for each entry in the unsorted pitch array
-            if lowestPitch == showNotes[t][1] then         -- if the entry matchest the closest note distance from cursor
-            
-              targetNoteIndex = showNotes[t][5]              
-              targetPitch = lowestPitch
-            end
-          end
-        end
+        
+        
       end           -- if take is MIDI
     end             -- if take not nil
          
@@ -229,14 +229,13 @@ function main()
           end
         elseif incr < 0 then                                      -- if nudge encroaches on prev note
           if startppqpos + incr == startppqposPrev then           -- subtract 1 tick to incr
-            incr = incr - 1 
+            incr = incr + 1
           end
         end
         reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
       end
      
       if cursorSource ~= 1 then 
-        --reaper.ShowConsoleMsg("true" .. "\n")
         local newTime = reaper.MIDI_GetProjTimeFromPPQPos(take, startppqpos + incr)
         reaper.SetEditCurPos( newTime, 1, 0)
       end

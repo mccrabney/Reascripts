@@ -138,6 +138,7 @@ function getMouseInfo()
         local pitchSorted = {}                  -- pitches under cursor to be sorted
         local distanceFromCursor = {}           -- corresponding distances of notes from mouse
         local distanceSorted = {}               -- ^ same, but to be sorted
+        local sameDistanceTable = {}
         item = reaper.BR_GetMouseCursorContext_Item() -- get item under mouse
         position_ppq = reaper.MIDI_GetPPQPosFromProjTime(take, cursorPos) -- convert to PPQ
         local notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take
@@ -190,13 +191,13 @@ function getMouseInfo()
         local lowestPitch = pitchSorted[1]                            -- find the lowest pitch in array
         local sameDistance = 0                                        -- initialize the sameDistance variable
         local sameLowest
-          
+        
         for j = 1, #distanceSorted do                                 -- for each entry in the sorted distance array
           if distanceSorted[j] == distanceSorted[j+1] then            -- if entries are equal
             if j == 1 then sameDistance = sameDistance+1 end 
             for p = 1, #distanceFromCursor do                          -- for each entry in the distanceFromCursor array
               if distanceFromCursor[p] == distanceSorted[1] then       -- if distFromMouse index = closest note entry,
-                sameLowest = p                                        -- get the index 
+                sameLowest = p                                         -- get the index 
               end
             end 
           end
@@ -204,11 +205,10 @@ function getMouseInfo()
         
                   --~~~~~~~  multiple equidistant notes
         if sameDistance > 0 then                           -- if there are notes that are the same distance from mouse
-          for t = 1, #distanceFromCursor do                 -- for each entry in the unsorted pitch array
-            if lowestPitch == showNotes[t][1] then         -- if the entry matchest the closest note distance from cursor
-            
-              targetNoteIndex = showNotes[t][5]              
-              targetPitch = lowestPitch
+          for t = 1, #distanceFromCursor do                 -- for each entry in the unsorted distance array
+            if targetNoteDistance == distanceSorted[t] then         -- if the entry matchest the closest note distance from cursor
+              targetNoteIndex = showNotes[t][5]          
+              targetPitch = showNotes[t][1]
             end
           end
         end
@@ -221,6 +221,7 @@ function getMouseInfo()
           end                                     
         end                                                
         
+        
       -- automatically increment same-distance notes 1 tick upon inspection only?  
       --_, _, _, equiStartPPQ, _, _, _, _ = reaper.MIDI_GetNote(take, showNotes[t][5]) -- get note start/end position              
       --reaper.MIDI_SetNote( take, showNotes[t][5], nil, nil, equiStartPPQ+1, nil, nil, nil, nil)
@@ -228,11 +229,11 @@ function getMouseInfo()
       
       end           -- if take is MIDI
     end             -- if take not nil
-         
+
     table.sort(showNotes, function(a, b)                -- sort the shownotes table
       return a[1] < b[1]
     end)
-    
+
     if targetNoteIndex then 
       _, _, _, targetPPQ, targetEndPPQ, _, _, _= reaper.MIDI_GetNote(take, targetNoteIndex) -- get note start/end position              
       targetNotePos = reaper.MIDI_GetProjTimeFromPPQPos( take, targetPPQ)
@@ -275,8 +276,9 @@ lastX = 0
 pop = 0 
 editCurPosLast = -1
 local incr = {1, 10, 24, 48, 96, 240, 480, 960}
-BM = reaper.JS_LICE_CreateBitmap(true, 1, 1)
-BM2 = reaper.JS_LICE_CreateBitmap(true, 1, 1)
+noteOnLine  = reaper.JS_LICE_CreateBitmap(true, 1, 1)
+noteOffLine = reaper.JS_LICE_CreateBitmap(true, 1, 1)
+    
     --[[------------------------------[[--
           loop and show tooltips, cursor as necessary  
     --]]------------------------------]]--
@@ -366,6 +368,10 @@ function loop()
   if mouseState ~= 1 then                                       -- if not left click 
             ----------------------------------------------------- draw guideline at target note 
     if targetPitch ~= nil and info == "arrange" and take ~= nil then
+      
+      --reaper.ClearConsole()
+      --reaper.ShowConsoleMsg(targetNoteIndex ..  "\n")
+      
       local sysTime = math.floor( reaper.time_precise  ())        -- blink cursor
       if sysTime % 2 ~= 0 then 
         if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end
@@ -373,22 +379,25 @@ function loop()
         if cursorSource == 1 then curColor = 0xFFFF5959 else curColor = 0xFF0073ff end
       end
       
-      reaper.JS_LICE_Clear(BM, curColor )
-      reaper.JS_LICE_Clear(BM2, curColor )
+      reaper.JS_LICE_Clear(noteOnLine, curColor )
+      reaper.JS_LICE_Clear(noteOffLine, curColor )
+      
       
       if targetNotePos then 
         local zoom_lvl = reaper.GetHZoomLevel()
         local Arr_start_time = reaper.GetSet_ArrangeView2(0, false, 0, 0)
         targetNotePixel = math.floor((targetNotePos - Arr_start_time) * zoom_lvl)
         targetNotePixelEnd = math.floor((targetEndPos - Arr_start_time) * zoom_lvl)
+        if targetNotePixel    < 0 then targetNotePixel    = 0 end
+        if targetNotePixelEnd < 0 then targetNotePixelEnd = 0 end
       end
       
-      reaper.JS_Composite(track_window, targetNotePixel, trPos, 2, tcpHeight, BM, 0, 0, 1, 1, true) -- DRAW
-      reaper.JS_Composite(track_window, targetNotePixelEnd, trPos, 1, tcpHeight, BM2, 0, 0, 1, 1, true) -- DRAW
+      reaper.JS_Composite(track_window, targetNotePixel, trPos, 2, tcpHeight, noteOnLine, 0, 0, 1, 1, true) -- DRAW
+      reaper.JS_Composite(track_window, targetNotePixelEnd, trPos, 1, tcpHeight, noteOffLine, 0, 0, 1, 1, true) -- DRAW
       
     else                                                    -- if no note under cursor
-      reaper.JS_Composite_Unlink(track_window, BM, true)    -- CLEAR
-      reaper.JS_Composite_Unlink(track_window, BM2, true)    -- CLEAR
+      reaper.JS_Composite_Unlink(track_window, noteOnLine, true)     -- CLEAR
+      reaper.JS_Composite_Unlink(track_window, noteOffLine, true)    -- CLEAR
     end
     
                        ----------------------------------------- draw the text readout 
@@ -493,8 +502,8 @@ function loop()
       reaper.ImGui_PopStyleVar(ctx)
     end           
   else                                                    -- if no note under cursor
-    reaper.JS_Composite_Unlink(track_window, BM, true)  -- CLEAR
-    reaper.JS_Composite_Unlink(track_window, BM2, true)    -- CLEAR
+    reaper.JS_Composite_Unlink(track_window, noteOnLine, true)  -- CLEAR
+    reaper.JS_Composite_Unlink(track_window, noteOffLine, true)    -- CLEAR
   end
   reaper.defer(loop)
   editCurPosLast = reaper.GetCursorPosition()
@@ -519,8 +528,8 @@ end
 -----------------------------------------------
 function SetButtonOFF()
   Clean()
-  reaper.JS_LICE_DestroyBitmap( BM)
-  reaper.JS_LICE_DestroyBitmap( BM2)
+  reaper.JS_LICE_DestroyBitmap( noteOnLine)
+  reaper.JS_LICE_DestroyBitmap( noteOffLine)
   reaper.SetToggleCommandState( sec, cmd, 0 ) -- Set OFF
   reaper.RefreshToolbar2( sec, cmd ) 
 end
