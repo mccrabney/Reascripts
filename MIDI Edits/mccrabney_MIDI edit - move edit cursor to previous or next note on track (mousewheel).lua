@@ -21,6 +21,8 @@
    + Initial Release
 --]]
 
+
+
 local script_folder = debug.getinfo(1).source:match("@?(.*[\\|/])")
 script_folder = string.gsub(script_folder, "MIDI Edits\\", "")
 for key in pairs(reaper) do _G[key]=reaper[key]  end 
@@ -81,12 +83,18 @@ for i = 0, CountTrItem-1 do
     itemEnd = itemStart + reaper.GetMediaItemInfo_Value( item, 'D_LENGTH' )
     notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take
     if notesCount == 0  then no_undo() return end  -- if no notes, give up and quit
- 
-    for n = 0, notesCount-1 do               -- for each note
+    
+    reaper.ClearConsole()
+    for n = 0, notesCount-1 do               -- for each note, from last to first
       _, _, _, startppqposOut, endppqposOut, _, _, _ = reaper.MIDI_GetNote(take, n) 
       tallyNotes = tallyNotes+1
       startPosTable[tallyNotes] = reaper.MIDI_GetProjTimeFromPPQPos(take, startppqposOut) -- prj time of noteon ^
       endPosTable[tallyNotes] = reaper.MIDI_GetProjTimeFromPPQPos(take, endppqposOut) -- prj time of noteoff ^
+      if startPosTable[n] == startPosTable[n+1] then
+
+        
+      end
+      
       --notePitchTable[tallyNotes] = pitch     -- pitch of current note, unused for now
                                              -- if cursor is in current note
       if cursPos >= startPosTable[tallyNotes] and cursPos < endPosTable[tallyNotes] then 

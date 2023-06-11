@@ -4,12 +4,16 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.37
+ * Version: 1.37a
 --]]
  
 --[[
  * Changelog:
- * v1.37 (2023-6-3)
+ * v1.38 (2023-6-11)
+   + bring up to speed with "shownotes" target note selector feature 
+ * v1.37a 2023-6-9)
+   + reverted previous negatively nudged note change
+ * v1.37 (2023-6-8)
    + fixed equidistant note nudge bug
    + if negatively nudged note occupies same space as another note, add 1 tick instead of subtracting one tick
  * v1.36 (2023-6-3)
@@ -60,7 +64,7 @@ end
     --[[------------------------------[[--
           get details of MIDI notes under mouse -- mccrabney        
     --]]------------------------------]]--
-    
+--step = 0    
 function getCursorInfo()
   local pitchUnderCursor = {}    -- pitches of notes under the cursor (for undo)
   local showNotes = {}    -- table consisting of sub-tables grouping Pitch and Vel
@@ -76,34 +80,45 @@ function getCursorInfo()
   if window ~= "midi editor" and hZoom > 2 then   -- ifn't ME, and if slightly zoomed in
     if track then                      -- if there is a track
       trackHeight = reaper.GetMediaTrackInfo_Value( track, "I_TCPH")
+      cursorSource = tonumber(reaper.GetExtState(extName, 8 )) 
+    
+      if cursorSource == 1 then
+        take = reaper.BR_GetMouseCursorContext_Take() -- get take under mouse 
+        cursorPos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position
+      else
+        cursorPos = reaper.GetCursorPosition()   -- get pos at edit cursor
+        local CountTrItem = reaper.CountTrackMediaItems(track)
+        if CountTrItem then 
+          for i = 0, CountTrItem-1 do         -- for each item,               
+            local item = reaper.GetTrackMediaItem(track,i)      
+            local itemStart = reaper.GetMediaItemInfo_Value( item, 'D_POSITION' )
+            local itemEnd = itemStart + reaper.GetMediaItemInfo_Value( item, 'D_LENGTH' )
+            if itemStart <= cursorPos and itemEnd > cursorPos then
+               take = reaper.GetTake( item, 0 )
+            end
+          end
+        end
+      end
     end
- 
-    take = reaper.BR_GetMouseCursorContext_Take() -- get take under mouse 
-    cursorSource = tonumber(reaper.GetExtState(extName, 8 )) 
-    if cursorSource == 1 then
-      cursorPos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position
-    else
-      cursorPos = reaper.GetCursorPosition()   -- get pos at edit cursor
-    end
-            
+              
     if take and trackHeight > 25 then -- and cursorSource == 0 then      -- if track height isn't tiny
       if reaper.TakeIsMIDI(take) then 
         local pitchSorted = {}                  -- pitches under cursor to be sorted
         local distanceFromCursor = {}            -- corresponding distances of notes from mouse
         local distanceSorted = {}               -- ^ same, but to be sorted
+        
         item = reaper.BR_GetMouseCursorContext_Item() -- get item under mouse
         position_ppq = reaper.MIDI_GetPPQPosFromProjTime(take, cursorPos) -- convert to PPQ
         local notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take
         
         for n = notesCount-1, 0, -1 do
           _, selected, muted, startppq, endppq, ch, pitch, vel = reaper.MIDI_GetNote(take, n) -- get note start/end position              
-          
           if startppq <= position_ppq and endppq >= position_ppq then  -- is current note the note under the cursor?
             notePos = reaper.MIDI_GetProjTimeFromPPQPos( take, startppq)
             
             numberNotes = numberNotes+1                           -- add to count of how many notes are under cursor
             noteLength = math.floor(endppq - startppq)
-            showNotes[numberNotes] = {pitch, vel, noteLength, ch+1, n, tostring(muted), posString}   -- get the pitch and corresponding velocity as table-in-table
+            showNotes[numberNotes] = {pitch, vel, noteLength, ch+1, n, tostring(muted), notePPQ}   -- get the pitch and corresponding velocity as table-in-table
             pitchUnderCursor[numberNotes] = pitch                 -- get the pitch to reference for undo message
             pitchSorted[numberNotes] = pitch
             distanceFromCursor[numberNotes] = position_ppq - startppq       -- put distance to cursor in index position reference table
@@ -111,16 +126,17 @@ function getCursorInfo()
           end
         end
         
+        step = tonumber(reaper.GetExtState(extName, 'step'))
+        --reaper.ShowConsoleMsg("step: " .. step .. "\n")
+         
         table.sort(distanceSorted)  -- sort the note table so the closest noteon is at index position 1
         table.sort(pitchSorted)     -- sort the pitch table so the lowest pitch is at index position 1
         local targetNoteDistance = distanceSorted[1]                  -- find the distance from cursor of the closest noteon
-        local lowestPitch = pitchSorted[1]                            -- find the lowest pitch in array
-        local sameDistance = 0                                        -- initialize the sameDistance variable
+        local lowestPitch = pitchSorted[1]                            -- find the lowest pitch in array                                        -- initialize the sameDistance variable
         local sameLowest
                
         for j = 1, #distanceSorted do                                 -- for each entry in the sorted distance array
           if distanceSorted[j] == distanceSorted[j+1] then            -- if entries are equal
-            if j == 1 then sameDistance = sameDistance+1 end 
             for p = 1, #distanceFromCursor do                          -- for each entry in the distanceFromCursor array
               if distanceFromCursor[p] == distanceSorted[1] then       -- if distFromMouse index = closest note entry,
                 sameLowest = p                                         -- get the index 
@@ -129,26 +145,17 @@ function getCursorInfo()
           end
         end
         
-                  --~~~~~~~  multiple equidistant notes
-        if sameDistance > 0 then                           -- if there are notes that are the same distance from mouse
-          for t = 1, #distanceFromCursor do                 -- for each entry in the unsorted distance array
-            if targetNoteDistance == distanceSorted[t] then         -- if the entry matchest the closest note distance from cursor
-              targetNoteIndex = showNotes[t][5]          
-              targetPitch = showNotes[t][1]
-            end
+        --~~~~~~~ find closest note
+        for i = #distanceFromCursor, 1, -1 do                        -- for each entry in the unsorted distance array
+        --for i = 1, #distanceFromCursor do                        -- for each entry in the unsorted distance array
+          if targetNoteDistance == distanceFromCursor[i] then   
+            if #showNotes == 1 then step = 0 end
+            if #showNotes > i-1 + step then
+              targetNoteIndex = showNotes[i + step][5]
+              targetPitch = showNotes[i + step][1]                  -- get the pitch value of the closest note
+            end                                        
           end
-        end
-                 
-        --~~~~~~~  closest note
-        for i = 1, #distanceFromCursor do                        -- for each entry in the unsorted distance array
-          if targetNoteDistance == distanceFromCursor[i] and sameDistance == 0 then   
-            targetNoteIndex = showNotes[i][5]
-            targetPitch = showNotes[i][1]                  -- get the pitch value of the closest note
-          end                                     
         end                                                
-        
-        
-        
       end           -- if take is MIDI
     end             -- if take not nil
          
@@ -160,11 +167,10 @@ function getCursorInfo()
       _, _, _, targetPPQ, _, _, _, _= reaper.MIDI_GetNote(take, targetNoteIndex) -- get note start/end position              
       targetNotePos = reaper.MIDI_GetProjTimeFromPPQPos( take, targetPPQ)
       track = reaper.GetMediaItemTake_Track( take )
-      trPos = reaper.GetMediaTrackInfo_Value( track, 'I_TCPY' )
       tcpHeight = reaper.GetMediaTrackInfo_Value( track, 'I_TCPH')
     end 
     
-  return take, targetPitch, targetNoteIndex, targetNotePos, track, trPos, tcpHeight, cursorSource
+  return take, targetPitch, targetNoteIndex, targetNotePos, track, tcpHeight, cursorSource
   end
 end
 
@@ -181,7 +187,7 @@ function main()
   incr = tonumber(reaper.GetExtState(extName, 7 ))
   if incr == nil then incr = 0 end
   
-  take, targetNoteNumber, targetNoteIndex, _, track, trPos, tcpHeight, cursorSource = getCursorInfo()
+  take, targetNoteNumber, targetNoteIndex, targetNotePos, track, tcpHeight, cursorSource = getCursorInfo()
   
   _,_,a,b,c,device,direction  = reaper.get_action_context() 
   --reaper.ShowConsoleMsg(a .. " | " .. b .. " | " .. c .. " | " .. device .. " | " .. direction .. "\n")
@@ -205,7 +211,7 @@ function main()
     
     if take ~= nil and targetNoteIndex ~= nil and targetNoteIndex ~= -1 then
       _, _, _, startppqpos, endposppq, _, pitch, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
-    
+     
       if incr > 0 then 
         _, _, _, startppqposNext, _, _, pitch2, _ = reaper.MIDI_GetNote( take, targetNoteIndex +1 )      
         _, _, _, startppqposPrev, endposppqPrev, _, _, _ = reaper.MIDI_GetNote( take, targetNoteIndex -1 )
@@ -229,7 +235,8 @@ function main()
           end
         elseif incr < 0 then                                      -- if nudge encroaches on prev note
           if startppqpos + incr == startppqposPrev then           -- subtract 1 tick to incr
-            incr = incr + 1
+            --reaper.ShowConsoleMsg(showNotes[targetNoteIndex][7] .. "\n")
+            incr = incr - 1
           end
         end
         reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
