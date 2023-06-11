@@ -4,11 +4,14 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.37a
+ * Version: 1.38a
 --]]
  
 --[[
  * Changelog:
+ * v1.38a (2023-6-11)
+   + reset step upon nudge 
+   + switch target cursor to edit cursor upon nudge - makes more predictable
  * v1.38 (2023-6-11)
    + bring up to speed with "shownotes" target note selector feature 
  * v1.37a 2023-6-9)
@@ -51,7 +54,6 @@ extName = 'mccrabney_MIDI edit - show notes, under cursor and last-received.lua'
     --]]------------------------------]]--
     
 function RazorEditSelectionExists()
- 
   for i = 0, reaper.CountTracks(0)-1 do          -- for each track, check if RE is present
     local retval, x = reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(0,i), "P_RAZOREDITS", "string", false)
     if x ~= "" then return true end              -- if present, return true 
@@ -59,7 +61,6 @@ function RazorEditSelectionExists()
   end
 end                                 
   
-
 -----------------------------------------------------------
     --[[------------------------------[[--
           get details of MIDI notes under mouse -- mccrabney        
@@ -127,7 +128,6 @@ function getCursorInfo()
         end
         
         step = tonumber(reaper.GetExtState(extName, 'step'))
-        --reaper.ShowConsoleMsg("step: " .. step .. "\n")
          
         table.sort(distanceSorted)  -- sort the note table so the closest noteon is at index position 1
         table.sort(pitchSorted)     -- sort the pitch table so the lowest pitch is at index position 1
@@ -228,24 +228,31 @@ function main()
         end
       end
       
+      local targetChange = 0
       if pitch ~= pitch2 then             -- if two different notes
         if incr > 0 then                  -- if moving forwards
           if startppqpos + incr == startppqposNext then           -- if nudge encroaches on next note 
+            targetChange = 1
             incr = incr + 1                                       -- add 1 tick to incr
           end
         elseif incr < 0 then                                      -- if nudge encroaches on prev note
           if startppqpos + incr == startppqposPrev then           -- subtract 1 tick to incr
-            --reaper.ShowConsoleMsg(showNotes[targetNoteIndex][7] .. "\n")
+            targetChange = -1
             incr = incr - 1
           end
         end
         reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
       end
-     
-      if cursorSource ~= 1 then 
-        local newTime = reaper.MIDI_GetProjTimeFromPPQPos(take, startppqpos + incr)
-        reaper.SetEditCurPos( newTime, 1, 0)
+
+      if cursorSource == 0 then         -- 
+        reaper.SetExtState(extName, 'stepDown', 1, false) 
+      else
+        reaper.SetExtState(extName, 'toggleCursor', 1, true)
+        reaper.SetExtState(extName, 'stepDown', 1, false) 
       end
+     
+      local newTime = reaper.MIDI_GetProjTimeFromPPQPos(take, startppqpos + incr)
+      reaper.SetEditCurPos( newTime, 1, 0)
       
       reaper.MIDI_Sort(take)
     
@@ -253,7 +260,8 @@ function main()
       cursorNoteSymbol = pitchList[(targetNoteNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
       reaper.Undo_OnStateChange2(proj, "nudged note " .. targetNoteNumber .. "(" .. cursorNoteSymbol .. octave .. ")")
     end
-
+    
+    --reaper.SetExtState(extName, 'DoRefresh', '1', false)
     reaper.PreventUIRefresh(-1)
     reaper.UpdateArrange()
   end
