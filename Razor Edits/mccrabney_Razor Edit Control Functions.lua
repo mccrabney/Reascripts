@@ -932,9 +932,7 @@ end
     --]]------------------------------]]--
 
 function RazorEditSelectionExists(make,itemType)    ---itemType: 0 for audio, 1 for MIDI
-  
   reaper.Undo_BeginBlock2(0)          -- make them from selected items.
-
   local midiFlag = 0
   local itemUnderMouse
   local itemCount = reaper.CountSelectedMediaItems(0)  -- how many items are selected
@@ -944,8 +942,7 @@ function RazorEditSelectionExists(make,itemType)    ---itemType: 0 for audio, 1 
     if itemUnderMouse ~= nil then 
       reaper.SetMediaItemSelected( itemUnderMouse, true )  -- set it selected
       itemCount = 1
-    end
-                                          -- update item count
+    end                                        -- update item count
   end
   
   for i=0, reaper.CountTracks(0)-1 do          -- for each track, check if RE is present
