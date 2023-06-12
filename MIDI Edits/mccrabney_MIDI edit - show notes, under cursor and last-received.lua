@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.69
+ * Version: 1.70
 --]]
  
 -- HOW TO USE -- 
@@ -19,7 +19,7 @@
 
 dofile(reaper.GetResourcePath() .. '/Scripts/ReaTeam Extensions/API/imgui.lua')('0.8')
 extName = 'mccrabney_MIDI edit - show notes, under cursor and last-received.lua'
-if reaper.HasExtState(extName, 8) then						-- get the cursorsource, if previously set
+if reaper.HasExtState(extName, 8) then            -- get the cursorsource, if previously set
   cursorSource = tonumber(reaper.GetExtState(extName, 8 ))
 end
 
@@ -208,8 +208,8 @@ function getCursorInfo()
         if #showNotes then
           if reaper.HasExtState(extName, 'stepIncr') then         -- update display, called from child scripts
             step = step + 1
-            reaper.SetExtState(extName, 'step', step, false)
             if step >= #showNotes then step = 0 end
+            reaper.SetExtState(extName, 'step', step, false)
             reaper.DeleteExtState(extName, 'stepIncr', false)
           end
           
@@ -298,8 +298,10 @@ lastX = 0
 pop = 0 
 editCurPosLast = -1
 local incr = {1, 10, 24, 48, 96, 240, 480, 960}
-noteOnLine  = reaper.JS_LICE_CreateBitmap(true, 1, 1)
-noteOffLine = reaper.JS_LICE_CreateBitmap(true, 1, 1)
+noteOnLine        = reaper.JS_LICE_CreateBitmap(true, 1, 1)
+noteOnLineShadow  = reaper.JS_LICE_CreateBitmap(true, 1, 1)
+noteOffLine       = reaper.JS_LICE_CreateBitmap(true, 1, 1)
+noteOffLineShadow = reaper.JS_LICE_CreateBitmap(true, 1, 1)
     
     --[[------------------------------[[--
           loop and show tooltips, cursor as necessary  
@@ -339,7 +341,6 @@ function loop()
   end       
   
           ----------------------------------------------------- optimizer to reduce calls to getCursorInfo
-
   if loopCount >= 3 and info == "arrange" and lastX ~= x and pop == 0  
   or editCurPos ~= editCurPosLast then 
     take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight = getCursorInfo() 
@@ -385,21 +386,18 @@ function loop()
   -------------------------------------------------------------------------------------------------
   ------------------------------GUI ---------------------------------------------------------------
   mouseState = reaper.JS_Mouse_GetState(0xFF)
-  --reaper.ShowConsoleMsg(mouseState .. "\n") 
   --if mouseState ~= 1 and mouseState ~= 64 then    -- acknowledging 64 (middlemouse) prevents single click from working.                             -- if not left click 
   if mouseState ~= 1 then                                       -- if not left click 
             ----------------------------------------------------- draw guideline at target note 
     if targetPitch ~= nil and info == "arrange" and take ~= nil then 
+      
       local sysTime = math.floor( reaper.time_precise  ())        -- blink cursor
-      if sysTime % 2 ~= 0 then 
-        if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end
-      else
-        if cursorSource == 1 then curColor = 0xFFFF5959 else curColor = 0x912954ff end
-      end
+      if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end
       
       reaper.JS_LICE_Clear(noteOnLine, curColor )
+      reaper.JS_LICE_Clear(noteOnLineShadow,  0x85000000 )
       reaper.JS_LICE_Clear(noteOffLine, curColor )
-      
+      reaper.JS_LICE_Clear(noteOffLineShadow, 0x85000000 )
       
       if targetNotePos then 
         local zoom_lvl = reaper.GetHZoomLevel()
@@ -411,12 +409,16 @@ function loop()
       end
       
       local pad = 15
-      reaper.JS_Composite(track_window, targetNotePixel,    trPos + pad, 2, tcpHeight - pad - 3, noteOnLine, 0, 0, 1, 1, true) -- DRAW
-      reaper.JS_Composite(track_window, targetNotePixelEnd, trPos + pad, 1, tcpHeight - pad - 3, noteOffLine, 0, 0, 1, 1, true) -- DRAW
+      reaper.JS_Composite(track_window, targetNotePixel,      trPos + pad, 1, tcpHeight - pad - 3, noteOnLine, 0, 0, 1, 1, true) -- DRAW
+      reaper.JS_Composite(track_window, targetNotePixel+1,    trPos + pad, 1, tcpHeight - pad - 3, noteOnLineShadow, 0, 0, 1, 1, true) -- DRAW
+      reaper.JS_Composite(track_window, targetNotePixelEnd+1, trPos + pad, 1, tcpHeight - pad - 3, noteOffLine, 0, 0, 1, 1, true) -- DRAW
+      reaper.JS_Composite(track_window, targetNotePixelEnd,   trPos + pad, 1, tcpHeight - pad - 3, noteOffLineShadow, 0, 0, 1, 1, true) -- DRAW
       
     else                                                    -- if no note under cursor
       reaper.JS_Composite_Unlink(track_window, noteOnLine, true)     -- CLEAR
+      reaper.JS_Composite_Unlink(track_window, noteOnLineShadow, true)     -- CLEAR
       reaper.JS_Composite_Unlink(track_window, noteOffLine, true)    -- CLEAR
+      reaper.JS_Composite_Unlink(track_window, noteOffLineShadow, true)    -- c'mon it's clear
     end
     
                        ----------------------------------------- draw the text readout 
@@ -452,9 +454,15 @@ function loop()
         
         for i = #showNotes, 1, -1 do                   -- for each top-level entry in the showNotes table,
           if showNotes[1] and targetPitch then
-            if string.len(showNotes[i][7]) < posStringSize[#posStringSize] then
-              showNotes[i][7] = " " .. showNotes[i][7]
+            if showNotes[i][7] == "" then 
+              for j = 1, posStringSize[#posStringSize] do 
+                showNotes[i][7] = " " .. showNotes[i][7]
+              end
             end
+            
+            --if string.len(showNotes[i][7]) < posStringSize[#posStringSize] then
+            --  showNotes[i][7] = " " .. showNotes[i][7]
+            --end
             
             octave = math.floor(showNotes[i][1]/12)-1                    -- establish the octave for readout
             local pitchList = {"C ", "C#", "D ", "D#", "E ", "F ", "F#", "G ", "G#", "A ", "A#", "B "}
@@ -501,9 +509,7 @@ function loop()
               increment = ""
             end
             
-            if showNotes[i][6] == "true" then 
-              color = 0x7a7a7aFF
-            end
+            if showNotes[i][6] == "true" then color = 0x7a7a7aFF end
             
             table.sort(showNotes, function(a, b) return a[1] < b[1] end)
             
@@ -520,9 +526,6 @@ function loop()
       reaper.ImGui_PopStyleColor(ctx)
       reaper.ImGui_PopStyleVar(ctx)
     end           
-  else                                                    -- if no note under cursor
-    reaper.JS_Composite_Unlink(track_window, noteOnLine, true)  -- CLEAR
-    reaper.JS_Composite_Unlink(track_window, noteOffLine, true)    -- CLEAR
   end
   reaper.defer(loop)
   editCurPosLast = reaper.GetCursorPosition()
@@ -549,6 +552,9 @@ function SetButtonOFF()
   Clean()
   reaper.JS_LICE_DestroyBitmap( noteOnLine)
   reaper.JS_LICE_DestroyBitmap( noteOffLine)
+  reaper.JS_LICE_DestroyBitmap( noteOnLineShadow)
+  reaper.JS_LICE_DestroyBitmap( noteOffLineShadow)
+
   reaper.SetToggleCommandState( sec, cmd, 0 ) -- Set OFF
   reaper.RefreshToolbar2( sec, cmd ) 
 end
@@ -559,6 +565,8 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.70 (2023-6-9)
+  + ghost cursors drop shadows
 * v1.69 (2023-6-9)
   + added ability to step through the notes/change target note currently under the cursor
     * use Script: mccrabney_MIDI edit - step through notes under cursor in 'show notes'.lua

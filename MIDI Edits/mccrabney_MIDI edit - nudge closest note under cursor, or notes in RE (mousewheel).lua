@@ -193,12 +193,12 @@ function main()
   --reaper.ShowConsoleMsg(a .. " | " .. b .. " | " .. c .. " | " .. device .. " | " .. direction .. "\n")
   
   if device == 16383 and direction == 129      -- for relative 
-  or device == 127 and direction >= 15 then    -- for mousewheel
+  or device == 127   and direction >= 15 then    -- for mousewheel
     incr = incr
   end
   
   if device == 16383 and direction == 16383     -- for relative
-  or device == 127 and direction <= -15 then    -- for mousewheel
+  or device == 127   and direction <= -15 then    -- for mousewheel
     incr = incr * -1
   end  
   
@@ -207,6 +207,7 @@ function main()
     task = 6
     SetGlobalParam(job, task, _, _, incr)
   else                                          -- perform the edit on extState target note
+    --reaper.ShowConsoleMsg("non-RE op" .. "\n")
     local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"}
     
     if take ~= nil and targetNoteIndex ~= nil and targetNoteIndex ~= -1 then
@@ -228,16 +229,13 @@ function main()
         end
       end
       
-      local targetChange = 0
-      if pitch ~= pitch2 then             -- if two different notes
-        if incr > 0 then                  -- if moving forwards
+      if pitch ~= pitch2 then                                     -- if two different notes
+        if incr > 0 then                                          -- if moving forwards
           if startppqpos + incr == startppqposNext then           -- if nudge encroaches on next note 
-            targetChange = 1
             incr = incr + 1                                       -- add 1 tick to incr
           end
         elseif incr < 0 then                                      -- if nudge encroaches on prev note
           if startppqpos + incr == startppqposPrev then           -- subtract 1 tick to incr
-            targetChange = -1
             incr = incr - 1
           end
         end
@@ -253,20 +251,15 @@ function main()
      
       local newTime = reaper.MIDI_GetProjTimeFromPPQPos(take, startppqpos + incr)
       reaper.SetEditCurPos( newTime, 1, 0)
-      
       reaper.MIDI_Sort(take)
-    
       octave = math.floor(targetNoteNumber/12)-1                               -- establish the octave for readout
       cursorNoteSymbol = pitchList[(targetNoteNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
       reaper.Undo_OnStateChange2(proj, "nudged note " .. targetNoteNumber .. "(" .. cursorNoteSymbol .. octave .. ")")
     end
-    
     --reaper.SetExtState(extName, 'DoRefresh', '1', false)
     reaper.PreventUIRefresh(-1)
     reaper.UpdateArrange()
   end
-  
-
 end
 
 main()
