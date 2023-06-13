@@ -4,12 +4,14 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.11
+ * Version: 1.12a
  * donation link: 
 --]]
 
 --[[
  * Changelog:
+ * v1.12a (2023-6-12)
+	+ added split at cursor task
  * v1.12 (2023-6-12)
     + fixed obvious undo message error
     + fixed bug where multiple equidistant notes nudged backwards de-synced (for loop going in bad direction)
@@ -116,6 +118,7 @@ function MIDINotesInRE(task)
   local mouseTake                 -- take under mouse
   local mouseItem                 -- item under mouse
   local mouse_position_ppq        -- ppq pos of mouse at function call
+  cursorSource = tonumber(reaper.GetExtState(extName, 8 ))
   
   reaper.PreventUIRefresh(1)
   
@@ -169,7 +172,7 @@ function MIDINotesInRE(task)
               
               for n = notesCount-1, 0, -1 do         --- for each note, starting with last in item
                  --retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, noteidx )
-                _, _, muted, startppqposOut, endppqposOut, _, pitch, vel = reaper.MIDI_GetNote(take, n) -- get note info
+                _, sel, muted, startppqposOut, endppqposOut, chan, pitch, vel = reaper.MIDI_GetNote(take, n) -- get note info
                 
               -- delete notes with razor edits:
               
@@ -308,7 +311,7 @@ function MIDINotesInRE(task)
                     undoMessage = "changed velocity of notes in REs"
                   end       
 
-                -- EDIT: transpose whose noteons exist within Razer Edits
+                -- transpose whose noteons exist within Razer Edits
                 elseif task == 21 then  
                   if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
                     pitch = pitch+incr
@@ -317,7 +320,24 @@ function MIDINotesInRE(task)
                     reaper.MIDI_SetNote( take, n, nil, nil, nil, nil, nil, pitch, nil)
                     
                     undoMessage = "transposed notes in REs"
-                  end       
+                  end
+                  
+                -- split notes whose noteons exist within Razor Edit at mouse cursor
+                elseif task == 7 then   
+                  if cursorSource == 1 then
+                    cursorPos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position
+                  else
+                    cursorPos = reaper.GetCursorPosition()   -- get pos at edit cursor
+                  end
+                  editCursor_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, cursorPos) -- convert project time to PPQ
+                  if startppqposOut < editCursor_ppq_pos and editCursor_ppq_pos < endppqposOut then
+                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut, editCursor_ppq_pos-96, nil, nil, nil, nil)
+                    reaper.MIDI_InsertNote( take, sel, 0, editCursor_ppq_pos, endppqposOut, chan, pitch, vel, nil)
+                    reaper.MIDI_Sort(take)
+                  end  
+                  
+                  undoMessage = "split notes" 
+                  
                 end     -- of MIDI task switch section
               end       -- for each note   
 
