@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="abfee6c5899bdf5e791f3663d3e1c7049b6cfbe4">
+<index version="1" name="mccrabney Reascripts" commit="930fd5a1e35ee290aad78c636fbad0f2041b35b2">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -200,6 +200,12 @@ then no time readout is displayed.
       <version name="1.70" author="mccrabney" time="2023-06-12T23:32:34Z">
         <changelog><![CDATA[+ ghost cursors drop shadows]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/abfee6c5899bdf5e791f3663d3e1c7049b6cfbe4/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - split note under cursor, or notes in RE.lua" type="script" desc="split note under cursor, or notes in RE">
+      <version name="1.0" author="mccrabney" time="2023-06-13T00:25:55Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/930fd5a1e35ee290aad78c636fbad0f2041b35b2/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20split%20note%20under%20cursor,%20or%20notes%20in%20RE.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - split notes at edit cursor.lua" type="script" desc="split notes at edit cursor">
