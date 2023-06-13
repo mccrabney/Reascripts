@@ -93,10 +93,6 @@ function main()
     local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"} 
     
     if take ~= nil and targetNoteIndex ~= -1 then
-      if cursorSource == 0 then cursorPos = reaper.GetCursorPosition() 
-      else cursorx, y = reaper.GetMousePosition()
-      end
-      -- get edit cursor position
       editCursor_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, cursorPos) -- convert project time to PPQ
       notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take
       for n = notesCount-1, 0, -1 do
