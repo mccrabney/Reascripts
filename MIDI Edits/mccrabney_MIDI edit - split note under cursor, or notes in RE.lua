@@ -78,9 +78,9 @@ function main()
   cursorSource = tonumber(reaper.GetExtState(extName, 8 ))
   
   if RazorEditSelectionExists() then
-    task = 1
+    task = 7
     job = 1
-    --SetGlobalParam(job, task, _)
+    SetGlobalParam(job, task, _)
   else
     take, targetNoteNumber, targetNoteIndex = getNotesUnderCursor()
     
@@ -100,9 +100,7 @@ function main()
         if startppqposOut < editCursor_ppq_pos and editCursor_ppq_pos < endppqposOut and n == targetNoteIndex then
           reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut, editCursor_ppq_pos-96, nil, nil, nil, nil)
           reaper.MIDI_InsertNote( take, sel, mute, editCursor_ppq_pos, endppqposOut, chan, pitch, vel, nil)
-          reaper.MIDI_Sort(take)
         end
-        
       end
       reaper.MIDI_Sort(take)
       reaper.SetExtState(extName, 'DoRefresh', '1', false)
