@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="930fd5a1e35ee290aad78c636fbad0f2041b35b2">
+<index version="1" name="mccrabney Reascripts" commit="be43194f9926d105fb806c477e74f1c94460296a">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -357,6 +357,9 @@ then no time readout is displayed.
         <changelog><![CDATA[+ re-allowed nudged notes to escape RE bounds
 + implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts"]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/7e71c29aaf552453207292bd6c705d2d752e792a/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.12a" author="mccrabney" time="2023-06-13T00:39:39Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/be43194f9926d105fb806c477e74f1c94460296a/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Razor Edit MIDI - copy selected notes in RE.lua" type="script" desc="copy notes whose note-ons are contained in Razor Edit">
