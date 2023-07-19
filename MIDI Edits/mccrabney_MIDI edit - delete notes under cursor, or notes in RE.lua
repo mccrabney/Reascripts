@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.311
+ * Version: 1.32
 --]]
  
 --[[
  * Changelog:
+ * v1.32 (2023-6-19)
+  + removed erroneous console message
  * v1.311 (2023-5-27)
   + updated name of parent script extstate
  * v1.31 (2023-5-09)
@@ -58,8 +60,6 @@ function getNotesUnderMouseCursor()
   
   showNotes = {}
   numVars = tonumber(reaper.GetExtState(extName, 1 ))
-  
-  --reaper.ShowConsoleMsg(numVars)
   tableSize = tonumber(reaper.GetExtState(extName, 2 ))
   guidString = reaper.GetExtState(extName, 3 )
   take = reaper.SNM_GetMediaItemTakeByGUID( 0, guidString )
