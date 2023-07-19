@@ -4,15 +4,11 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.33
+ * Version: 1.311
 --]]
  
 --[[
  * Changelog:
- * v1.33 (2023-6-11)
-  + if note is deleted, reset the "step" param in shownotes thread 
- * v1.32 (2023-6-8)
-  + if in edit cursor mode and no note is under edit cursor, switch to mouse cursor
  * v1.311 (2023-5-27)
   + updated name of parent script extstate
  * v1.31 (2023-5-09)
@@ -58,10 +54,12 @@ end
           refer to extstates to get MIDI under mouse
     --]]------------------------------]]--
     
-function getNotesUnderCursor()
+function getNotesUnderMouseCursor()
   
   showNotes = {}
   numVars = tonumber(reaper.GetExtState(extName, 1 ))
+  
+  --reaper.ShowConsoleMsg(numVars)
   tableSize = tonumber(reaper.GetExtState(extName, 2 ))
   guidString = reaper.GetExtState(extName, 3 )
   take = reaper.SNM_GetMediaItemTakeByGUID( 0, guidString )
@@ -87,35 +85,27 @@ end
     --[[------------------------------[[--
           delete notes whose ons are in RE if present, else delete note under mouse, closest first
     --]]------------------------------]]--
+
 function main()
   reaper.PreventUIRefresh(1)
  
-  cursorSource = tonumber(reaper.GetExtState(extName, 8 ))
-  
   if RazorEditSelectionExists() then
     task = 1
     job = 1
     SetGlobalParam(job, task, _)
   else
-    take, targetNoteNumber, targetNoteIndex = getNotesUnderCursor()
-    
-    if cursorSource == 0 and take ~= nil and targetNoteIndex == -1 then 
-      reaper.SetExtState(extName, 'toggleCursor', 1, false)
-      reaper.SetExtState(extName, 'DoRefresh', '1', false)
-    end
-    
-    local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"} 
+    take, targetNoteNumber, targetNoteIndex = getNotesUnderMouseCursor()
+    --reaper.ShowConsoleMsg(targetNoteNumber)
+    local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"}
     
     if take ~= nil and targetNoteIndex ~= -1 then
       reaper.MIDI_DeleteNote(take, targetNoteIndex)
       reaper.MIDI_Sort(take)
       reaper.SetExtState(extName, 'DoRefresh', '1', false)
-      reaper.SetExtState(extName, 'stepDown', 1, false)
       octave = math.floor(targetNoteNumber/12)-1                               -- establish the octave for readout
       cursorNoteSymbol = pitchList[(targetNoteNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
       reaper.Undo_OnStateChange2(proj, "deleted note " .. targetNoteNumber .. ", (" .. cursorNoteSymbol .. octave .. ")")
-    end
-    
+    end 
   end
   
   reaper.PreventUIRefresh(-1)
