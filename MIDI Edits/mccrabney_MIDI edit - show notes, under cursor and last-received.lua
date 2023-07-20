@@ -27,7 +27,6 @@ toggleNoteHold = 0
 
 local main_wnd = reaper.GetMainHwnd() -- GET MAIN WINDOW
 local track_window = reaper.JS_Window_FindChildByID(main_wnd, 0x3E8) -- GET TRACK VIEW
-
 local pitchList = {"C ", "C#", "D ", "D#", "E ", "F ", "F#", "G ", "G#", "A ", "A#", "B "}
 local ctx = reaper.ImGui_CreateContext('shownotes')
 
@@ -370,7 +369,7 @@ function loop()
   end       
 
   if reaper.HasExtState(extName, 'toggleNoteHold') then         
-    if toggleNoteHold == 0 then
+    if toggleNoteHold == 0 and RazorEditSelectionExists() then
       toggleNoteHold = 1
       if targetPitch then noteHoldNumber = targetPitch end
       reaper.SetExtState(extName, "noteHold", noteHoldNumber, false)         -- write the note hold number
@@ -382,7 +381,6 @@ function loop()
   end      
   
   if RazorEditSelectionExists() and noteHoldNumber ~= -1 then      
-    -- use this to draw a composite over RE area?
   else
     toggleNoteHold = 0
     reaper.SetExtState(extName, "noteHold", -1, false)         -- write the note hold number
