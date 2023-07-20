@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.72
+ * Version: 1.72a
 --]]
  
 -- HOW TO USE -- 
@@ -366,7 +366,6 @@ function loop()
   ------------------------------------------------------------- toggle whether focus is edit or mouse cursor                                        
   if reaper.HasExtState(extName, 'noteHoldUpdate') then         
     noteHoldNumber = tostring(math.floor(reaper.GetExtState(extName, 'noteHold')))
-    reaper.ShowConsoleMsg(noteHoldNumber .. "\n")
     reaper.DeleteExtState(extName, 'noteHoldUpdate', false)
   end       
 
@@ -380,7 +379,14 @@ function loop()
       reaper.SetExtState(extName, "noteHold", -1, false)         -- write the note hold number
     end
     reaper.DeleteExtState(extName, 'toggleNoteHold', false)
-  end       
+  end      
+  
+  if RazorEditSelectionExists() and noteHoldNumber ~= -1 then      
+    -- use this to draw a composite over RE area?
+  else
+    toggleNoteHold = 0
+    reaper.SetExtState(extName, "noteHold", -1, false)         -- write the note hold number
+  end
   
   
   ---------------------------------------------------  get last note hit and feed it into table 
@@ -419,9 +425,14 @@ function loop()
   --if mouseState ~= 1 and mouseState ~= 64 then    -- acknowledging 64 (middlemouse) prevents single click from working.                             -- if not left click 
   if mouseState ~= 1 then                                       -- if not left click 
             ----------------------------------------------------- draw guideline at target note 
+    if RazorEditSelectionExists() and noteHoldNumber ~= -1 then      
+      -- use this to draw a composite over RE area?
+    else
+      -- clear composite over RE area?
+    end
+    
     if targetPitch ~= nil and info == "arrange" and take ~= nil then 
       
-      local sysTime = math.floor( reaper.time_precise  ())        -- blink cursor
       if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end
       
       reaper.JS_LICE_Clear(noteOnLine, curColor )
@@ -600,6 +611,8 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.72a (2023-7-20)
+  + clearing REs turns off RE-last-hit focus
 * v1.72 (2023-7-20)
   + transposing last-hit notes in RE now updates the last-hit note
 * v1.71 (2023-7-19)
