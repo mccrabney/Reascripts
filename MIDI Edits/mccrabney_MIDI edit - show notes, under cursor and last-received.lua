@@ -23,6 +23,8 @@ if reaper.HasExtState(extName, 8) then            -- get the cursorsource, if pr
   cursorSource = tonumber(reaper.GetExtState(extName, 8 ))
 end
 
+toggleNoteHold = 0
+
 local main_wnd = reaper.GetMainHwnd() -- GET MAIN WINDOW
 local track_window = reaper.JS_Window_FindChildByID(main_wnd, 0x3E8) -- GET TRACK VIEW
 
@@ -48,6 +50,7 @@ end
           watch for last-hit note on dedicated track        
     --]]------------------------------]]--
 
+noteHoldNumber = -1
 function getLastNoteHit()                       
   local numTracks = reaper.CountTracks(0)       -- how many tracks
   local isTrack = 0                             -- is the track present
@@ -61,7 +64,13 @@ function getLastNoteHit()
         lastNote = reaper.TrackFX_GetParam(findTrack, 0, 2)  -- find last hit note
         lastNote = math.floor(lastNote)
         lastVel = reaper.TrackFX_GetParam(findTrack, 0, 3)  -- find last hit velocity
-        lastVel = math.floor(lastVel)        
+        lastVel = math.floor(lastVel)  
+        if toggleNoteHold == 1 then 
+          noteHoldNumber = lastNote 
+        else 
+          noteHoldNumber = -1 
+        end
+        reaper.SetExtState(extName, 'noteHold', noteHoldNumber, false)         -- write the note hold number
       else                                      -- if noteoff, display no-note value
         lastNote = -1                           -- no note value
       end
@@ -340,6 +349,7 @@ function loop()
     --lastX = -1
   end       
   
+  
           ----------------------------------------------------- optimizer to reduce calls to getCursorInfo
   if loopCount >= 3 and info == "arrange" and lastX ~= x and pop == 0  
   or editCurPos ~= editCurPosLast then 
@@ -348,13 +358,26 @@ function loop()
     if take ~= nil and reaper.TakeIsMIDI(take) then             -- if take is MIDI
       loopCount = 0                                             -- reset loopcount
       lastX = x                                                 -- set lastX mouse position
-      reaper.SetExtState(extName, 'ready', 1, false)            -- bad attempt at preventing wrong index
     end
     
     if reset == 1 then reset = 0 end                            -- set reset
   end                                                           
- 
-           ---------------------------------------------------  get last note hit and feed it into table 
+  
+  ------------------------------------------------------------- toggle whether focus is edit or mouse cursor                                        
+  if reaper.HasExtState(extName, 'toggleNoteHold') then         
+    if toggleNoteHold == 0 then
+      toggleNoteHold = 1
+      if targetPitch then noteHoldNumber = targetPitch end
+      reaper.SetExtState(extName, "noteHold", noteHoldNumber, false)         -- write the note hold number
+    elseif toggleNoteHold == 1 then
+      toggleNoteHold = 0
+      reaper.SetExtState(extName, "noteHold", -1, false)         -- write the note hold number
+    end
+    reaper.DeleteExtState(extName, 'toggleNoteHold', false)
+  end       
+  
+  ---------------------------------------------------  get last note hit and feed it into table 
+  
   if loopCount < 500 then lastNote, lastVel = getLastNoteHit() end                                                           
   x, y = reaper.GetMousePosition()                              -- mousepos
   _, info = reaper.GetThingFromPoint( x, y )                    -- mousedetails
@@ -372,7 +395,7 @@ function loop()
       end  
     end    
     
-    if skip ~= 1 then                                           -- if incoming note is not present in table,
+    if skip ~= 1 and toggleNoteHold == 0 then                                           -- if incoming note is not present in table,
       lastMIDI[1] = {lastNote, lastVel, 0, 0} 
       table.insert(showNotes, 1, lastMIDI[1])                   -- insert it
       showNotes[1][7] = ""                               
@@ -445,7 +468,8 @@ function loop()
         local spacingD = ""
         local spacingCH = " "
         local postNote = "  "
-    
+        local pitchList = {"C ", "C#", "D ", "D#", "E ", "F ", "F#", "G ", "G#", "A ", "A#", "B "}
+        
         posStringSize, noteStringSize = {}
         for i = 1, #showNotes do
           posStringSize[i] = string.len(showNotes[i][7])
@@ -460,12 +484,7 @@ function loop()
               end
             end
             
-            --if string.len(showNotes[i][7]) < posStringSize[#posStringSize] then
-            --  showNotes[i][7] = " " .. showNotes[i][7]
-            --end
-            
             octave = math.floor(showNotes[i][1]/12)-1                    -- establish the octave for readout
-            local pitchList = {"C ", "C#", "D ", "D#", "E ", "F ", "F#", "G ", "G#", "A ", "A#", "B "}
             cursorNoteSymbol = pitchList[(showNotes[i][1] - 12*(octave+1)+1)]       -- establish the note symbol for readout
       
             if     showNotes[i][1] > -1  and showNotes[i][1] <  10 then spacingN = "  "     -- spacingN for the note readout
@@ -521,6 +540,17 @@ function loop()
             end
           end
         end                                               -- for each shown note
+        
+        if toggleNoteHold == 1 and noteHoldNumber ~= -1 then 
+          local togPad = ""
+          for j = 1, posStringSize[#posStringSize] do togPad = " " .. togPad end
+          octave = math.floor(noteHoldNumber/12)-1                    -- establish the octave for readout
+          cursorNoteSymbol = pitchList[(noteHoldNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
+          
+          reaper.ImGui_TextColored(ctx, 0x00FF45FF, togPad .. "n: " .. noteHoldNumber ..spacingO .. "(" .. cursorNoteSymbol ..  octave .. ")  " .. "(RE target note)"  ) 
+          
+        end
+        
         reaper.ImGui_End(ctx)
       end                                                 -- if imgui begin
       reaper.ImGui_PopStyleColor(ctx)
@@ -565,6 +595,11 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.71 (2023-7-19)
+  + added ability to toggle holding of last hit note using script: mccrabney_MIDI edit - toggle hold input note for 'show notes'
+    * running this action sets RE target note to note under cursor
+    * inputting notes from controller will change target note.
+    * running the script again again releases the note.
 * v1.70 (2023-6-9)
   + ghost cursors drop shadows
 * v1.69 (2023-6-9)
