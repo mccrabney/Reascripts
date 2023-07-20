@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.70
+ * Version: 1.72
 --]]
  
 -- HOW TO USE -- 
@@ -364,6 +364,12 @@ function loop()
   end                                                           
   
   ------------------------------------------------------------- toggle whether focus is edit or mouse cursor                                        
+  if reaper.HasExtState(extName, 'noteHoldUpdate') then         
+    noteHoldNumber = tostring(math.floor(reaper.GetExtState(extName, 'noteHold')))
+    reaper.ShowConsoleMsg(noteHoldNumber .. "\n")
+    reaper.DeleteExtState(extName, 'noteHoldUpdate', false)
+  end       
+
   if reaper.HasExtState(extName, 'toggleNoteHold') then         
     if toggleNoteHold == 0 then
       toggleNoteHold = 1
@@ -375,6 +381,7 @@ function loop()
     end
     reaper.DeleteExtState(extName, 'toggleNoteHold', false)
   end       
+  
   
   ---------------------------------------------------  get last note hit and feed it into table 
   
@@ -546,9 +553,7 @@ function loop()
           for j = 1, posStringSize[#posStringSize] do togPad = " " .. togPad end
           octave = math.floor(noteHoldNumber/12)-1                    -- establish the octave for readout
           cursorNoteSymbol = pitchList[(noteHoldNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
-          
           reaper.ImGui_TextColored(ctx, 0x00FF45FF, togPad .. "n: " .. noteHoldNumber ..spacingO .. "(" .. cursorNoteSymbol ..  octave .. ")  " .. "(RE target note)"  ) 
-          
         end
         
         reaper.ImGui_End(ctx)
@@ -595,6 +600,8 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.72 (2023-7-20)
+  + transposing last-hit notes in RE now updates the last-hit note
 * v1.71 (2023-7-19)
   + added ability to toggle holding of last hit note using script: mccrabney_MIDI edit - toggle hold input note for 'show notes'
     * running this action sets RE target note to note under cursor
