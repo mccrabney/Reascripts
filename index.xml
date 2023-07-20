@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="8a2a72b90d5d340d5f7e7170ae5f945c6e379461">
+<index version="1" name="mccrabney Reascripts" commit="d999a06349ffd9ba203fbf9b634a28b5c271dbc7">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -385,12 +385,6 @@ then no time readout is displayed.
         <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20(higher%20than%20last-hit%20note).lua</source>
       </version>
     </reapack>
-    <reapack name="mccrabney_Razor Edit MIDI - delete notes (last-hit).lua" type="script" desc="delete last-hit notes in Razor Edit">
-      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
-        <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20(last-hit).lua</source>
-      </version>
-    </reapack>
     <reapack name="mccrabney_Razor Edit MIDI - delete notes (lower than last-hit note).lua" type="script" desc="delete notes lower than last-hit note in Razor Edit">
       <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
@@ -482,12 +476,6 @@ then no time readout is displayed.
       <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
         <changelog><![CDATA[+ Initial Release]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20select%20notes%20in%20editor.lua</source>
-      </version>
-    </reapack>
-    <reapack name="mccrabney_Razor Edit MIDI - select notes in MIDI editor (last-hit).lua" type="script" desc="in MIDI editor, select last-hit notes whose note-ons are contained in Razor Edit">
-      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
-        <changelog><![CDATA[+ Initial Release]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20select%20notes%20in%20MIDI%20editor%20(last-hit).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Razor Edit MIDI - toggle mute RE contents (or selected items).lua" type="script" desc="toggle mute RE contents or selected items">
