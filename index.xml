@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="d999a06349ffd9ba203fbf9b634a28b5c271dbc7">
+<index version="1" name="mccrabney Reascripts" commit="b3d49dbf19650969df6b4d4168930f4285ab8ac3">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -201,6 +201,13 @@ then no time readout is displayed.
         <changelog><![CDATA[+ ghost cursors drop shadows]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/abfee6c5899bdf5e791f3663d3e1c7049b6cfbe4/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
       </version>
+      <version name="1.72" author="mccrabney" time="2023-07-20T18:05:35Z">
+        <changelog><![CDATA[+ transposing last-hit notes in RE now updates the last-hit note]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/7aa5705308172107f75c132612312fba391af97d/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.72a" author="mccrabney" time="2023-07-20T18:22:23Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/b3d49dbf19650969df6b4d4168930f4285ab8ac3/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - split note under cursor, or notes in RE.lua" type="script" desc="split note under cursor, or notes in RE">
       <version name="1.0" author="mccrabney" time="2023-06-13T00:25:55Z">
@@ -365,6 +372,13 @@ then no time readout is displayed.
       </version>
       <version name="1.12a" author="mccrabney" time="2023-06-13T00:39:39Z">
         <source main="main">https://github.com/mccrabney/Reascripts/raw/be43194f9926d105fb806c477e74f1c94460296a/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.13" author="mccrabney" time="2023-07-20T18:05:22Z">
+        <changelog><![CDATA[+ added mode to only apply RE edit to only last-hit OR note under cursor at time of engagement
++ transpose last-hit or note under cursor now updates target note/display
+* v1.12a (2023-6-12)
++ added split at cursor task]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/dd70c1541e560bb51f0da303ce78d3f33e647aa8/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Razor Edit MIDI - copy selected notes in RE.lua" type="script" desc="copy notes whose note-ons are contained in Razor Edit">
