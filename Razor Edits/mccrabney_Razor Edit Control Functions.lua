@@ -10,8 +10,10 @@
 
 --[[
  * Changelog:
+ * v1.13 (2023-7-20)
+  + added mode to only apply RE edit to only last-hit OR note under cursor at time of engagement
  * v1.12a (2023-6-12)
-	+ added split at cursor task
+  + added split at cursor task
  * v1.12 (2023-6-12)
     + fixed obvious undo message error
     + fixed bug where multiple equidistant notes nudged backwards de-synced (for loop going in bad direction)
@@ -91,12 +93,7 @@ function SetGlobalParam(job, task, clear, val, incr)   -- get job and details fr
   
   --reaper.ClearConsole()
   if clear == 1 then unselectAllMIDIinTrack() end     -- deselect MIDI in every item on selected track
-      
-  if job == 1 then                                    -- run specific RE-MIDI edit task
-    if task == 0 or 2 or 3 or 4 or 13 or 14 or 15 then   -- if commands require lastHit value,
-      lastNoteHit = getLastNoteHit() end                 --  get it
-    MIDINotesInRE(task) end
-  
+  if job == 1 then MIDINotesInRE(task) end
   if job == 2 then muteREcontents() end                   -- RE movement/size controls
   if job == 3 then moveREbyVisibleGrid(incr) end
   if job == 4 then moveREwithcursor(val) end
@@ -111,7 +108,7 @@ end
     --[[------------------------------[[--
           do edits to notes in RE   -- mccrabney        
     --]]------------------------------]]--    
-
+noteHoldNumber = -1
 function MIDINotesInRE(task)
 
   local mouseNote                 -- note under mouse cursor
@@ -119,6 +116,7 @@ function MIDINotesInRE(task)
   local mouseItem                 -- item under mouse
   local mouse_position_ppq        -- ppq pos of mouse at function call
   cursorSource = tonumber(reaper.GetExtState(extName, 8 ))
+  noteHoldNumber = tonumber(reaper.GetExtState(extName, 'noteHold' ))
   
   reaper.PreventUIRefresh(1)
   
@@ -160,33 +158,32 @@ function MIDINotesInRE(task)
               -- EDIT: nudge notes whose noteons exist within Razor Edit backwards 
               if task == 6 and incr < 0 then
                 for n = 0, notesCount do         --- for each note, starting with first in item
-                   --retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, noteidx )
                   _, _, muted, startppqposOut, endppqposOut, _, pitch, vel = reaper.MIDI_GetNote(take, n) -- get note info
                   
-                  if startppqposOut > razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
-                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
+                  if startppqposOut > razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then
+                    if noteHoldNumber == -1 then
+                      reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
+                    elseif noteHoldNumber == pitch then
+                      reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
+                    end
                     undoMessage = "nudge notes in REs"
                   end
                 end
               end
               
               for n = notesCount-1, 0, -1 do         --- for each note, starting with last in item
-                 --retval, selected, muted, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote( take, noteidx )
                 _, sel, muted, startppqposOut, endppqposOut, chan, pitch, vel = reaper.MIDI_GetNote(take, n) -- get note info
                 
               -- delete notes with razor edits:
-              
-                 -- EDIT: delete last-hit notes whose noteons exist within Razor Edit
-                if task == 0 then
-                  if lastNoteHit == pitch and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_DeleteNote( take, n ) 
-                    undoMessage = "delete lasthit notes in RE"
-                  end
                 
                   -- EDIT: delete all notes whose noteons exist within Razor Edit
-                elseif task == 1 then   
+                if task == 1 then   
                   if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_DeleteNote( take, n )
+                    if noteHoldNumber == -1 then
+                      reaper.MIDI_DeleteNote( take, n )
+                    elseif noteHoldNumber == pitch then
+                      reaper.MIDI_DeleteNote( take, n )
+                    end
                     undoMessage = "delete notes in RE"
                   end
                 
@@ -214,7 +211,11 @@ function MIDINotesInRE(task)
                 -- EDIT: delete all notes whose noteons AND noteoffs exist within Razor Edit
                 elseif task == 8 then   
                   if startppqposOut >= razorStart_ppq_pos and endppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_DeleteNote( take, n )
+                    if noteHoldNumber == -1 then
+                      reaper.MIDI_DeleteNote( take, n )
+                    elseif noteHoldNumber == pitch then
+                      reaper.MIDI_DeleteNote( take, n )
+                    end                    
                     undoMessage = "delete notes contained within RE" 
                   end
                     
@@ -256,47 +257,53 @@ function MIDINotesInRE(task)
                 -- EDIT: select all notes whose noteons exist within Razor Edit
                 elseif task == 5 then
                   if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
-                    reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, nil, nil)
+                    if noteHoldNumber == -1 then
+                      reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, nil, nil)
+                    elseif noteHoldNumber == pitch then
+                      reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, nil, nil)
+                    end
                   end
                   undoMessage = "select all notes in RE"
                   
-                -- EDIT: select all last-hit notes whose noteons exist within Razor Edit
-                elseif task == 12 then
-                  if lastNoteHit == pitch and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, nil, nil)
-                  end  
-                  undoMessage = "select all last-hit notes in RE"                  
            -----------------------------------------------------------------------
               -- nudge notes with razor edits:
               
                 -- EDIT: nudge notes whose noteons exist within Razor Edit forwards 
                elseif task == 6 and incr > 0 then
                   if startppqposOut > razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
-                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
+                    if noteHoldNumber == -1 then                    
+                      reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
+                    elseif noteHoldNumber == pitch then
+                      reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
+                    end
                     if n == 0 then undoMessage = "nudge notes in REs" end
                   end
 
-                -- EDIT: nudge last-hit notes whose noteons exist within Razor Edit forwards and backwards
-                elseif task == 13 then
-                  if lastNoteHit == pitch and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
-                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
-                    undoMessage = "nudge last-hit notes in RE forwards" 
-                  end
-                  
                 -- EDIT: nudge noteoffs whose noteons exist within Razor Edit forwards and backwards
                 elseif task == 18 then  
                   --reaper.ShowConsoleMsg(incr .. "\n")
                   if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_SetNote( take, n, nil, nil, nil, endppqposOut+incr, nil, nil, nil, nil)
+                    if noteHoldNumber == -1 then                    
+                      reaper.MIDI_SetNote( take, n, nil, nil, nil, endppqposOut+incr, nil, nil, nil, nil)
+                    elseif noteHoldNumber == pitch then
+                      reaper.MIDI_SetNote( take, n, nil, nil, nil, endppqposOut+incr, nil, nil, nil, nil)
+                    end
                     undoMessage = "adjust length of notes in RE" 
                   end
                   
               -- toggle mute notes with razor edits:
                 elseif task == 17 then  
                   if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
-                    if muted == false then reaper.MIDI_SetNote( take, n, nil, true, nil, nil, nil, nil, nil, nil)
-                    else reaper.MIDI_SetNote( take, n, nil, false, nil, nil, nil, nil, nil, nil)
+                    if noteHoldNumber == -1 then                    
+                      if muted == false then reaper.MIDI_SetNote( take, n, nil, true, nil, nil, nil, nil, nil, nil)
+                      else reaper.MIDI_SetNote( take, n, nil, false, nil, nil, nil, nil, nil, nil)
+                      end
+                    elseif noteHoldNumber == pitch then
+                      if muted == false then reaper.MIDI_SetNote( take, n, nil, true, nil, nil, nil, nil, nil, nil)
+                      else reaper.MIDI_SetNote( take, n, nil, false, nil, nil, nil, nil, nil, nil)
+                      end
                     end
+                    
                     undoMessage = "mute notes in RE" 
                   end
                   
@@ -306,7 +313,11 @@ function MIDINotesInRE(task)
                     vel = vel+incr
                     if vel > 127 then vel = 127 end
                     if vel < 1 then vel = 1 end
-                    reaper.MIDI_SetNote( take, n, nil, nil, nil, nil, nil, nil, vel)
+                    if noteHoldNumber == -1 then                    
+                      reaper.MIDI_SetNote( take, n, nil, nil, nil, nil, nil, nil, vel)
+                    elseif noteHoldNumber == pitch then
+                      reaper.MIDI_SetNote( take, n, nil, nil, nil, nil, nil, nil, vel)
+                    end
                     
                     undoMessage = "changed velocity of notes in REs"
                   end       
@@ -317,7 +328,11 @@ function MIDINotesInRE(task)
                     pitch = pitch+incr
                     if pitch > 127 then pitch= 127 end
                     if pitch < 0 then pitch= 0 end
-                    reaper.MIDI_SetNote( take, n, nil, nil, nil, nil, nil, pitch, nil)
+                    if noteHoldNumber == -1 then                    
+                      reaper.MIDI_SetNote( take, n, nil, nil, nil, nil, nil, pitch, nil)
+                    elseif noteHoldNumber == pitch then
+                      reaper.MIDI_SetNote( take, n, nil, nil, nil, nil, nil, pitch, nil)
+                    end                    
                     
                     undoMessage = "transposed notes in REs"
                   end
@@ -390,55 +405,7 @@ function getMouseInfo()
   return note, take, item, position_ppq
 end
 
----------------------------------------------------------------------
-    --[[------------------------------[[--
-          watch for last-hit note on dedicated track -- mccrabney        
-    --]]------------------------------]]--
 
-function getLastNoteHit()                       -- open the function
-  local numTracks = reaper.CountTracks(0)       -- how many tracks
-  local isTrack = 0                             -- is the track present
-  local lastNote = -1                           -- initialize lastNote
-  for i = 1, numTracks do                       -- for every track 
-    local findTrack = reaper.GetTrack(0,i-1)    -- get each track
-    _, trackName = reaper.GetSetMediaTrackInfo_String( findTrack, 'P_NAME', '', 0 )
-    if trackName:lower():find("lastmidi") then  -- if desired trackname
-      isTrack = isTrack+1                       -- flag that the ref track is present
-      lastNote = reaper.TrackFX_GetParam(findTrack, 0, 2)  -- find last hit note
-    end                                         -- end if/else desired trackname
-  end                                           -- end for every track
-  
-  if isTrack == 0 then                          -- if reference track isn't present, 
-    
-    reaper.InsertTrackAtIndex( numTracks, false ) -- insert one at end of project
-    refTrack = reaper.GetTrack( 0, numTracks)     -- get the new track
-    _, _ = reaper.GetSetMediaTrackInfo_String(refTrack, "P_NAME", "lastmidi", true)
-        -- using data byte 1 of midi notes received by JS MIDI Examiner - thanks, schwa!
-    reaper.TrackFX_AddByName( refTrack, "midi_examine", false, 1 )  -- add js
-    reaper.SetMediaTrackInfo_Value( refTrack, "D_VOL", 0 )      -- volume off
-    reaper.SetMediaTrackInfo_Value( refTrack, 'I_FOLDERDEPTH', 1 )   -- set folder
-    reaper.InsertTrackAtIndex( numTracks+1, false ) -- insert another track
-    controller = reaper.GetTrack( 0, numTracks+1)     -- get the new track
-    _, _ = reaper.GetSetMediaTrackInfo_String(controller, "P_NAME", "controller", true)
-    reaper.SetMediaTrackInfo_Value( controller, 'I_RECARM', 1 )   -- arm it
-    reaper.SetMediaTrackInfo_Value( controller, 'I_RECMODE', 2 )  -- turn recording off
-    reaper.SetMediaTrackInfo_Value( controller, 'I_RECMON', 1 )  -- turn rec mon on
-                                        -- turn rec mon on, set to all MIDI inputs
-    reaper.SetMediaTrackInfo_Value( controller, 'I_RECINPUT', 4096 | 0 | (63 << 5) ) 
-    
-    --reaper.ShowConsoleMsg("This script uses last-received MIDI as a reference for edits. \n")     -- communicate
-    --reaper.ShowConsoleMsg("A 'lastmidi' folder has been created for this purpose. \n")
-    --reaper.ShowConsoleMsg("It contains a track armed to 'All MIDI inputs'. \n")
-    --reaper.ShowConsoleMsg("This folder can be hidden and/or ignored from now on. \n")
-    --reaper.ShowConsoleMsg("Close this window, trigger your reference, and re-run the edit. \n")
-    
-    reaper.ShowMessageBox("A folder has been created to watch your MIDI controllers.\nRetrigger the reference MIDI and rerun the script.", "No MIDI reference", 0)  
-  
-  end
-  return lastNote         -- lastNoteHit is a referenced variable for edits
-end                                             -- end function
-
-    
 --------------------------------------------------------------------
     --[[------------------------------[[--
           unselect all MIDI notes -- mccrabney   
