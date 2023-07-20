@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.12a
+ * Version: 1.13
  * donation link: 
 --]]
 
@@ -12,6 +12,7 @@
  * Changelog:
  * v1.13 (2023-7-20)
   + added mode to only apply RE edit to only last-hit OR note under cursor at time of engagement
+  + transpose last-hit or note under cursor now updates target note/display
  * v1.12a (2023-6-12)
   + added split at cursor task
  * v1.12 (2023-6-12)
@@ -325,13 +326,16 @@ function MIDINotesInRE(task)
                 -- transpose whose noteons exist within Razer Edits
                 elseif task == 21 then  
                   if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    pitch = pitch+incr
-                    if pitch > 127 then pitch= 127 end
-                    if pitch < 0 then pitch= 0 end
+                    local ogPitch = pitch
+                    pitch = pitch + incr
+                    if pitch > 127 then pitch = 127 end
+                    if pitch < 0 then pitch = 0 end
                     if noteHoldNumber == -1 then                    
                       reaper.MIDI_SetNote( take, n, nil, nil, nil, nil, nil, pitch, nil)
-                    elseif noteHoldNumber == pitch then
+                    elseif noteHoldNumber == ogPitch then
                       reaper.MIDI_SetNote( take, n, nil, nil, nil, nil, nil, pitch, nil)
+                      reaper.SetExtState(extName, "noteHold", pitch, false)
+                      reaper.SetExtState(extName, "noteHoldUpdate", incr, false)
                     end                    
                     
                     undoMessage = "transposed notes in REs"
