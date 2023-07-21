@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="f55be9596a50002f76fccaaa501643a4b0f576fa">
+<index version="1" name="mccrabney Reascripts" commit="ccbfa00d30cae37baf23b4fed6558e57d5da162a">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -246,6 +246,12 @@ then no time readout is displayed.
       <version name="1.2" author="mccrabney" time="2023-06-04T00:12:59Z">
         <changelog><![CDATA[+ set extstate to persist]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/2708ac35e6aeca792f76799d3c2906703e589e34/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20toggle%20between%20mouse%20and%20edit%20cursor%20for%20'show%20notes'.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - toggle hold input note for 'show notes'.lua" type="script" desc="toggle hold input note for 'show notes'">
+      <version name="1.1" author="mccrabney" time="2023-07-21T11:49:29Z">
+        <changelog><![CDATA[+ if no razor edit exists, create one out of selected item]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/ccbfa00d30cae37baf23b4fed6558e57d5da162a/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20toggle%20hold%20input%20note%20for%20'show%20notes'.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - transpose note under cursor or notes in RE (mousewheel).lua" type="script" desc="transpose note under cursor">
