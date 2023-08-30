@@ -4,11 +4,14 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.00
+ * Version: 1.01
 --]]
      
   ---------------------------------------------------------------------------------------    
 
+-- prints markers and regions from items on tracks titled "markers" / "regions"
+-- will inherit title, color, and length (for regions). regions can overlap.
+-- see this post for gif/usage description https://forum.cockos.com/showthread.php?p=2707391#post2707391
 
 local markerTable = {}
 markersAndRegions, markers, _, _= reaper.CountProjectMarkers( 0 )
