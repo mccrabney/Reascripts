@@ -4,14 +4,18 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.01
+ * Version: 1.02
 --]]
      
   ---------------------------------------------------------------------------------------    
 
--- prints markers and regions from items on tracks titled "markers" / "regions"
--- will inherit title, color, and length (for regions). regions can overlap.
+-- add two tracks, respectively titled "markers" and "regions" to the top of your project
+-- running this script will prints markers/regions from items on these tracks 
+-- markers/regions will inherit title, color, and length (for regions). regions can overlap.
 -- see this post for gif/usage description https://forum.cockos.com/showthread.php?p=2707391#post2707391
+
+
+local targetTracks = 0
 
 local markerTable = {}
 markersAndRegions, markers, _, _= reaper.CountProjectMarkers( 0 )
@@ -33,7 +37,25 @@ for i = 1, reaper.CountTracks(0) do
   track = reaper.GetTrack(0,i-1)
   _, tr_name = reaper.GetSetMediaTrackInfo_String( track, 'P_NAME', '', 0 )
   
+  if tr_name:lower():find("regions") then
+    targetTracks = targetTracks + 1
+    items = reaper.CountTrackMediaItems(track)
+    for i = 0, items do
+      item = reaper.GetTrackMediaItem( track, i )
+      if item then
+        take = reaper.GetActiveTake(item)
+        takeName = reaper.GetTakeName( take )
+        startPos = reaper.GetMediaItemInfo_Value( item, "D_POSITION" )
+        endPos   = startPos + reaper.GetMediaItemInfo_Value( item, "D_LENGTH" )
+        name = reaper.GetMediaItemInfo_Value( item, "D_NAME" )
+        color = reaper.GetDisplayedMediaItemColor(item)
+        reaper.AddProjectMarker2( 0, true, startPos, endPos, takeName, i+1, color )
+      end
+    end
+  end
+  
   if tr_name:lower():find("markers") then
+    targetTracks = targetTracks + 1
     items = reaper.CountTrackMediaItems(track)
     for i = 0, items do
       item = reaper.GetTrackMediaItem( track, i )
@@ -48,20 +70,6 @@ for i = 1, reaper.CountTracks(0) do
     end
   end
   
-  if tr_name:lower():find("regions") then
-    items = reaper.CountTrackMediaItems(track)
-    for i = 0, items do
-      item = reaper.GetTrackMediaItem( track, i )
-      if item then
-        take = reaper.GetActiveTake(item)
-        takeName = reaper.GetTakeName( take )
-        startPos = reaper.GetMediaItemInfo_Value( item, "D_POSITION" )
-        endPos   = startPos + reaper.GetMediaItemInfo_Value( item, "D_LENGTH" )
-        name = reaper.GetMediaItemInfo_Value( item, "D_NAME" )
-        color = reaper.GetDisplayedMediaItemColor(item)
-        reaper.AddProjectMarker2( 0, true, startPos, endPos, takeName, i+1, color )
-      end
-    end
-    return
-  end
+  if targetTracks > 1 then return end
+  
 end
