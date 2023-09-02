@@ -4,18 +4,23 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.00
+ * Version: 1.01
 --]]
  
 -- HOW TO USE -- 
 -- run script after hitting a note assigned in RS5K
 -- todo: handle multiple RS5K instances assigned to same note
 
+-- CHANGELOG
+--  - is now a defer script, toggle on and off
+
 ---------------------------------------------------------------------
     --[[------------------------------[[--
           watch for last-hit note on dedicated track        
     --]]------------------------------]]--
-    
+local extName = 'open last-hit RS5K instance'
+local _, _, sec, cmd = reaper.get_action_context()
+
 function getLastNoteHit()                       
   local numTracks = reaper.CountTracks(0)       -- how many tracks
   local isTrack = 0                             -- is the track present
@@ -52,32 +57,54 @@ function getLastNoteHit()
 
 end
 
-function main()
+prevNote = -1
+function Main()
   local lastNote = getLastNoteHit()
-  for j = 1, reaper.CountTracks(0) do
-    tr = reaper.GetTrack(0,j-1)
-    local _, chunk = reaper.GetTrackStateChunk( tr, '', false )
-    
-    for line in chunk:gmatch('[^\r\n]+') do
-      if line:find('reasamplomatic.dll') then 
-        local _, name = reaper.GetTrackName(tr, "") 
-                     
-        for count = 0, reaper.TrackFX_GetCount(tr)-1 do
-          local _, param = reaper.TrackFX_GetParamName(tr, count, 3, "")              
-          if param == "Note range start" then
-            nstart = reaper.TrackFX_GetParam(tr, count, 3)
-            nstart = math.floor(nstart*128) if nstart == 128 then nstart = nstart-1 end
-            
-            if lastNote == nstart then
-              reaper.SetOnlyTrackSelected( tr, true )
-              reaper.TrackFX_Show(tr, count, 1)
-              reaper.Main_OnCommand(reaper.NamedCommandLookup("_SWSTL_SHOWMCPEX"), 0)
+  
+  if reaper.HasExtState(extName, 'prevNote') then
+    prevNote = tonumber(reaper.GetExtState( extName, 'prevNote' ))
+  end
+ 
+  if lastNote ~= prevNote then 
+  
+    for j = 1, reaper.CountTracks(0) do
+      tr = reaper.GetTrack(0,j-1)
+      local _, chunk = reaper.GetTrackStateChunk( tr, '', false )
+      
+      for line in chunk:gmatch('[^\r\n]+') do
+        if line:find('reasamplomatic.dll') then 
+          local _, name = reaper.GetTrackName(tr, "") 
+                       
+          for count = 0, reaper.TrackFX_GetCount(tr)-1 do
+            local _, param = reaper.TrackFX_GetParamName(tr, count, 3, "")              
+            if param == "Note range start" then
+              nstart = reaper.TrackFX_GetParam(tr, count, 3)
+              nstart = math.floor(nstart*128) if nstart == 128 then nstart = nstart-1 end
+              
+              if lastNote == nstart then
+                reaper.SetOnlyTrackSelected( tr, true )
+                reaper.TrackFX_Show(tr, count, 1)
+                reaper.Main_OnCommand(reaper.NamedCommandLookup("_SWSTL_SHOWMCPEX"), 0)
+              end
             end
-          end
-        end  
+          end  
+        end
       end
     end
   end
+  
+  reaper.SetExtState(extName, 'prevNote', lastNote, false)         -- write the note hold number
+  reaper.defer(Main)
 end    
- 
-main()
+
+function Exit()
+    reaper.SetToggleCommandState(sec, cmd, 0)
+    reaper.RefreshToolbar2(sec, cmd)
+end
+
+reaper.SetToggleCommandState(sec, cmd, 1)
+reaper.RefreshToolbar2(sec, cmd)
+
+reaper.atexit(Exit)
+
+Main()
