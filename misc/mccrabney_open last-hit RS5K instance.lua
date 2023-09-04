@@ -68,7 +68,7 @@ function Main()
   if reaper.HasExtState(extName, 'prevNote') then
     prevNote = tonumber(reaper.GetExtState( extName, 'prevNote' ))
   else 
-    prevNote - -1
+    prevNote = -1
   end
  
   if lastNote ~= prevNote then
