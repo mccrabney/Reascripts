@@ -9,9 +9,15 @@
  
 --[[
  * Changelog:
- * v1.0 (2023-09-02)
+ * v1.0 (2023-09-04)
    + Initial Release
 --]]
+
+-- HOW TO USE:
+-- run "mccrabney_MIDI edit - show notes, under cursor and last-received.lua"
+-- point the mouse at a note associated with an instance of RS5K in the arrange screen
+-- run this script. any RS5Ks associated with this note will open, floating if multiple
+-- if none exist, nothing will happen.
 
 local script_folder = debug.getinfo(1).source:match("@?(.*[\\|/])")
 script_folder = string.gsub(script_folder, "MIDI Edits\\", "")
@@ -54,43 +60,58 @@ end
 
 ---------------------------------------------------------------------
     --[[------------------------------[[--
-          open RS5K instance, if any, of note under target cursor 
+          open RS5K instances, if any, of note under target cursor 
     --]]------------------------------]]--
 
+rs5ks = {}
+instance = 0
+prevTrack = -1
+
+reaper.ClearConsole()
+
 function main()
+  reaper.Main_OnCommand( 40297, 0)                                    -- unselect all tracks
+  reaper.Main_OnCommand(reaper.NamedCommandLookup("_S&M_WNCLS3"), 0)  -- close all floating fx windows
+  reaper.Main_OnCommand(reaper.NamedCommandLookup("_S&M_WNCLS4"), 0)  -- close all fx chain windows
   reaper.PreventUIRefresh(1)
   _, cursorNote, _ = getNotesUnderMouseCursor()
   
-  for j = 1, reaper.CountTracks(0) do
-    tr = reaper.GetTrack(0,j-1)
-    local _, chunk = reaper.GetTrackStateChunk( tr, '', false )
-    
-    for line in chunk:gmatch('[^\r\n]+') do
-      
-      if line:find('reasamplomatic.dll') then 
-        local _, name = reaper.GetTrackName(tr, "") 
+  if cursorNote then                                 -- if there's a note under the cursor
+    for j = 1, reaper.CountTracks(0) do              -- for each track
+      tr = reaper.GetTrack(0, j - 1)                 -- get track
+      fxCount = reaper.TrackFX_GetCount(tr)          -- count fx on each instance track
         
-        for count = 0, reaper.TrackFX_GetCount(tr)-1 do
-          local _, param = reaper.TrackFX_GetParamName(tr, count, 3, "")              
-  
-          if param == "Note range start" then
-            nstart = reaper.TrackFX_GetParam(tr, count, 3)
-            nstart = math.floor(nstart*128) if nstart == 128 then nstart = nstart-1 end
+      for p = 0, fxCount-1 do                        -- for each fx
+        retval, buf = reaper.TrackFX_GetNamedConfigParm( tr, p, "fx_name" ) 
+      
+        if buf:match("ReaSamplOmatic5000")  then     -- if RS5K
+          local _, param = reaper.TrackFX_GetParamName(tr, p, 3)  -- get param name        
+          
+          if param == "Note range start" then        -- if it's the right one, and if it's rs5k,
+            noteStart = reaper.TrackFX_GetParam(tr, p, 3)        -- set/fix math for noteStart value
+            noteStart = math.floor(noteStart*128) if noteStart == 128 then noteStart = noteStart - 1 end
             
-            if cursorNote == nstart then
-              reaper.SetOnlyTrackSelected( tr, true )
-              reaper.TrackFX_Show(tr, count, 1)
-              reaper.Main_OnCommand(reaper.NamedCommandLookup("_SWSTL_SHOWMCPEX"), 0)
+            if cursorNote == noteStart then          -- if it's the same as our note under cursor,
+              instance = instance + 1
+              reaper.SetTrackSelected( tr, true )
+              reaper.TrackFX_Show(tr, p, 3 )         -- float all RS5Ks
+              reaper.TrackFX_Show(tr, 1, 1 )         -- open FX chain window
             end
           end
-        end  
-      end
+        end                                          -- if RS5K
+      end                                            -- for each fx
+    end                                              -- for each track
+    
+    if instance == 1 then                            -- if there's only 1 rs5k instance associated with note,
+      reaper.Main_OnCommand(reaper.NamedCommandLookup("_S&M_WNCLS5"), 0) -- close floating fx into fx chain window
     end
-  end 
-  
+     
+    reaper.Main_OnCommand(reaper.NamedCommandLookup("_SWSTL_SHOWMCPEX"), 0) -- show selected tracks in MCP
+    --reaper.Main_OnCommand(41155, 0)                  -- reposition floating windows
+  end                                                -- if there's a note under the cursor
+    
   reaper.PreventUIRefresh(-1)
   reaper.UpdateArrange()
-  
 end
  
 main()
