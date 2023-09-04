@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.01
+ * Version: 1.02
 --]]
  
 -- HOW TO USE -- 
@@ -12,6 +12,7 @@
 -- todo: handle multiple RS5K instances assigned to same note
 
 -- CHANGELOG
+--  - fixed nil comparison when extstate isn't created yet
 --  - is now a defer script, toggle on and off
 
 ---------------------------------------------------------------------
@@ -20,6 +21,7 @@
     --]]------------------------------]]--
 local extName = 'open last-hit RS5K instance'
 local _, _, sec, cmd = reaper.get_action_context()
+local samplerInstances = {}
 
 function getLastNoteHit()                       
   local numTracks = reaper.CountTracks(0)       -- how many tracks
@@ -58,14 +60,19 @@ function getLastNoteHit()
 end
 
 prevNote = -1
+
 function Main()
   local lastNote = getLastNoteHit()
+  local samplerCount = 0
   
   if reaper.HasExtState(extName, 'prevNote') then
     prevNote = tonumber(reaper.GetExtState( extName, 'prevNote' ))
+  else 
+    prevNote - -1
   end
  
-  if lastNote ~= prevNote then 
+  if lastNote ~= prevNote then
+      reaper.ClearConsole()
   
     for j = 1, reaper.CountTracks(0) do
       tr = reaper.GetTrack(0,j-1)
@@ -77,14 +84,21 @@ function Main()
                        
           for count = 0, reaper.TrackFX_GetCount(tr)-1 do
             local _, param = reaper.TrackFX_GetParamName(tr, count, 3, "")              
+            
             if param == "Note range start" then
               nstart = reaper.TrackFX_GetParam(tr, count, 3)
               nstart = math.floor(nstart*128) if nstart == 128 then nstart = nstart-1 end
               
               if lastNote == nstart then
+                --reaper.ShowConsoleMsg("nstart - " .. nstart .. "\n") 
+              
+                samplerCount = samplerCount+1
+                --reaper.ShowConsoleMsg(samplerCount .. "\n")
+              
                 reaper.SetOnlyTrackSelected( tr, true )
                 reaper.TrackFX_Show(tr, count, 1)
                 reaper.Main_OnCommand(reaper.NamedCommandLookup("_SWSTL_SHOWMCPEX"), 0)
+
               end
             end
           end  
@@ -93,7 +107,10 @@ function Main()
     end
   end
   
-  reaper.SetExtState(extName, 'prevNote', lastNote, false)         -- write the note hold number
+  if prevNote ~= nil then 
+    reaper.SetExtState(extName, 'prevNote', lastNote, false)         -- write the note hold number
+  end
+  
   reaper.defer(Main)
 end    
 
