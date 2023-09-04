@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney Reascripts" commit="9d9db06d1cd9b50f6fa300748d9a768e96803c25">
+<index version="1" name="mccrabney Reascripts" commit="74e4365c3bad75be1d474a9f6e9f74cff3c272de">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -290,6 +290,9 @@ then no time readout is displayed.
       </version>
       <version name="1.01" author="mccrabney" time="2023-09-02T19:44:39Z">
         <source main="main">https://github.com/mccrabney/Reascripts/raw/9d9db06d1cd9b50f6fa300748d9a768e96803c25/misc/mccrabney_open%20last-hit%20RS5K%20instance.lua</source>
+      </version>
+      <version name="1.02" author="mccrabney" time="2023-09-04T11:25:03Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/74e4365c3bad75be1d474a9f6e9f74cff3c272de/misc/mccrabney_open%20last-hit%20RS5K%20instance.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_play or stop, setting track to trim if Record was active.lua" type="script" desc="play or stop, setting track to trim if Record was active">
