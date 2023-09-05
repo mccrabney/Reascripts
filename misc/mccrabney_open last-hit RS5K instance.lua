@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.02
+ * Version: 1.03
 --]]
  
 -- HOW TO USE -- 
@@ -12,8 +12,9 @@
 -- todo: handle multiple RS5K instances assigned to same note
 
 -- CHANGELOG
---  - fixed nil comparison when extstate isn't created yet
---  - is now a defer script, toggle on and off
+--1.03  - fixed typo
+--1.02  - fixed nil comparison when extstate isn't created yet
+--1.01  - is now a defer script, toggle on and off
 
 ---------------------------------------------------------------------
     --[[------------------------------[[--
