@@ -4,12 +4,14 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.00
+ * Version: 1.01
 --]]
  
 --[[
  * Changelog:
- * v1.0 (2023-09-04)
+ * v1.1 
+   + if only 1 instance of rs5k associated with note, open fx chain to index pos 1
+ * v1.0 
    + Initial Release
 --]]
 
@@ -95,7 +97,7 @@ function main()
               instance = instance + 1
               reaper.SetTrackSelected( tr, true )
               reaper.TrackFX_Show(tr, p, 3 )         -- float all RS5Ks
-              reaper.TrackFX_Show(tr, 1, 1 )         -- open FX chain window
+              reaper.TrackFX_Show(tr, 0, 1 )         -- open FX chain window to first fx index
             end
           end
         end                                          -- if RS5K
