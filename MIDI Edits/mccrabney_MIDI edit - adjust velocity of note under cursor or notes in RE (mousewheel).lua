@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.12
+ * Version: 1.13
 --]]
  
 --[[
  * Changelog:
+ * v1.13 (2023-10-16)
+   + babydev incompetence
  * v1.12 (2023-10-16)
    + fixed scenario where extstate doesn't exist yet
  * v1.11 (2023-5-27)
@@ -83,7 +85,7 @@ function main()
   
   incr = tonumber(reaper.GetExtState(extName, 7 ))
   if incr == nil then incr = 1
-  if incr == 10 then incr = 2
+  elseif incr == 10 then incr = 2
   elseif incr == 24 then incr = 4
   elseif incr == 48 then incr = 8
   elseif incr == 96 then incr = 16
