@@ -341,7 +341,7 @@ function loop()
   end   
     
   if reaper.HasExtState(extName, 'toggleCursor') then           -- toggle whether focus is edit or mouse cursor                                        -- fools the optimizer into resetting
-    if cursorSource == 0 then 
+    if cursorSource ~= 1 then                                   -- if cursorSource is 0 or something else
       cursorSource = 1 
     elseif cursorSource == 1 then 
       cursorSource = 0  
