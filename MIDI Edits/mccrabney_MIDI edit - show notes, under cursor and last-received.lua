@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.72a
+ * Version: 1.72b
 --]]
  
 -- HOW TO USE -- 
@@ -23,8 +23,9 @@ if reaper.HasExtState(extName, 8) then            -- get the cursorsource, if pr
   cursorSource = tonumber(reaper.GetExtState(extName, 8 ))
 end
 
-toggleNoteHold = 0
-
+resetCursor = 50  -- how many loopCounts should pass before cursor is reset from Edit to Mouse
+                  -- this resets cursor when idle time
+                  
 local main_wnd = reaper.GetMainHwnd() -- GET MAIN WINDOW
 local track_window = reaper.JS_Window_FindChildByID(main_wnd, 0x3E8) -- GET TRACK VIEW
 local pitchList = {"C ", "C#", "D ", "D#", "E ", "F ", "F#", "G ", "G#", "A ", "A#", "B "}
@@ -48,7 +49,8 @@ end
     --[[------------------------------[[--
           watch for last-hit note on dedicated track        
     --]]------------------------------]]--
-
+    
+toggleNoteHold = 0
 noteHoldNumber = -1
 function getLastNoteHit()                       
   local numTracks = reaper.CountTracks(0)       -- how many tracks
@@ -155,8 +157,8 @@ function getCursorInfo()
         end
       end
     end
-    
-    if take and trackHeight > 25 then -- and cursorSource == 0 then      -- if track height isn't tiny
+
+    if take and trackHeight > 10 then -- and cursorSource == 0 then      -- if track height isn't tiny
       if reaper.TakeIsMIDI(take) then 
         IDtable = {}                            -- get the note IDs under cursor
         local pitchSorted = {}                  -- pitches under cursor to be sorted
@@ -285,6 +287,7 @@ function getCursorInfo()
     elseif targetNoteIndex == nil then 
       targetNoteIndex = -1
       step = 0
+      reaper.DeleteExtState(extName, 4, false)          -- what is the target pitch under mouse
       reaper.SetExtState(extName, 'step', step, false)
       reaper.SetExtState(extName, 5, targetNoteIndex, false)      -- what is the target index under mouse
     end
@@ -346,17 +349,25 @@ function loop()
     reaper.SetExtState(extName, 8, cursorSource, true)
     reaper.DeleteExtState(extName, 'toggleCursor', false)
     --lastX = -1
-  end       
+  end
+  
+  if loopCount > resetCursor then 
+    cursorSource = 1
+    reaper.SetExtState(extName, 8, cursorSource, true) 
+  end
   
   
           ----------------------------------------------------- optimizer to reduce calls to getCursorInfo
-  if loopCount >= 3 and info == "arrange" and lastX ~= x and pop == 0  
-  or editCurPos ~= editCurPosLast then 
+  if loopCount >= 5 and info == "arrange" and lastX ~= x and pop == 0  
+  or editCurPos ~= editCurPosLast then
+    --reaper.ShowConsoleMsg("called" .. "\n")
     take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight = getCursorInfo() 
     
     if take ~= nil and reaper.TakeIsMIDI(take) then             -- if take is MIDI
       loopCount = 0                                             -- reset loopcount
       lastX = x                                                 -- set lastX mouse position
+    else
+      lastX = x         --- NEW ADDITION 
     end
     
     if reset == 1 then reset = 0 end                            -- set reset
@@ -441,13 +452,13 @@ function loop()
       if targetNotePos then 
         local zoom_lvl = reaper.GetHZoomLevel()
         local Arr_start_time = reaper.GetSet_ArrangeView2(0, false, 0, 0)
-        targetNotePixel   = math.floor((targetNotePos - Arr_start_time) * zoom_lvl)
-        targetNotePixelEnd = math.floor((targetEndPos - Arr_start_time) * zoom_lvl)
+        targetNotePixel    = math.floor((targetNotePos - Arr_start_time) * zoom_lvl)
+        targetNotePixelEnd = math.floor((targetEndPos  - Arr_start_time) * zoom_lvl)
         if targetNotePixel    < 0 then targetNotePixel    = 0 end
         if targetNotePixelEnd < 0 then targetNotePixelEnd = 0 end
       end
       
-      local pad = 15
+      local pad = 0     -- how many pixels to pad top of ghost cursor 
       reaper.JS_Composite(track_window, targetNotePixel,      trPos + pad, 1, tcpHeight - pad - 3, noteOnLine, 0, 0, 1, 1, true) -- DRAW
       reaper.JS_Composite(track_window, targetNotePixel+1,    trPos + pad, 1, tcpHeight - pad - 3, noteOnLineShadow, 0, 0, 1, 1, true) -- DRAW
       reaper.JS_Composite(track_window, targetNotePixelEnd+1, trPos + pad, 1, tcpHeight - pad - 3, noteOffLine, 0, 0, 1, 1, true) -- DRAW
@@ -609,6 +620,9 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.72b (2023-7-20)
+  + if loopcount passes resetCursor value, then cursor resets to "under mouse"
+  + remove padding for ghost cursors
 * v1.72a (2023-7-20)
   + clearing REs turns off RE-last-hit focus
 * v1.72 (2023-7-20)
