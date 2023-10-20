@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.32
+ * Version: 1.33
 --]]
  
 --[[
  * Changelog:
+ * v1.33 (2023-10-20)
+  + ????
  * v1.32 (2023-6-19)
   + removed erroneous console message
  * v1.311 (2023-5-27)
