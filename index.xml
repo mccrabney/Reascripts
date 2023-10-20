@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="utf-8"?>
+<index version="1" commit="7fdf40cf6c91df3f823ea0399c1a5442df94de8f">
+  <category name="Audio">
+    <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
+      <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/fccb14151ca03e3cdde1133f299b608acd93ccee/Audio/mccrabney_find%20tiny%20items%20and%20items%20without%20fades%20in%20track.lua</source>
+      </version>
+      <version name="1.0" author="mccrabney" time="2023-01-09T15:15:33Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/cd9e0a76ff114d13bdf5092ede3d8620fba82ee0/Audio/mccrabney_find%20tiny%20items%20and%20items%20without%20fades%20in%20track.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_select and move edit cursor to smallest item in track.lua" type="script" desc="select and move edit cursor to smallest item in track">
+      <version name="1.0" author="mccrabney" time="2023-03-12T19:33:16Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/1c68fbbdf7d3a659435648c12159f6ae3f6c76a8/Audio/mccrabney_select%20and%20move%20edit%20cursor%20to%20smallest%20item%20in%20track.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_select tiny items.lua" type="script" desc="select tiny items in tracks">
+      <version name="1.0" author="mccrabney" time="2023-03-11T23:07:35Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/0ecc673e369fcc234907b732d6edbfd8f4a55121/Audio/mccrabney_select%20tiny%20items.lua</source>
+      </version>
+      <version name="1.1" author="mccrabney" time="2023-03-17T19:49:49Z">
+        <changelog><![CDATA[+ do nothing if no track is selected]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/5d22b3800a224e79ee1712bcaa561f9027559c37/Audio/mccrabney_select%20tiny%20items.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="MIDI Edits">
+    <reapack name="mccrabney_MIDI edit - adjust length of note under cursor or notes in RE (mousewheel).lua" type="script" desc="adjust length of note under cursor">
+      <version name="1.31" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <changelog><![CDATA[+ updated name of parent script extstate]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20adjust%20length%20of%20note%20under%20cursor%20or%20notes%20in%20RE%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - adjust ppq increment for edit scripts (mousewheel).lua" type="script" desc="adjust ppq increment for edit scripts">
+      <version name="1.1" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <changelog><![CDATA[+ updated name of parent script extstate ]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20adjust%20ppq%20increment%20for%20edit%20scripts%20(mousewheel).lua</source>
+      </version>
+      <version name="1.12" author="mccrabney" time="2023-06-04T00:12:59Z">
+        <changelog><![CDATA[+ extstate sync fix]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/2708ac35e6aeca792f76799d3c2906703e589e34/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20adjust%20ppq%20increment%20for%20edit%20scripts%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - adjust velocity of note under cursor or notes in RE (mousewheel).lua" type="script" desc="adjust velocity of note under cursor">
+      <version name="1.11" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <changelog><![CDATA[+ updated name of parent script extstate ]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20adjust%20velocity%20of%20note%20under%20cursor%20or%20notes%20in%20RE%20(mousewheel).lua</source>
+      </version>
+      <version name="1.12" author="mccrabney" time="2023-10-16T14:21:10Z">
+        <changelog><![CDATA[+ fixed scenario where extstate doesn't exist yet]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/64253637f7225056eb315c23d7a300342a0d1786/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20adjust%20velocity%20of%20note%20under%20cursor%20or%20notes%20in%20RE%20(mousewheel).lua</source>
+      </version>
+      <version name="1.13" author="mccrabney" time="2023-10-16T14:29:52Z">
+        <changelog><![CDATA[+ babydev incompetence]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/ff9f7f7e0d733d762ddd3d23a8b5e3a80c3f13de/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20adjust%20velocity%20of%20note%20under%20cursor%20or%20notes%20in%20RE%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - delete notes under cursor, or notes in RE.lua" type="script" desc="Delete notes under cursor, or notes in RE">
+      <version name="1.32" author="mccrabney" time="2023-10-20T16:39:03Z">
+        <changelog><![CDATA[+ removed erroneous console message]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/855e09fe540e3d6b3fa9f1c2b7e4c090ea0d5c98/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20delete%20notes%20under%20cursor,%20or%20notes%20in%20RE.lua</source>
+      </version>
+      <version name="1.33" author="mccrabney" time="2023-10-20T16:45:42Z">
+        <changelog><![CDATA[+ ????]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/7fdf40cf6c91df3f823ea0399c1a5442df94de8f/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20delete%20notes%20under%20cursor,%20or%20notes%20in%20RE.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - duplicate notes under edit cursor at mouse cursor.lua" type="script" desc="duplicate notes under edit cursor at mouse cursor">
+      <version name="1.1" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <changelog><![CDATA[+ nil messages
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20duplicate%20notes%20under%20edit%20cursor%20at%20mouse%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - duplicate notes under mouse cursor at edit cursor.lua" type="script" desc="duplicate notes under mouse cursor at edit cursor">
+      <version name="1.1" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <changelog><![CDATA[+ nil messages
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20duplicate%20notes%20under%20mouse%20cursor%20at%20edit%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - insert last-received CC message at edit cursor.lua" type="script" desc="Insert last-received CC in selected item under edit cursor">
+      <version name="1.4" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <changelog><![CDATA[+ added sanity check to prevent addition of cc 123, whether or not it actually did anything
++ added better undo messaging
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20insert%20last-received%20CC%20message%20at%20edit%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - insert note-length-dependent CC messages at note position (articulation).lua" type="script" desc="insert note-length-dependent CC messages at note position (articulation)">
+      <version name="1.0" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20insert%20note-length-dependent%20CC%20messages%20at%20note%20position%20(articulation).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - move edit cursor to next note on track.lua" type="script" desc="move edit cursor to next MIDI note in track">
+      <version name="1.2" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <changelog><![CDATA[+ fixed nil comparisons
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20move%20edit%20cursor%20to%20next%20note%20on%20track.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - move edit cursor to previous note on track.lua" type="script" desc="move edit cursor to previous MIDI note in track">
+      <version name="1.2" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <changelog><![CDATA[+ fixed nil comparisons
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20move%20edit%20cursor%20to%20previous%20note%20on%20track.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - move edit cursor to previous or next note on track (mousewheel).lua" type="script" desc="move edit cursor to next/previous MIDI note in track">
+      <version name="1.3" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <changelog><![CDATA[+ fixed another nil comparison]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20move%20edit%20cursor%20to%20previous%20or%20next%20note%20on%20track%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - mute note under cursor, or notes in RE.lua" type="script" desc="mute notes under cursor, closest first">
+      <version name="1.12" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <changelog><![CDATA[+ updated name of parent script extstate ]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20mute%20note%20under%20cursor,%20or%20notes%20in%20RE.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - nudge closest note under cursor, or notes in RE (mousewheel).lua" type="script" desc="nudge closest note under cursor (or notes in RE)">
+      <version name="1.33" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <changelog><![CDATA[+ updated name of parent script extstate ]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20nudge%20closest%20note%20under%20cursor,%20or%20notes%20in%20RE%20(mousewheel).lua</source>
+      </version>
+      <version name="1.34" author="mccrabney" time="2023-05-27T18:34:19Z">
+        <changelog><![CDATA[+ added relative support]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/6c2562666feebbead23713bcdcabe6d0abe29142/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20nudge%20closest%20note%20under%20cursor,%20or%20notes%20in%20RE%20(mousewheel).lua</source>
+      </version>
+      <version name="1.36" author="mccrabney" time="2023-06-04T00:12:59Z">
+        <changelog><![CDATA[+ reverted to local getCursorInfo function, prevents de-sync with "show notes" script]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/2708ac35e6aeca792f76799d3c2906703e589e34/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20nudge%20closest%20note%20under%20cursor,%20or%20notes%20in%20RE%20(mousewheel).lua</source>
+      </version>
+      <version name="1.37" author="mccrabney" time="2023-06-09T13:09:17Z">
+        <changelog><![CDATA[+ fixed equidistant note nudge bug
++ if negatively nudged note occupies same space as another note, add 1 tick instead of subtracting one tick]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d308d60622d79969d0bc9dad40754cec64a2a506/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20nudge%20closest%20note%20under%20cursor,%20or%20notes%20in%20RE%20(mousewheel).lua</source>
+      </version>
+      <version name="1.37a" author="mccrabney" time="2023-06-11T12:01:56Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/2d710c47022ccca55fdf27afa84f55d67bc363d4/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20nudge%20closest%20note%20under%20cursor,%20or%20notes%20in%20RE%20(mousewheel).lua</source>
+      </version>
+      <version name="1.38a" author="mccrabney" time="2023-06-11T13:14:04Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/3a4d45e6f11785e7a8369aececa0b9131ea41ddf/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20nudge%20closest%20note%20under%20cursor,%20or%20notes%20in%20RE%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - open RS5K instance of note under cursor.lua" type="script" desc="open RS5K instance of note under cursor">
+      <version name="1.00" author="mccrabney" time="2023-09-02T19:07:47Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/7ba4f694465c3437a035ad4919f07076dde412b6/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20open%20RS5K%20instance%20of%20note%20under%20cursor.lua</source>
+      </version>
+      <version name="1.01" author="mccrabney" time="2023-09-06T11:38:53Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/64aae8f9b091d8f95aec35731def4af4b9cf0e00/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20open%20RS5K%20instance%20of%20note%20under%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - select and copy notes.lua" type="script" desc="select and copy notes">
+      <version name="1.1" author="mccrabney" time="2023-07-20T20:53:35Z">
+        <changelog><![CDATA[+ new RE response]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/146c8a193758b19f6765b4e7b6fd84142171c4d5/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20select%20and%20copy%20notes.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - select notes in editor.lua" type="script" desc="in MIDI editor, select notes in whose note-ons are contained in Razor Edit">
+      <version name="1.1" author="mccrabney" time="2023-07-20T20:53:35Z">
+        <changelog><![CDATA[+ better RE behavior ]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/146c8a193758b19f6765b4e7b6fd84142171c4d5/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20select%20notes%20in%20editor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - show notes, under cursor and last-received.lua" type="script" desc="show notes, under cursor and last-received.lua">
+      <version name="1.62" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.63" author="mccrabney" time="2023-05-27T15:45:40Z">
+        <changelog><![CDATA[+ updated name of script, extstate 
++ changed display for edit cursor mode: blue, vs red, and non-rounded tooltip corners
++ v1.62 (2023-5-26)
++ added "edit cursor mode" where edit cursor provides note data rather than mouse cursor
++ v1.61 (2023-5-25)
++ implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts"
++ added note position readout, where time 1.1.000 begins at a marker named "start"
+if no marker named "start" is present, or if notes begin before "start" marker,
+then no time readout is displayed.
++ v1.6 (2023-5-23)
++ removed pause function, chasing an index as one note is nudged past another proved too difficult
++ v1.511 (2023-5-22)
++ minor typo fix
++ v1.51 (2023-5-21)
++ now reports toolbar button toggle state
++ v1.50 (2023-5-20)
++ added secondary script "pause show notes" to "hold" a target note in yellow
++ issue, mouse must still be over target Take, fix eventually? 
++ v1.45 (2023-5-09)
++ added muted note coloration
++ v1.44 (2023-5-07)
++ added extstates to output notes under mouse to other scripts
++ v1.43 (2023-5-05)
++ fixed error message, improved spacing on readout
++ v1.42 (2023-5-04)
++ added note duration display, changed readout to conform to conventional MPC step edit screen]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/e7335b5450e99dc830f0e39c75f76e6a9aa8ac12/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.65" author="mccrabney" time="2023-06-04T00:12:59Z">
+        <changelog><![CDATA[+ fixed samedistance bug preventing closest note from being targeted]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/2708ac35e6aeca792f76799d3c2906703e589e34/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.66" author="mccrabney" time="2023-06-08T11:32:09Z">
+        <changelog><![CDATA[+ time display: add support for time signatures other than 4/4
++ disable ghost cursor and text readout while left or middle clicking mouse]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/7b7dad8d546702022bab52cc84056df130004492/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.67" author="mccrabney" time="2023-06-08T14:11:50Z">
+        <changelog><![CDATA[+ added ghost cursor to show the noteOFF position]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/1d6e098585085a16bf47b743358c4ae0d9e8991a/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.67a" author="mccrabney" time="2023-06-08T16:20:59Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/1f83b67df064f74bb237181c7676bf0f7df61396/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.69" author="mccrabney" time="2023-06-11T12:01:56Z">
+        <changelog><![CDATA[+ added ability to step through the notes/change target note currently under the cursor
+* use Script: mccrabney_MIDI edit - step through notes under cursor in 'show notes'.lua
+* targetNote will step through notes under cursor, closest to farthest.]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/2d710c47022ccca55fdf27afa84f55d67bc363d4/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.70" author="mccrabney" time="2023-06-12T23:32:34Z">
+        <changelog><![CDATA[+ ghost cursors drop shadows]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/abfee6c5899bdf5e791f3663d3e1c7049b6cfbe4/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.72" author="mccrabney" time="2023-07-20T18:05:35Z">
+        <changelog><![CDATA[+ transposing last-hit notes in RE now updates the last-hit note]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/7aa5705308172107f75c132612312fba391af97d/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.72a" author="mccrabney" time="2023-07-20T18:22:23Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/b3d49dbf19650969df6b4d4168930f4285ab8ac3/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.72b" author="mccrabney" time="2023-10-16T11:03:40Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/72824d75c70ff24c822a663285a592004c631943/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.73" author="mccrabney" time="2023-10-16T11:12:57Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/0c6220411d9ffe570aa0480e394916f230e5197c/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - split note under cursor, or notes in RE.lua" type="script" desc="split note under cursor, or notes in RE">
+      <version name="1.0" author="mccrabney" time="2023-06-13T00:25:55Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/930fd5a1e35ee290aad78c636fbad0f2041b35b2/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20split%20note%20under%20cursor,%20or%20notes%20in%20RE.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - split notes at edit cursor.lua" type="script" desc="split notes at edit cursor">
+      <version name="1.0" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20split%20notes%20at%20edit%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - step through notes under cursor in 'show notes'.lua" type="script" desc="step through targetNoteIndex for 'show notes'">
+      <version name="1.2" author="mccrabney" time="2023-06-11T12:01:56Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/2d710c47022ccca55fdf27afa84f55d67bc363d4/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20step%20through%20notes%20under%20cursor%20in%20'show%20notes'.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - toggle between mouse and edit cursor for 'show notes'.lua" type="script" desc="toggle between mouse/edit cursor for ShowNotes">
+      <version name="1.1" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <changelog><![CDATA[+ updated name of parent script extstate ]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20toggle%20between%20mouse%20and%20edit%20cursor%20for%20'show%20notes'.lua</source>
+      </version>
+      <version name="1.2" author="mccrabney" time="2023-06-04T00:12:59Z">
+        <changelog><![CDATA[+ set extstate to persist]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/2708ac35e6aeca792f76799d3c2906703e589e34/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20toggle%20between%20mouse%20and%20edit%20cursor%20for%20'show%20notes'.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - toggle hold input note for 'show notes'.lua" type="script" desc="toggle hold input note for 'show notes'">
+      <version name="1.1" author="mccrabney" time="2023-07-21T11:49:29Z">
+        <changelog><![CDATA[+ if no razor edit exists, create one out of selected item]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/ccbfa00d30cae37baf23b4fed6558e57d5da162a/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20toggle%20hold%20input%20note%20for%20'show%20notes'.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - transpose note under cursor or notes in RE (mousewheel).lua" type="script" desc="transpose note under cursor">
+      <version name="1.11" author="mccrabney" time="2023-05-27T13:45:45Z">
+        <changelog><![CDATA[+ updated name of parent script extstate ]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20transpose%20note%20under%20cursor%20or%20notes%20in%20RE%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="misc">
+    <reapack name="mccrabney_markers and regions from items.lua" type="script" desc="markers and regions from items">
+      <version name="1.00" author="mccrabney" time="2023-07-19T15:16:41Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/8a2a72b90d5d340d5f7e7170ae5f945c6e379461/misc/mccrabney_markers%20and%20regions%20from%20items.lua</source>
+      </version>
+      <version name="1.01" author="mccrabney" time="2023-08-30T22:26:31Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/b143417dbda562a5818990cc47b6ba7809ed4f2d/misc/mccrabney_markers%20and%20regions%20from%20items.lua</source>
+      </version>
+      <version name="1.02" author="mccrabney" time="2023-08-31T11:44:02Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/7dad7f42a29f5e9e80b4e793dfa667537a7244e0/misc/mccrabney_markers%20and%20regions%20from%20items.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_move edit cursor to next or prev visible grid (mousewheel or relative CC).lua" type="script" desc="move edit cursor to next or prev visible grid (mousewheel or relative CC)">
+      <version name="1.0" author="mccrabney" time="2023-02-17T12:17:17Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/dc798b97dc7cd0420ce2b9c8468ea3cc0f402c0d/misc/mccrabney_move%20edit%20cursor%20to%20next%20or%20prev%20visible%20grid%20(mousewheel%20or%20relative%20CC).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_open last-hit RS5K instance.lua" type="script" desc="open last-hit RS5K instance">
+      <version name="1.00" author="mccrabney" time="2023-09-01T12:15:40Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/622c6b23765680b52f8a806a00144f8100fd7d6d/misc/mccrabney_open%20last-hit%20RS5K%20instance.lua</source>
+      </version>
+      <version name="1.01" author="mccrabney" time="2023-09-02T19:44:39Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/9d9db06d1cd9b50f6fa300748d9a768e96803c25/misc/mccrabney_open%20last-hit%20RS5K%20instance.lua</source>
+      </version>
+      <version name="1.02" author="mccrabney" time="2023-09-04T11:25:03Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/74e4365c3bad75be1d474a9f6e9f74cff3c272de/misc/mccrabney_open%20last-hit%20RS5K%20instance.lua</source>
+      </version>
+      <version name="1.03" author="mccrabney" time="2023-09-05T10:51:31Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/a572eee12029881734e95f5515745a97e729ed80/misc/mccrabney_open%20last-hit%20RS5K%20instance.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_play or stop, setting track to trim if Record was active.lua" type="script" desc="play or stop, setting track to trim if Record was active">
+      <version name="1.0" author="mccrabney" time="2023-02-15T21:35:50Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/417770471f21d0f3d1641f4fbab179d910147190/misc/mccrabney_play%20or%20stop,%20setting%20track%20to%20trim%20if%20Record%20was%20active.lua</source>
+      </version>
+      <version name="1.1" author="mccrabney" time="2023-03-17T12:04:55Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/61b2836bef05a032edecfd203f06a7765b4a2f2c/misc/mccrabney_play%20or%20stop,%20setting%20track%20to%20trim%20if%20Record%20was%20active.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_record media and latch selected track automation.lua" type="script" desc="record media and latch selected track automation">
+      <version name="1.0" author="mccrabney" time="2023-02-15T21:35:50Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/417770471f21d0f3d1641f4fbab179d910147190/misc/mccrabney_record%20media%20and%20latch%20selected%20track%20automation.lua</source>
+      </version>
+      <version name="1.1" author="mccrabney" time="2023-03-17T12:04:55Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/61b2836bef05a032edecfd203f06a7765b4a2f2c/misc/mccrabney_record%20media%20and%20latch%20selected%20track%20automation.lua</source>
+      </version>
+    </reapack>
+  </category>
+  <category name="Razor Edits">
+    <reapack name="mccrabney_Razor Edit - move RE &amp; edit cursor (backwards).lua" type="script" desc="move RE &amp; edit cursor (backwards)">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20-%20move%20RE%20&amp;%20edit%20cursor%20(backwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit - move RE &amp; edit cursor (forwards).lua" type="script" desc="move RE &amp; edit cursor (forwards)">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20-%20move%20RE%20&amp;%20edit%20cursor%20(forwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit - move RE &amp;or edit cursor by visible grid division (backwards).lua" type="script" desc="move RE &amp;or edit cursor by visible grid division (backwards)">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20-%20move%20RE%20&amp;or%20edit%20cursor%20by%20visible%20grid%20division%20(backwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit - move RE &amp;or edit cursor by visible grid division (forwards).lua" type="script" desc="move RE &amp;or edit cursor by visible grid division (forwards)">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20-%20move%20RE%20&amp;or%20edit%20cursor%20by%20visible%20grid%20division%20(forwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit - resize RE end by visible grid division (backwards).lua" type="script" desc="resize RE end by visible grid division (backwards)">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20-%20resize%20RE%20end%20by%20visible%20grid%20division%20(backwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit - resize RE end by visible grid division (forwards).lua" type="script" desc="resize RE end by visible grid division (forwards)">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20-%20resize%20RE%20end%20by%20visible%20grid%20division%20(forwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit - resize RE start by visible grid division (backwards).lua" type="script" desc="resize RE start by visible grid division (backwards)">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20-%20resize%20RE%20start%20by%20visible%20grid%20division%20(backwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit - resize RE start by visible grid division (forwards).lua" type="script" desc="resize RE start by visible grid division (forwards)">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20-%20resize%20RE%20start%20by%20visible%20grid%20division%20(forwards).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit Control Functions.lua" type="script" desc="Razor Edit Control Functions">
+      <version name="1.05" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ general cleanup, excessive comments in code
++ an attempt to use MIDI_Sort properly
++ RE movement: added undo points 
++ MIDI edits: added "select last hit notes in RE"
++ MIDI edits: if no REs exist, enclose selected items in RE then run edit
++ MIDI edits: nudge last-hit note in RE 
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.06" author="mccrabney" time="2022-12-20T13:46:38Z">
+        <changelog><![CDATA[+ RE dimension functions are now up to date
++ changed child scripts from deferred to one-offs (duh)
++ moved (get mouse note, item, take, position) info to dedicated function
++ updated RazorEditSelectionExists(1) to select item under mouse if no item is selected
++ mute: if no RE, mute item under mouse cursor instead
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/cb56ccacce18a3719b5f16c287038ed1ae68b56b/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.07" author="mccrabney" time="2022-12-29T14:29:06Z">
+        <changelog><![CDATA[+ fixes to RazorEditSelectionExists(make) to prevent error when no item is present
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/c082cd544fd4dc6e14155e222f6831caa8eb5961/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.08" author="mccrabney" time="2023-01-01T15:07:10Z">
+        <changelog><![CDATA[+ fixed add fx by js filename
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/5705a1ceafdfbb3fd85f01301b7290c5fb5f2019/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.09" author="mccrabney" time="2023-01-05T19:04:55Z">
+        <changelog><![CDATA[+ fixed MIDI scripts trying to work on audio items and creating unwanted REs
++ 
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4310e1db978612a1400bc22d8b9abbdf64bbfe7f/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.1" author="mccrabney" time="2023-05-11T18:54:23Z">
+        <changelog><![CDATA[+ updated to prevent notes from escaping RE bounds
++ improved communication with other scripts
++ began cleanup of inexperienced, verbose code
++ needs further integration with "show notes, closest first etc"
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/0e5e1f8639798c5eeae737542fa1a9d7bf65aa7a/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.11" author="mccrabney" time="2023-05-26T13:15:10Z">
+        <changelog><![CDATA[+ re-allowed nudged notes to escape RE bounds
++ implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts"]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/7e71c29aaf552453207292bd6c705d2d752e792a/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.12a" author="mccrabney" time="2023-06-13T00:39:39Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/be43194f9926d105fb806c477e74f1c94460296a/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+      <version name="1.13" author="mccrabney" time="2023-07-20T18:05:22Z">
+        <changelog><![CDATA[+ added mode to only apply RE edit to only last-hit OR note under cursor at time of engagement
++ transpose last-hit or note under cursor now updates target note/display
+* v1.12a (2023-6-12)
++ added split at cursor task]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/dd70c1541e560bb51f0da303ce78d3f33e647aa8/Razor%20Edits/mccrabney_Razor%20Edit%20Control%20Functions.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes (fully contained).lua" type="script" desc="delete notes fully contained within Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20(fully%20contained).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes (higher than last-hit note).lua" type="script" desc="delete notes higher than last-hit note in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20(higher%20than%20last-hit%20note).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes (lower than last-hit note).lua" type="script" desc="delete notes lower than last-hit note in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20(lower%20than%20last-hit%20note).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes (noteons in RE).lua" type="script" desc="delete notes whose note-ons are contained in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20(noteons%20in%20RE).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes (other than last-hit).lua" type="script" desc="delete notes (not last hit) whose note-ons are contained in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20(other%20than%20last-hit).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes that are higher than notes under mouse cursor (inclusive).lua" type="script" desc="delete notes under mouse cursor (and higher) in Razor Edits">
+      <version name="1.0" author="mccrabney" time="2022-12-30T13:04:07Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/59dd44fa22318b123376e38ac5672c5e771c1bf7/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20that%20are%20higher%20than%20notes%20under%20mouse%20cursor%20(inclusive).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes that are higher than notes under mouse cursor.lua" type="script" desc="delete notes under mouse cursor (and higher) in Razor Edits">
+      <version name="1.0" author="mccrabney" time="2022-12-30T13:04:07Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/59dd44fa22318b123376e38ac5672c5e771c1bf7/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20that%20are%20higher%20than%20notes%20under%20mouse%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes that are lower than note under mouse cursor (inclusive).lua" type="script" desc="delete notes under mouse cursor (and lower) in Razor Edits">
+      <version name="1.0" author="mccrabney" time="2022-12-30T13:04:07Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/59dd44fa22318b123376e38ac5672c5e771c1bf7/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20that%20are%20lower%20than%20note%20under%20mouse%20cursor%20(inclusive).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes that are lower than note under mouse cursor.lua" type="script" desc="delete notes under mouse cursor (and lower) in Razor Edits">
+      <version name="1.0" author="mccrabney" time="2022-12-30T13:04:07Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/59dd44fa22318b123376e38ac5672c5e771c1bf7/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20that%20are%20lower%20than%20note%20under%20mouse%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes under mouse cursor (and higher).lua" type="script" desc="delete notes under mouse cursor (and higher) in Razor Edits">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20under%20mouse%20cursor%20(and%20higher).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - delete notes under mouse cursor (and lower).lua" type="script" desc="delete notes under mouse cursor (and lower) in Razor Edits">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20delete%20notes%20under%20mouse%20cursor%20(and%20lower).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - nudge last-hit notes (mousewheel).lua" type="script" desc="nudge last-hit notes whose note-ons are contained in Razor Edit (mousewheel)">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20nudge%20last-hit%20notes%20(mousewheel).lua</source>
+      </version>
+      <version name="1.1" author="mccrabney" time="2023-05-21T16:02:04Z">
+        <changelog><![CDATA[+ bring up to date with other scripts]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/239d227964da419bdfcacde3cc1fab4491c7a962/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20nudge%20last-hit%20notes%20(mousewheel).lua</source>
+      </version>
+      <version name="1.2" author="mccrabney" time="2023-05-26T13:15:10Z">
+        <changelog><![CDATA[+ implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts"]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/7e71c29aaf552453207292bd6c705d2d752e792a/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20nudge%20last-hit%20notes%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - nudge notes (mousewheel).lua" type="script" desc="nudge notes whose note-ons are contained in Razor Edit (mousewheel)">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20nudge%20notes%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - nudge notes, note under mouse if no RE present (mousewheel).lua" type="script" desc="nudge notes whose note-ons are contained in Razor Edit (mousewheel)">
+      <version name="1.1" author="mccrabney" time="2023-01-09T12:08:40Z">
+        <changelog><![CDATA[+ nudge notes under mouse if no RE is present
+]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/e2dd2f1c386e2c16d69b65e5e1fc5fa8eb7548ed/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20nudge%20notes,%20note%20under%20mouse%20if%20no%20RE%20present%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - RE contents - mute.lua" type="script" desc="toggle mute RE contents or selected items">
+      <version name="1.0" author="mccrabney" time="2022-12-20T13:46:38Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/cb56ccacce18a3719b5f16c287038ed1ae68b56b/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20RE%20contents%20-%20mute.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - select notes in editor.lua" type="script" desc="in MIDI editor, select notes in whose note-ons are contained in Razor Edit">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20select%20notes%20in%20editor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Razor Edit MIDI - toggle mute RE contents (or selected items).lua" type="script" desc="toggle mute RE contents or selected items">
+      <version name="1.0" author="mccrabney" time="2022-12-18T15:21:10Z">
+        <changelog><![CDATA[+ Initial Release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/d71a133cf56bb11867eb660658c43dda978571c8/Razor%20Edits/mccrabney_Razor%20Edit%20MIDI%20-%20toggle%20mute%20RE%20contents%20(or%20selected%20items).lua</source>
+      </version>
+    </reapack>
+  </category>
+  <metadata>
+    <description><![CDATA[{\rtf1\ansi\deff0{\fonttbl{\f0 \fswiss Helvetica;}{\f1 Courier;}}
+{\colortbl;\red255\green0\blue0;\red0\green0\blue255;}
+\widowctrl\hyphauto
+
+{\pard \ql \f0 \sa180 \li0 \fi0 discussion thread: https://forum.cockos.com/showthread.php?t=274257\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 mccrabney scripts - MIDI editing from the main screen, inspired by grid-editing in JJOS 128XL, a third party OS for the MPC1000/2500 sequencers.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 the goal of these scripts is to spend less time in the MIDI editor.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 start with "mccrabney_MIDI edit - show notes, under mouse and last-received" this will give a readout of notes under the mouse cursor in Arrange, including the last MIDI note currently received by your controller.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 the select/copy scripts will operate most predictably using these MIDI editor settings:\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 -- One MIDI editor per track/project -- Open all MIDI in the track/project -- media item selection is linked to visibility OFF -- selection is linked to editability OFF -- Make secondary items editable by default\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 places i've been:\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Wheelboro, NC - Thumbville, South Carolina - Garnett, Virginia - Thimpleton, SC - Dimple, Kentucky - Marmott, Indiana - Thumb of God, Georgia - Chaff County, Alabama - Thorny Bush, Mississippi - Whiddle, South Carolina - Dickle, Tennessee - Abstinence, Tennessee - Gurth, Texas - Foyble Valley, Mississippi - Godhood, Arkansas - Berlapp, Tennessee - Kinkle Village, Florida - Gurney, Virginia - Mouthole, Kentucky - Mooth, Kentucky - Mutton Beach, South Carolina - Franton, North Carolina - Dunth, NC - Menthol, Georgia - Bunkle, Texas - Slaw Canyon, Tennessee - Hayte Village, Alabama - Brood, Kentucky - Blanders, North Carolina - Knobbit, Alabama - Burth, Virginia - Nawtonomy, Alabamistan - Dormancy, Florida - Putina, Kentucky - Sholder, Kentucky - Chinsville, Georgia - Bamboozle, NC - Dimple Canyon, Virginia - Twiddy, Alabama - Gerbage, Tennessee - Complicit, California - Obtoose, U.S.A. - Quisling, Arizona - Discretion, Ohio - Doopt, Florida - Dundle, Louisiana - Farcey, Georgia - Harblesburg, Texas - Sputumton, Florida - Transmission, Georgia - Bungle, Nevada - Phlemming, NC - Wooleye, Louisiana - Blueseets, Oklahoma - Barrph, NY - Pinkerton, Oregon - Bludgeon, NY - Swindelton, FL - Theeble, GA - Wwoshnington D.C. - Dewlapp, Kentucky - Gruntleton, GA\par}
+}
+]]></description>
+  </metadata>
+</index>
