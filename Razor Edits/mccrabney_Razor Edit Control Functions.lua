@@ -11,10 +11,10 @@
 --[[
  * Changelog:
  * v1.13 (2023-7-20)
-  + added mode to only apply RE edit to only last-hit OR note under cursor at time of engagement
-  + transpose last-hit or note under cursor now updates target note/display
+    + added mode to only apply RE edit to only last-hit OR note under cursor at time of engagement
+    + transpose last-hit or note under cursor now updates target note/display
  * v1.12a (2023-6-12)
-  + added split at cursor task
+    + added split at cursor task
  * v1.12 (2023-6-12)
     + fixed obvious undo message error
     + fixed bug where multiple equidistant notes nudged backwards de-synced (for loop going in bad direction)
@@ -68,7 +68,7 @@ README:
         if not already present, a reference track will be created for this. 
     * you can change the ppqIncr value for a different nudge amount
     * this script currently only works on MIDI notes, not CCs
-    * requires (more or less) these MIDI editor settings:
+  * requires (more or less) these MIDI editor settings:
                 -- One MIDI editor per track/project
                 -- Open all MIDI in the track/project
                 -- media item selection is linked to visibility OFF
@@ -93,21 +93,23 @@ extName = "mccrabney_MIDI edit - show notes, under mouse and last-received.lua"
 function SetGlobalParam(job, task, clear, val, incr)   -- get job and details from child scripts
   
   --reaper.ClearConsole()
-  if clear == 1 then unselectAllMIDIinTrack() end      -- deselect MIDI in every item on selected track
-  if job == 1 and task ~= 11 then MIDINotesInRE(task) end
-  if job == 2 then muteREcontents() end                -- RE movement/size controls
+  if clear == 1 then unselectAllMIDIinTrack() end     -- deselect MIDI in every item on selected track
+  if job == 1 then MIDINotesInRE(task) end
+  if job == 2 then muteREcontents() end                   -- RE movement/size controls
   if job == 3 then moveREbyVisibleGrid(incr) end
   if job == 4 then moveREwithcursor(val) end
   if job == 5 or                                        
      job == 6 then resizeREbyVisibleGrid(job, val) end
+  
 end
+
 
 
 ---------------------------------------------------------------------
     --[[------------------------------[[--
           do edits to notes in RE   -- mccrabney        
     --]]------------------------------]]--    
-    
+noteHoldNumber = -1
 function MIDINotesInRE(task)
 
   local mouseNote                 -- note under mouse cursor
@@ -116,7 +118,8 @@ function MIDINotesInRE(task)
   local mouse_position_ppq        -- ppq pos of mouse at function call
   cursorSource = tonumber(reaper.GetExtState(extName, 8 ))
   noteHoldNumber = tonumber(reaper.GetExtState(extName, 'noteHold' ))
-  if not noteHoldNumber then noteHoldNumber = -1 end
+  --reaper.ShowConsoleMsg(noteHoldNumber.. "\n")
+  
   reaper.PreventUIRefresh(1)
   
   if task == 9 or 10 then                -- if task is mouse-related,
@@ -124,8 +127,6 @@ function MIDINotesInRE(task)
   end
                   -- if it's not MIDI, or of there's no item under cursor, quit everything
   --if mouseTake ~= nil and reaper.TakeIsMIDI(mouseTake) == 0 then return end      
-  
-  
   
   if RazorEditSelectionExists(1, 1) then      -- if no razor edit, create one out of selected item                                         -- if no item is selected, select item under mouse 
     local areas = GetRazorEdits()          -- get all areas 
@@ -201,13 +202,6 @@ function MIDINotesInRE(task)
                     reaper.MIDI_DeleteNote( take, n )
                     undoMessage = "delete notes lower than lasthit in RE" 
                   end 
-                
-                -- EDIT: delete all but the last-hit notes whose noteons exist within Razor Edit
-                elseif task == 4 then   
-                  if pitch ~= lastNoteHit and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_DeleteNote( take, n )
-                    undoMessage = "delete all but lasthit in RE" 
-                  end 
 
                 -- EDIT: delete all notes whose noteons AND noteoffs exist within Razor Edit
                 elseif task == 8 then   
@@ -263,17 +257,6 @@ function MIDINotesInRE(task)
                     elseif noteHoldNumber == pitch then
                       reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, nil, nil)
                     end
-                    --copySelectedMIDIinRE()
-                  end
-                  undoMessage = "select all notes in RE"-- EDIT: select all notes whose noteons exist within Razor Edit
-                  
-                elseif task == 0 then
-                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
-                    if noteHoldNumber == -1 then
-                      reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, nil, nil)
-                    elseif noteHoldNumber == pitch then
-                      reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, nil, nil)
-                    end
                   end
                   undoMessage = "select all notes in RE"
                   
@@ -293,6 +276,7 @@ function MIDINotesInRE(task)
 
                 -- EDIT: nudge noteoffs whose noteons exist within Razor Edit forwards and backwards
                 elseif task == 18 then  
+                  --reaper.ShowConsoleMsg(incr .. "\n")
                   if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
                     if noteHoldNumber == -1 then                    
                       reaper.MIDI_SetNote( take, n, nil, nil, nil, endppqposOut+incr, nil, nil, nil, nil)
@@ -382,12 +366,15 @@ function MIDINotesInRE(task)
       end               -- if not Envelope
     end                 -- for each area
   end                   -- if RE   
-
-  if task == 0 then copySelectedMIDIinRE() end
-
+  
+  -- EDIT: select and copy all MIDI in REs -- occurs here after note-by-note edit switch above
+  if task == 11 then copySelectedMIDIinRE()
+    undoMessage = "select/copy all notes in RE"
+  end                                       -- select/copy notes in REs
+  reaper.PreventUIRefresh(-1)
   reaper.UpdateArrange()
   if undoMessage ~= nil then reaper.Undo_OnStateChange2(proj, undoMessage) end
-end                     -- end function MIDINotesInRE()
+end                                         -- end function MIDINotesInRE()
 
 ---------------------------------------------------------------------
     --[[------------------------------[[--
@@ -449,8 +436,7 @@ end        -- function
 
 function copySelectedMIDIinRE()
   reaper.PreventUIRefresh(1)
-  --unselectAllMIDIinTrack()
-  --MIDINotesInRE(5)                            -- select RE-enclosed notes
+  MIDINotesInRE(5)                            -- select RE-enclosed notes
   if RazorEditSelectionExists(0,1) then       -- if RE exists (don't make if not) -- unnecessary?
     local areas = GetRazorEdits()             -- get all areas 
     local areaData = areas[1]                 -- look at the first area
@@ -1031,6 +1017,8 @@ function GetVisibleGridDivision()  ----
       local active_tmsgn = reaper.FindTempoTimeSigMarker( 0, cursorpos )
       _, _, _, _, tempo = reaper.GetTempoTimeSigMarker( 0, active_tmsgn )
     end
+    --local val = 60/tempo
+    --reaper.ShowConsoleMsg(val)
     grid_duration = 60/tempo * division
   end
     
