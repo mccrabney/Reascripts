@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.73
+ * Version: 1.74c
 --]]
  
 -- HOW TO USE -- 
@@ -96,14 +96,52 @@ function getLastNoteHit()
     reaper.SetMediaTrackInfo_Value( controller, 'I_RECINPUT', 4096 | 0 | (63 << 5) ) 
     reaper.ShowMessageBox("A folder has been created to watch your MIDI controllers.\n", "No MIDI reference", 0)  
   end
+  
   return lastNote, lastVel         
-
 end
+
+-----------------------------------------------------------
+    --[[------------------------------[[--
+          get the track name of the target note if RS5K
+    --]]------------------------------]]--
+
+function getInstanceTrackName(cursorNote)
+  if cursorNote then                                 -- if there's a note under the cursor
+    for j = 1, reaper.CountTracks(0) do              -- for each track
+      tr = reaper.GetTrack(0, j - 1)                 -- get track
+      fxCount = reaper.TrackFX_GetCount(tr)          -- count fx on each instance track
+        
+      for p = 0, fxCount-1 do                        -- for each fx
+        retval, buf = reaper.TrackFX_GetNamedConfigParm( tr, p, "fx_name" ) 
+      
+        if buf:match("ReaSamplOmatic5000")  then     -- if RS5K
+          local _, param = reaper.TrackFX_GetParamName(tr, p, 3)  -- get param name        
+          
+          if param == "Note range start" then        -- if it's the right one, and if it's rs5k,
+            noteStart = reaper.TrackFX_GetParam(tr, p, 3)        -- set/fix math for noteStart value
+            noteStart = math.floor(noteStart*128) if noteStart == 128 then noteStart = noteStart - 1 end
+            
+            --reaper.ShowConsoleMsg(cursorNote .. " _ " .. noteStart ..  "\n")
+            
+            if cursorNote == noteStart then          -- if it's the same as our note under cursor,
+              --instance = instance + 1
+              _, trName = reaper.GetTrackName( tr )    
+            end
+          end
+        end                                          -- if RS5K
+      end                                            -- for each fx
+    end                                              -- for each track
+    
+  end
+  return trName
+end
+
 
 -----------------------------------------------------------
     --[[------------------------------[[--
           get details of MIDI notes under cursor
     --]]------------------------------]]--
+    
 step = 0
 function getCursorInfo()
   local pitchUnderCursor = {}    -- pitches of notes under the cursor (for undo)
@@ -203,11 +241,25 @@ function getCursorInfo()
             else
               posString = ""
             end
+ 
+            userNoteName = reaper.GetTrackMIDINoteNameEx( 0, track, pitch, ch )
+            
+            local displayName
+            
+            if userNoteName ~= nil then 
+              displayName = userNoteName 
+            else 
+              displayName = getInstanceTrackName(pitch)
+            end
+            
+            if displayName ~= "" then
+              displayName = "'" .. displayName .. "'"
+            end
             
             numberNotes = numberNotes+1                           -- add to count of how many notes are under cursor
             IDtable[numberNotes] = {pitch, n}                     -- get noteidx for each note under cursor
             noteLength = math.floor(endppq - startppq)            -- establish the length of the note
-            showNotes[numberNotes] = {pitch, vel, noteLength, ch+1, n, tostring(muted), posString}   -- get the pitch and corresponding velocity as table-in-table
+            showNotes[numberNotes] = {pitch, vel, noteLength, ch+1, n, tostring(muted), posString, displayName}   -- get the pitch and corresponding velocity as table-in-table
             pitchUnderCursor[numberNotes] = pitch                 -- get the pitch to reference for undo message
             pitchSorted[numberNotes] = pitch                    
             distanceFromCursor[numberNotes] = position_ppq - startppq       -- put distance to cursor in index position reference table
@@ -296,8 +348,8 @@ function getCursorInfo()
     for i = 1, #showNotes do                             -- send off the table after all of the other variables
       reaper.SetExtState(extName, i + numVars, table.concat(showNotes[i],","), false)
     end
-  
-    return take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight
+
+    return take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trackName
   end
 end
 
@@ -325,7 +377,7 @@ function loop()
   reaper.ImGui_GetFrameCount(ctx)                               -- "a fast & inoffensive function"
    
   if reaper.HasExtState(extName, 'DoRefresh') then              -- update display, called from child scripts
-    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight = getCursorInfo()
+    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName = getCursorInfo()
     reaper.DeleteExtState(extName, 'DoRefresh', false)
     lastX = -1                                                  -- n/a x val fools the optimizer into resetting
     reset = 1                                                   -- allow nudge
@@ -360,8 +412,7 @@ function loop()
           ----------------------------------------------------- optimizer to reduce calls to getCursorInfo
   if loopCount >= 5 and info == "arrange" and lastX ~= x and pop == 0  
   or editCurPos ~= editCurPosLast then
-    --reaper.ShowConsoleMsg("called" .. "\n")
-    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight = getCursorInfo() 
+    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName = getCursorInfo() 
     
     if take ~= nil and reaper.TakeIsMIDI(take) then             -- if take is MIDI
       loopCount = 0                                             -- reset loopcount
@@ -420,7 +471,8 @@ function loop()
     if skip ~= 1 and toggleNoteHold == 0 then                                           -- if incoming note is not present in table,
       lastMIDI[1] = {lastNote, lastVel, 0, 0} 
       table.insert(showNotes, 1, lastMIDI[1])                   -- insert it
-      showNotes[1][7] = ""                               
+      showNotes[1][7] = ""
+      showNotes[1][8] = "" 
     end    
   
     octaveNote = math.floor(lastNote/12)-1                      -- get symbols for last-received MIDI
@@ -441,7 +493,6 @@ function loop()
     end
     
     if targetPitch ~= nil and info == "arrange" and take ~= nil then 
-      
       if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end
       
       reaper.JS_LICE_Clear(noteOnLine, curColor )
@@ -541,7 +592,7 @@ function loop()
             
             if showNotes[i][1] == targetPitch and showNotes[i][1] ~= lastNote then  -- color if entry matches the target note & no lastNote
               if cursorSource == 1 then color = 0xFF8383FF else color = 0xFFB1FFFF end
-              increment = "*" .. reaper.GetExtState(extName, 7 )
+              increment = "-" .. reaper.GetExtState(extName, 7 )
                              
             elseif showNotes[i][1] == lastNote and pop == 1 then      -- if note is received from controller
               notePresent = 1
@@ -563,11 +614,11 @@ function loop()
             reaper.ImGui_TextColored(ctx, color, showNotes[i][7] .. "n:" .. spacingN .. showNotes[i][1] .. 
               spacingO .. "(" .. cursorNoteSymbol ..  octave .. ")  " ..
               "ch:" .. spacingCH .. showNotes[i][4] ..   "  v: " .. spacingV .. showNotes[i][2] .. 
-              "  d: " .. spacingD .. showNotes[i][3] .. "  " ..  increment  )
+              "  d: " .. spacingD .. showNotes[i][3] .. "  " ..  showNotes[i][8] .. "  " .. increment  )
             end
           end
         end                                               -- for each shown note
-        
+               
         if toggleNoteHold == 1 and noteHoldNumber ~= -1 then 
           local togPad = ""
           for j = 1, posStringSize[#posStringSize] do togPad = " " .. togPad end
@@ -620,7 +671,10 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
-* v1.72b (2023-7-20)
+* v1.74 (2023-10-22)
+  + print named note or RS5K instance trackname to MIDI readout
+  + 
+* v1.73 (2023-7-20)
   + if loopcount passes resetCursor value, then cursor resets to "under mouse"
   + remove padding for ghost cursors
 * v1.72a (2023-7-20)
