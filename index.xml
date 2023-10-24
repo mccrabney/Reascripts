@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" commit="55da832e90ecfed964079826d34c9b713b2a6844">
+<index version="1" commit="9beb63e275842b5bd66986261b2580b9be48f52d">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -56,6 +56,12 @@
       <version name="1.13" author="mccrabney" time="2023-10-16T14:29:52Z">
         <changelog><![CDATA[+ babydev incompetence]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/ff9f7f7e0d733d762ddd3d23a8b5e3a80c3f13de/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20adjust%20velocity%20of%20note%20under%20cursor%20or%20notes%20in%20RE%20(mousewheel).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_MIDI edit - delete notes under cursor, or notes in RE.lua" type="script" desc="Delete notes under cursor, or notes in RE">
+      <version name="1.33" author="mccrabney" time="2023-10-24T16:31:17Z">
+        <changelog><![CDATA[+ fighting with reapack to make sure it updates]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/9beb63e275842b5bd66986261b2580b9be48f52d/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20delete%20notes%20under%20cursor,%20or%20notes%20in%20RE.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - duplicate notes under edit cursor at mouse cursor.lua" type="script" desc="duplicate notes under edit cursor at mouse cursor">
