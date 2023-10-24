@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.74c
+ * Version: 1.74
 --]]
  
 -- HOW TO USE -- 
@@ -121,8 +121,6 @@ function getInstanceTrackName(cursorNote)
             noteStart = reaper.TrackFX_GetParam(tr, p, 3)        -- set/fix math for noteStart value
             noteStart = math.floor(noteStart*128) if noteStart == 128 then noteStart = noteStart - 1 end
             
-            --reaper.ShowConsoleMsg(cursorNote .. " _ " .. noteStart ..  "\n")
-            
             if cursorNote == noteStart then          -- if it's the same as our note under cursor,
               --instance = instance + 1
               _, trName = reaper.GetTrackName( tr )    
@@ -131,7 +129,6 @@ function getInstanceTrackName(cursorNote)
         end                                          -- if RS5K
       end                                            -- for each fx
     end                                              -- for each track
-    
   end
   return trName
 end
@@ -202,7 +199,7 @@ function getCursorInfo()
         local pitchSorted = {}                  -- pitches under cursor to be sorted
         local distanceFromCursor = {}           -- corresponding distances of notes from mouse
         local distanceSorted = {}               -- ^ same, but to be sorted
-        item = reaper.BR_GetMouseCursorContext_Item() -- get item under mouse
+        item = reaper.BR_GetMouseCursorContext_Item()        -- get item under mouse
         position_ppq = reaper.MIDI_GetPPQPosFromProjTime(take, cursorPos) -- convert to PPQ
         local notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take
         
@@ -226,6 +223,7 @@ function getCursorInfo()
               _, remainder = math.modf(noteQN)
               noteMeasure = (math.floor(noteQN / bpi )) + 1
               notePPQ = math.floor((remainder * 960) + .5)
+
               if notePPQ == 960 then 
                 noteMeasure = noteMeasure + 1 
                 notePPQ = 0 
@@ -238,19 +236,15 @@ function getCursorInfo()
               while string.len(stringNotePPQ) < 3 do stringNotePPQ = "0" .. stringNotePPQ end 
               stringNoteMeasure = tostring(noteMeasure)
               posString = noteMeasure .. "." .. noteQN .. "." .. stringNotePPQ .. "  "
-            else
+            else                                                  -- if not after "start" marker
               posString = ""
             end
  
             userNoteName = reaper.GetTrackMIDINoteNameEx( 0, track, pitch, ch )
-            
             local displayName
             
-            if userNoteName ~= nil then 
-              displayName = userNoteName 
-            else 
-              displayName = getInstanceTrackName(pitch)
-            end
+            if userNoteName ~= nil then displayName = userNoteName 
+            else displayName = getInstanceTrackName(pitch) end
             
             if displayName ~= "" then
               displayName = "'" .. displayName .. "'"
