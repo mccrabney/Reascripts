@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" commit="9beb63e275842b5bd66986261b2580b9be48f52d">
+<index version="1" commit="364c5d46cbb262f2539aa8b36ff9c3b7d723a74b">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -241,6 +241,10 @@ then no time readout is displayed.
         <changelog><![CDATA[+ print named note or RS5K instance trackname to MIDI readout
 + ]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/a963810ccbeafadecfa9d41f899335a9caaece5f/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
+      </version>
+      <version name="1.75" author="mccrabney" time="2023-11-06T13:36:18Z">
+        <changelog><![CDATA[+ when middle mouse scrolling (hand scroll in my setup), don't print ghost lines]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/364c5d46cbb262f2539aa8b36ff9c3b7d723a74b/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - split note under cursor, or notes in RE.lua" type="script" desc="split note under cursor, or notes in RE">
