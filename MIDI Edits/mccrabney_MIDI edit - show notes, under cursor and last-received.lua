@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.74
+ * Version: 1.75
 --]]
  
 -- HOW TO USE -- 
@@ -402,10 +402,12 @@ function loop()
     reaper.SetExtState(extName, 8, cursorSource, true) 
   end
   
-  
+   
           ----------------------------------------------------- optimizer to reduce calls to getCursorInfo
   if loopCount >= 5 and info == "arrange" and lastX ~= x and pop == 0  
+  --if x ~= nil and lastX ~= nil and loopCount >= 5 and info == "arrange" and math.abs(x-lastX) > 2 and pop == 0  
   or editCurPos ~= editCurPosLast then
+    --if x ~= nil and lastX ~= nil then reaper.ShowConsoleMsg("x: " .. x .. " | lastX: " .. lastX .. "\n") end
     take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName = getCursorInfo() 
     
     if take ~= nil and reaper.TakeIsMIDI(take) then             -- if take is MIDI
@@ -486,7 +488,7 @@ function loop()
       -- clear composite over RE area?
     end
     
-    if targetPitch ~= nil and info == "arrange" and take ~= nil then 
+    if targetPitch ~= nil and info == "arrange" and take ~= nil and mouseState ~= 64 then 
       if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end
       
       reaper.JS_LICE_Clear(noteOnLine, curColor )
@@ -517,7 +519,7 @@ function loop()
     end
     
                        ----------------------------------------- draw the text readout 
-    if targetPitch ~= nil and info == "arrange" and take ~= nil  then
+    if targetPitch ~= nil and info == "arrange" and take ~= nil then
       reaper.ImGui_SetNextWindowPos(ctx, x - 11, y + 55)
       local rounding                          -- round window for mouse cursor, square for edit
       if cursorSource == 1 then rounding = 12 else rounding = 0 end
@@ -665,9 +667,10 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.75 (2023-11-5)
+  + when middle mouse scrolling (hand scroll in my setup), don't print ghost lines
 * v1.74 (2023-10-22)
   + print named note or RS5K instance trackname to MIDI readout
-  + 
 * v1.73 (2023-7-20)
   + if loopcount passes resetCursor value, then cursor resets to "under mouse"
   + remove padding for ghost cursors
