@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.75
+ * Version: 1.77
 --]]
  
 -- HOW TO USE -- 
@@ -25,7 +25,7 @@ end
 
 resetCursor = 50  -- how many loopCounts should pass before cursor is reset from Edit to Mouse
                   -- this resets cursor when idle time
-                  
+
 local main_wnd = reaper.GetMainHwnd() -- GET MAIN WINDOW
 local track_window = reaper.JS_Window_FindChildByID(main_wnd, 0x3E8) -- GET TRACK VIEW
 local pitchList = {"C ", "C#", "D ", "D#", "E ", "F ", "F#", "G ", "G#", "A ", "A#", "B "}
@@ -246,6 +246,8 @@ function getCursorInfo()
             if userNoteName ~= nil then displayName = userNoteName 
             else displayName = getInstanceTrackName(pitch) end
             
+            if displayName == nil then displayName = "" end
+            
             if displayName ~= "" then
               displayName = "'" .. displayName .. "'"
             end
@@ -352,8 +354,12 @@ end
 incrIndex = 2
 loopCount = 0
 lastX = 0
+elapsed = 0
+arrangeTime = 0
+lastArrangeTime = 0
 pop = 0 
 editCurPosLast = -1
+local elapsed 
 local incr = {1, 10, 24, 48, 96, 240, 480, 960}
 noteOnLine        = reaper.JS_LICE_CreateBitmap(true, 1, 1)
 noteOnLineShadow  = reaper.JS_LICE_CreateBitmap(true, 1, 1)
@@ -365,6 +371,7 @@ noteOffLineShadow = reaper.JS_LICE_CreateBitmap(true, 1, 1)
     --]]------------------------------]]--
 
 function loop()
+    
   loopCount = loopCount+1                                       -- advance loopcount
   editCurPos = reaper.GetCursorPosition()
   local lastMIDI = {}                                           -- 
@@ -402,9 +409,8 @@ function loop()
     reaper.SetExtState(extName, 8, cursorSource, true) 
   end
   
-   
           ----------------------------------------------------- optimizer to reduce calls to getCursorInfo
-  if loopCount >= 5 and info == "arrange" and lastX ~= x and pop == 0  
+  if loopCount >= 5 and info == "arrange" and lastX ~= x and pop == 0
   --if x ~= nil and lastX ~= nil and loopCount >= 5 and info == "arrange" and math.abs(x-lastX) > 2 and pop == 0  
   or editCurPos ~= editCurPosLast then
     --if x ~= nil and lastX ~= nil then reaper.ShowConsoleMsg("x: " .. x .. " | lastX: " .. lastX .. "\n") end
@@ -478,158 +484,171 @@ function loop()
   
   -------------------------------------------------------------------------------------------------
   ------------------------------GUI ---------------------------------------------------------------
-  mouseState = reaper.JS_Mouse_GetState(0xFF)
-  --if mouseState ~= 1 and mouseState ~= 64 then    -- acknowledging 64 (middlemouse) prevents single click from working.                             -- if not left click 
-  if mouseState ~= 1 then                                       -- if not left click 
+  startTime, endTime = reaper.BR_GetArrangeView( 0 )
+  arrangeTime = startTime + endTime
+  
+  if arrangeTime ~= lastArrangeTime then            -- clear graphics if scrolling arrange view
+    elapsed = 0
+    time_start = reaper.time_precise()
+  else
+    elapsed = reaper.time_precise() - time_start
+  end
+
+  lastArrangeTime = arrangeTime
+  
+  --if elapsed > .6 then                              -- if arrange is not moving
             ----------------------------------------------------- draw guideline at target note 
-    if RazorEditSelectionExists() and noteHoldNumber ~= -1 then      
+    --if RazorEditSelectionExists() and noteHoldNumber ~= -1 then      
       -- use this to draw a composite over RE area?
-    else
+    --else
       -- clear composite over RE area?
+    --end
+    
+  if targetPitch ~= nil and info == "arrange" and take ~= nil and elapsed > .2 then 
+    if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end
+    
+    reaper.JS_LICE_Clear(noteOnLine, curColor )
+    reaper.JS_LICE_Clear(noteOnLineShadow,  0x85000000 )
+    reaper.JS_LICE_Clear(noteOffLine, curColor )
+    reaper.JS_LICE_Clear(noteOffLineShadow, 0x85000000 )
+    
+    if targetNotePos then 
+      local zoom_lvl = reaper.GetHZoomLevel()
+      local Arr_start_time = reaper.GetSet_ArrangeView2(0, false, 0, 0)
+      targetNotePixel    = math.floor((targetNotePos - Arr_start_time) * zoom_lvl)
+      targetNotePixelEnd = math.floor((targetEndPos  - Arr_start_time) * zoom_lvl)
+      if targetNotePixel    < 0 then targetNotePixel    = 0 end
+      if targetNotePixelEnd < 0 then targetNotePixelEnd = 0 end
     end
     
-    if targetPitch ~= nil and info == "arrange" and take ~= nil and mouseState ~= 64 then 
-      if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end
+    local pad = 0     -- how many pixels to pad top of ghost cursor 
+    reaper.JS_Composite(track_window, targetNotePixel,      trPos + pad, 1, tcpHeight - pad - 3, noteOnLine, 0, 0, 1, 1, true) -- DRAW
+    reaper.JS_Composite(track_window, targetNotePixel+1,    trPos + pad, 1, tcpHeight - pad - 3, noteOnLineShadow, 0, 0, 1, 1, true) -- DRAW
+    reaper.JS_Composite(track_window, targetNotePixelEnd+1, trPos + pad, 1, tcpHeight - pad - 3, noteOffLine, 0, 0, 1, 1, true) -- DRAW
+    reaper.JS_Composite(track_window, targetNotePixelEnd,   trPos + pad, 1, tcpHeight - pad - 3, noteOffLineShadow, 0, 0, 1, 1, true) -- DRAW
+    
+  else                                                    -- if no note under cursor
+    reaper.JS_Composite_Unlink(track_window, noteOnLine, true)     -- CLEAR
+    reaper.JS_Composite_Unlink(track_window, noteOnLineShadow, true)     -- CLEAR
+    reaper.JS_Composite_Unlink(track_window, noteOffLine, true)    -- CLEAR
+    reaper.JS_Composite_Unlink(track_window, noteOffLineShadow, true)    -- c'mon it's clear
+  end
+  
+                     ----------------------------------------- draw the text readout 
+  if targetPitch ~= nil and info == "arrange" and take ~= nil and elapsed > .2 then
+    reaper.ImGui_SetNextWindowPos(ctx, x - 11, y + 55)
+    local rounding                          -- round window for mouse cursor, square for edit
+    if cursorSource == 1 then rounding = 12 else rounding = 0 end
+
+    reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_WindowBg(), 0x00000000 | 0xFF)
+    reaper.ImGui_PushStyleVar(ctx, reaper.ImGui_StyleVar_WindowRounding(), rounding)
+
+    if reaper.ImGui_Begin(ctx, 'Tooltip', false,
+    reaper.ImGui_WindowFlags_NoFocusOnAppearing() |
+    reaper.ImGui_WindowFlags_NoDecoration() |
+    reaper.ImGui_WindowFlags_TopMost() |
+    reaper.ImGui_WindowFlags_AlwaysAutoResize()) then
+    
+      local octaveNote                                  -- variables for readout
+      local noteSymbol                                  
+      local color = 0xFFFFFFFF                          -- offwhite for non-target note readouts
+      local spacingO = " "
+      local spacingN = ""
+      local spacingV = ""
+      local spacingD = ""
+      local spacingCH = " "
+      local postNote = "  "
+      local pitchList = {"C ", "C#", "D ", "D#", "E ", "F ", "F#", "G ", "G#", "A ", "A#", "B "}
       
-      reaper.JS_LICE_Clear(noteOnLine, curColor )
-      reaper.JS_LICE_Clear(noteOnLineShadow,  0x85000000 )
-      reaper.JS_LICE_Clear(noteOffLine, curColor )
-      reaper.JS_LICE_Clear(noteOffLineShadow, 0x85000000 )
-      
-      if targetNotePos then 
-        local zoom_lvl = reaper.GetHZoomLevel()
-        local Arr_start_time = reaper.GetSet_ArrangeView2(0, false, 0, 0)
-        targetNotePixel    = math.floor((targetNotePos - Arr_start_time) * zoom_lvl)
-        targetNotePixelEnd = math.floor((targetEndPos  - Arr_start_time) * zoom_lvl)
-        if targetNotePixel    < 0 then targetNotePixel    = 0 end
-        if targetNotePixelEnd < 0 then targetNotePixelEnd = 0 end
+      posStringSize, noteStringSize = {}
+      for i = 1, #showNotes do
+        posStringSize[i] = string.len(showNotes[i][7])
       end
+      table.sort(posStringSize)
       
-      local pad = 0     -- how many pixels to pad top of ghost cursor 
-      reaper.JS_Composite(track_window, targetNotePixel,      trPos + pad, 1, tcpHeight - pad - 3, noteOnLine, 0, 0, 1, 1, true) -- DRAW
-      reaper.JS_Composite(track_window, targetNotePixel+1,    trPos + pad, 1, tcpHeight - pad - 3, noteOnLineShadow, 0, 0, 1, 1, true) -- DRAW
-      reaper.JS_Composite(track_window, targetNotePixelEnd+1, trPos + pad, 1, tcpHeight - pad - 3, noteOffLine, 0, 0, 1, 1, true) -- DRAW
-      reaper.JS_Composite(track_window, targetNotePixelEnd,   trPos + pad, 1, tcpHeight - pad - 3, noteOffLineShadow, 0, 0, 1, 1, true) -- DRAW
-      
-    else                                                    -- if no note under cursor
-      reaper.JS_Composite_Unlink(track_window, noteOnLine, true)     -- CLEAR
-      reaper.JS_Composite_Unlink(track_window, noteOnLineShadow, true)     -- CLEAR
-      reaper.JS_Composite_Unlink(track_window, noteOffLine, true)    -- CLEAR
-      reaper.JS_Composite_Unlink(track_window, noteOffLineShadow, true)    -- c'mon it's clear
-    end
-    
-                       ----------------------------------------- draw the text readout 
-    if targetPitch ~= nil and info == "arrange" and take ~= nil then
-      reaper.ImGui_SetNextWindowPos(ctx, x - 11, y + 55)
-      local rounding                          -- round window for mouse cursor, square for edit
-      if cursorSource == 1 then rounding = 12 else rounding = 0 end
-  
-      reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_WindowBg(), 0x00000000 | 0xFF)
-      reaper.ImGui_PushStyleVar(ctx, reaper.ImGui_StyleVar_WindowRounding(), rounding)
-  
-      if reaper.ImGui_Begin(ctx, 'Tooltip', false,
-      reaper.ImGui_WindowFlags_NoFocusOnAppearing() |
-      reaper.ImGui_WindowFlags_NoDecoration() |
-      reaper.ImGui_WindowFlags_TopMost() |
-      reaper.ImGui_WindowFlags_AlwaysAutoResize()) then
-      
-        local octaveNote                                  -- variables for readout
-        local noteSymbol                                  
-        local color = 0xFFFFFFFF                          -- offwhite for non-target note readouts
-        local spacingO = " "
-        local spacingN = ""
-        local spacingV = ""
-        local spacingD = ""
-        local spacingCH = " "
-        local postNote = "  "
-        local pitchList = {"C ", "C#", "D ", "D#", "E ", "F ", "F#", "G ", "G#", "A ", "A#", "B "}
-        
-        posStringSize, noteStringSize = {}
-        for i = 1, #showNotes do
-          posStringSize[i] = string.len(showNotes[i][7])
-        end
-        table.sort(posStringSize)
-        
-        for i = #showNotes, 1, -1 do                   -- for each top-level entry in the showNotes table,
-          if showNotes[1] and targetPitch then
-            if showNotes[i][7] == "" then 
-              for j = 1, posStringSize[#posStringSize] do 
-                showNotes[i][7] = " " .. showNotes[i][7]
-              end
-            end
-            
-            octave = math.floor(showNotes[i][1]/12)-1                    -- establish the octave for readout
-            cursorNoteSymbol = pitchList[(showNotes[i][1] - 12*(octave+1)+1)]       -- establish the note symbol for readout
-      
-            if     showNotes[i][1] > -1  and showNotes[i][1] <  10 then spacingN = "  "     -- spacingN for the note readout
-            elseif showNotes[i][1] > 9   and showNotes[i][1] < 100 then spacingN = " " 
-            elseif showNotes[i][1] > 99                            then spacingN = "" 
-            end
-            
-            if octave < 0 then spacingO = "" postNote = postNote:gsub(' ', '') end  -- spacing for octave readout 
-            
-            if showNotes[i][4] ~= "in" then                                         -- spacingCH for channel readout
-              if showNotes[i][4] < 10 then spacingCH = "  " else spacingCH = " " end
-            else spacingCH = " " end
-              
-            if     showNotes[i][2] > 0  and showNotes[i][2] <  10 then spacingV = "  "         -- spacingV for the velocity readout
-            elseif showNotes[i][2] > 9  and showNotes[i][2] < 100 then spacingV = " " 
-            elseif showNotes[i][2] > 99                           then spacingV = "" 
-            end
-  
-            if type(showNotes[i][3]) == "number" then
-              if     showNotes[i][3] > 0    and showNotes[i][3] <    10 then spacingD = "    "   -- spacing for the duration readout
-              elseif showNotes[i][3] > 9    and showNotes[i][3] <   100 then spacingD = "   " 
-              elseif showNotes[i][3] > 99   and showNotes[i][3] <  1000 then spacingD = "  " 
-              elseif showNotes[i][3] > 999  and showNotes[i][3] < 10000 then spacingD = " " 
-              elseif showNotes[i][3] > 9999                             then spacingD = ""
-              end
-            end
-            
-            if showNotes[i][1] == targetPitch and showNotes[i][1] ~= lastNote then  -- color if entry matches the target note & no lastNote
-              if cursorSource == 1 then color = 0xFF8383FF else color = 0xFFB1FFFF end
-              increment = "-" .. reaper.GetExtState(extName, 7 )
-                             
-            elseif showNotes[i][1] == lastNote and pop == 1 then      -- if note is received from controller
-              notePresent = 1
-              showNotes[i][2] = lastVel                               -- set incoming velocity
-              showNotes[i][3] = ""                                    -- duration
-              showNotes[i][4] = "in"
-              increment = "" --incr[incrIndex] = ""
-              color = 0x00FF45FF                            -- green for incoming
-            elseif showNotes[i][1] ~= lastNote then 
-              color = 0xFFFFFFFF                            -- white for non-target
-              increment = ""
-            end
-            
-            if showNotes[i][6] == "true" then color = 0x7a7a7aFF end
-            
-            table.sort(showNotes, function(a, b) return a[1] < b[1] end)
-            
-            if i-1 ~= nil and showNotes[i] ~= showNotes[i+1] then
-            reaper.ImGui_TextColored(ctx, color, showNotes[i][7] .. "n:" .. spacingN .. showNotes[i][1] .. 
-              spacingO .. "(" .. cursorNoteSymbol ..  octave .. ")  " ..
-              "ch:" .. spacingCH .. showNotes[i][4] ..   "  v: " .. spacingV .. showNotes[i][2] .. 
-              "  d: " .. spacingD .. showNotes[i][3] .. "  " ..  showNotes[i][8] .. "  " .. increment  )
+      for i = #showNotes, 1, -1 do                   -- for each top-level entry in the showNotes table,
+        if showNotes[1] and targetPitch then
+          if showNotes[i][7] == "" then 
+            for j = 1, posStringSize[#posStringSize] do 
+              showNotes[i][7] = " " .. showNotes[i][7]
             end
           end
-        end                                               -- for each shown note
-               
-        if toggleNoteHold == 1 and noteHoldNumber ~= -1 then 
-          local togPad = ""
-          for j = 1, posStringSize[#posStringSize] do togPad = " " .. togPad end
-          octave = math.floor(noteHoldNumber/12)-1                    -- establish the octave for readout
-          cursorNoteSymbol = pitchList[(noteHoldNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
-          reaper.ImGui_TextColored(ctx, 0x00FF45FF, togPad .. "n: " .. noteHoldNumber ..spacingO .. "(" .. cursorNoteSymbol ..  octave .. ")  " .. "(RE target note)"  ) 
+          
+          octave = math.floor(showNotes[i][1]/12)-1                    -- establish the octave for readout
+          cursorNoteSymbol = pitchList[(showNotes[i][1] - 12*(octave+1)+1)]       -- establish the note symbol for readout
+    
+          if     showNotes[i][1] > -1  and showNotes[i][1] <  10 then spacingN = "  "     -- spacingN for the note readout
+          elseif showNotes[i][1] > 9   and showNotes[i][1] < 100 then spacingN = " " 
+          elseif showNotes[i][1] > 99                            then spacingN = "" 
+          end
+          
+          if octave < 0 then spacingO = "" postNote = postNote:gsub(' ', '') end  -- spacing for octave readout 
+          
+          if showNotes[i][4] ~= "in" then                                         -- spacingCH for channel readout
+            if showNotes[i][4] < 10 then spacingCH = "  " else spacingCH = " " end
+          else spacingCH = " " end
+            
+          if     showNotes[i][2] > 0  and showNotes[i][2] <  10 then spacingV = "  "         -- spacingV for the velocity readout
+          elseif showNotes[i][2] > 9  and showNotes[i][2] < 100 then spacingV = " " 
+          elseif showNotes[i][2] > 99                           then spacingV = "" 
+          end
+
+          if type(showNotes[i][3]) == "number" then
+            if     showNotes[i][3] > 0    and showNotes[i][3] <    10 then spacingD = "    "   -- spacing for the duration readout
+            elseif showNotes[i][3] > 9    and showNotes[i][3] <   100 then spacingD = "   " 
+            elseif showNotes[i][3] > 99   and showNotes[i][3] <  1000 then spacingD = "  " 
+            elseif showNotes[i][3] > 999  and showNotes[i][3] < 10000 then spacingD = " " 
+            elseif showNotes[i][3] > 9999                             then spacingD = ""
+            end
+          end
+          
+          if showNotes[i][1] == targetPitch and showNotes[i][1] ~= lastNote then  -- color if entry matches the target note & no lastNote
+            if cursorSource == 1 then color = 0xFF8383FF else color = 0xFFB1FFFF end
+            increment = "-" .. reaper.GetExtState(extName, 7 )
+                           
+          elseif showNotes[i][1] == lastNote and pop == 1 then      -- if note is received from controller
+            notePresent = 1
+            showNotes[i][2] = lastVel                               -- set incoming velocity
+            showNotes[i][3] = ""                                    -- duration
+            showNotes[i][4] = "in"
+            increment = "" --incr[incrIndex] = ""
+            color = 0x00FF45FF                            -- green for incoming
+          elseif showNotes[i][1] ~= lastNote then 
+            color = 0xFFFFFFFF                            -- white for non-target
+            increment = ""
+          end
+          
+          if showNotes[i][6] == "true" then color = 0x7a7a7aFF end
+          
+          table.sort(showNotes, function(a, b) return a[1] < b[1] end)
+          
+          if i-1 ~= nil and showNotes[i] ~= showNotes[i+1] then
+          reaper.ImGui_TextColored(ctx, color, showNotes[i][7] .. "n:" .. spacingN .. showNotes[i][1] .. 
+            spacingO .. "(" .. cursorNoteSymbol ..  octave .. ")  " ..
+            "ch:" .. spacingCH .. showNotes[i][4] ..   "  v: " .. spacingV .. showNotes[i][2] .. 
+            "  d: " .. spacingD .. showNotes[i][3] .. "  " ..  showNotes[i][8] .. "  " .. increment  )
+          end
         end
-        
-        reaper.ImGui_End(ctx)
-      end                                                 -- if imgui begin
-      reaper.ImGui_PopStyleColor(ctx)
-      reaper.ImGui_PopStyleVar(ctx)
-    end           
-  end
+      end                                               -- for each shown note
+             
+      if toggleNoteHold == 1 and noteHoldNumber ~= -1 then 
+        local togPad = ""
+        for j = 1, posStringSize[#posStringSize] do togPad = " " .. togPad end
+        octave = math.floor(noteHoldNumber/12)-1                    -- establish the octave for readout
+        cursorNoteSymbol = pitchList[(noteHoldNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
+        reaper.ImGui_TextColored(ctx, 0x00FF45FF, togPad .. "n: " .. noteHoldNumber ..spacingO .. "(" .. cursorNoteSymbol ..  octave .. ")  " .. "(RE target note)"  ) 
+      end
+      
+      reaper.ImGui_End(ctx)
+    end                                                 -- if imgui begin
+    reaper.ImGui_PopStyleColor(ctx)
+    reaper.ImGui_PopStyleVar(ctx)
+  end           
+  
   reaper.defer(loop)
+  --elapsed = 1
+  --lastArrangeTime = arrangeTime
+  --elapsed = 0
   editCurPosLast = reaper.GetCursorPosition()
 end
 --------------------------------------------
@@ -667,6 +686,10 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.77 (2023-11-5)
+  + reverted mouse clearing in 1.75, and instead attempted blanking displays while screen scrolling via reaper.BR_GetArrangeView()
+* v1.76 (2023-11-9)
+  + lost version, see next
 * v1.75 (2023-11-5)
   + when middle mouse scrolling (hand scroll in my setup), don't print ghost lines
 * v1.74 (2023-10-22)
