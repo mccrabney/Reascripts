@@ -9,9 +9,11 @@
  
 --[[
  * Changelog:
- * v1.1 (2021-04-02)
+ * v1.2 (2023-11-14)
+   + fixed task #
+ * v1.1 (2023-??-??)
    + new RE response
- * v1.0 (2021-04-02)
+ * v1.0 (2023-??-??)
    + Initial Release
 --]]
 
@@ -82,7 +84,7 @@ function main()
   
   if RazorEditSelectionExists() then
     job = 1
-    task = 0
+    task = 11
     clear = 1
     SetGlobalParam(job, task, clear)
   else
