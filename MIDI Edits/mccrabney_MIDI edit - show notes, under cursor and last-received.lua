@@ -5,7 +5,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.78
+ * Version: 1.79
 --]]
  
 -- HOW TO USE -- 
@@ -17,6 +17,8 @@
 
 ---------------------------------------------------------------------
 -- Requires js_ReaScriptAPI extension: https://forum.cockos.com/showthread.php?t=212174
+
+--idleTask = 1
 
 dofile(reaper.GetResourcePath() .. '/Scripts/ReaTeam Extensions/API/imgui.lua')('0.8')
 extName = 'mccrabney_MIDI edit - show notes, under cursor and last-received.lua'
@@ -44,6 +46,7 @@ function RazorEditSelectionExists()
     if x ~= "" then return true end              -- if present, return true 
     if x == nil then return false end            -- return that no RE exists
   end
+  
 end    
 
 ---------------------------------------------------------------------
@@ -141,6 +144,7 @@ end
     
 step = 0
 function getCursorInfo()         -- this is a heavy action, run it as little as possible
+  --reaper.ShowConsoleMsg("getCursorInfo called" .. "\n")
   local pitchUnderCursor = {}    -- pitches of notes under the cursor (for undo)
   local showNotes = {}           -- table consisting of sub-tables grouping Pitch and Vel
   local trackHeight              
@@ -155,7 +159,6 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
   if window ~= "midi editor" and hZoom > 2 then   -- ifn't ME, and if slightly zoomed in
     if track then                                                     -- if there is a track
       trackHeight = reaper.GetMediaTrackInfo_Value( track, "I_TCPH")  -- set track height
-      
       if cursorSource == 1 then                       -- if cursorSource is mouse cursor,
         take = reaper.BR_GetMouseCursorContext_Take() -- get take under mouse 
         cursorPos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position
@@ -195,18 +198,20 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
 
     if take and trackHeight > 10 then           -- if there is a take, and if track height isn't tiny
       if reaper.TakeIsMIDI(take) then           -- if take is midi
+        local tr = reaper.GetMediaItemTake_Track( take )
+        _, trName = reaper.GetTrackName( tr )
         local pitchSorted = {}                  -- pitches under cursor to be sorted
         local distanceFromCursor = {}           -- corresponding distances of notes from mouse
         local distanceSorted = {}               -- ^ same, but to be sorted
         item = reaper.BR_GetMouseCursorContext_Item()        -- get item under mouse
         position_ppq = reaper.MIDI_GetPPQPosFromProjTime(take, cursorPos) -- convert to PPQ
+        --reaper.ShowConsoleMsg(position_ppq .. " _ ")
         local notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take
         
         for n = notesCount-1, 0, -1 do          -- for each note, from back to front
           _, selected, muted, startppq, endppq, ch, pitch, vel = reaper.MIDI_GetNote(take, n)  -- get note data           
           if startppq <= position_ppq and endppq >= position_ppq then  -- is current note the note under the cursor?
             notePos = reaper.MIDI_GetProjTimeFromPPQPos( take, startppq)  -- note pos of note under cursor
-            
             if startMarkerPos ~= -1 and notePos >= startMarkerPos then   -- if after "start" marker
               ptidx = reaper.CountTempoTimeSigMarkers( proj )            
               if ptidx == 0 then 
@@ -243,7 +248,12 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
             userNoteName = reaper.GetTrackMIDINoteNameEx( 0, track, pitch, ch )  -- set up named note/track readout text
             local displayName
                                                                   -- if no named MIDI note, get track name
-            if userNoteName ~= nil then displayName = userNoteName else displayName = getInstanceTrackName(pitch) end
+            if userNoteName ~= nil 
+              then displayName = userNoteName 
+            elseif trName == "sequencer" then
+              displayName = getInstanceTrackName(pitch) 
+            end
+            
             if displayName == nil then displayName = "" end       -- if no displayName, blank the readout value
             if displayName ~= "" then                             -- if displayname is not blank, 
               displayName = "'" .. displayName .. "'"             -- add quotes to displayname
@@ -341,7 +351,7 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
       reaper.SetExtState(extName, i + numVars, table.concat(showNotes[i],","), false)
     end
 
-    return take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trackName
+    return take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trackName, cursorPos
   end
 end
 
@@ -432,6 +442,7 @@ end
         
 incrIndex = 2                   -- vars/setup for loop
 loopCount = 0
+idleCount = 0
 lastX = 0
 elapsed = 0
 arrangeTime = 0
@@ -447,14 +458,14 @@ local incr = {1, 10, 24, 48, 96, 240, 480, 960}
     --]]------------------------------]]--
 
 function loop()
-    
   loopCount = loopCount+1                                       -- advance loopcount
+  idleCount = idleCount+1                                       -- advance idlecount
   editCurPos = reaper.GetCursorPosition()
   local lastMIDI = {}                                          
   reaper.ImGui_GetFrameCount(ctx)                               -- "a fast & inoffensive function"
    
   if reaper.HasExtState(extName, 'DoRefresh') then              -- update display, called from child scripts
-    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName = getCursorInfo()
+    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos = getCursorInfo()
     reaper.DeleteExtState(extName, 'DoRefresh', false)
     lastX = -1                                                  -- n/a x val fools the optimizer into resetting
     lastAllAreas = -1                                           -- allow reset after nudge for RE targeted notes
@@ -486,13 +497,14 @@ function loop()
   end
   
   ------------------------------------------------------------ optimizer to reduce calls to getCursorInfo
-  if loopCount >= 5 and info == "arrange" and lastX ~= x and pop == 0  -- if we're in the right place, and on the move
+  if loopCount >= 3 and info == "arrange" and lastX ~= x and pop == 0  -- if we're in the right place, and on the move
   or editCurPos ~= editCurPosLast then                                 -- or if the edit cursor has moved,
                                                                        -- get all the info:
-    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName = getCursorInfo() 
+    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos = getCursorInfo() 
     
     if take ~= nil and reaper.TakeIsMIDI(take) then             -- if take is MIDI
       loopCount = 0                                             -- reset loopcount
+      idleCount = 0                                             -- reset loopcount
       lastX = x                                                 -- set lastX mouse position
     else                                                        -- if take is nil or isn't MIDI
       lastX = x                                                 -- set lastX mouse position
@@ -525,11 +537,45 @@ function loop()
     reaper.SetExtState(extName, "noteHold", -1, false)          -- write the note hold number
   end
   
+                                         -- insert last-received MIDI into table
+  
+  --------------------------------------------------------
+  -- idle sensor -----------------------------------------
+  --------------------------------------------------------
+  if idleTask == 1 then
+    while idleCount > 100 do
+      if idleCount > 101 then break end         -- just do it once
+      --reaper.ShowConsoleMsg("idle" .."\n")
+      for i = 1, reaper.CountTracks(0) do
+        track = reaper.GetTrack(0,i-1)
+        item_num = reaper.CountTrackMediaItems(track)
+        for j = 0, item_num-1 do -- LOOP THROUGH MEDIA ITEMS
+          item = reaper.GetTrackMediaItem(track, j)
+          for t = 0, reaper.CountTakes(item)-1 do       -- for each take,
+            take = reaper.GetTake(item, t)              -- get take
+            if reaper.TakeIsMIDI(take) then             -- if it's MIDI, get RE PPQ values
+              _, ccCount, _ = reaper.MIDI_CountEvts(take) -- count notes in current take 
+              for n = 0, ccCount do
+                _, _, _, ppqpos, chanmsg, chan, msg2, msg3 = reaper.MIDI_GetCC( take, n )
+                --reaper.ShowConsoleMsg(chan .. " " .. msg2 .. " " .. msg3 .. "\n")
+                if chan == 15 and msg2 == 119 and msg3 == 1 then 
+                   reaper.MIDI_DeleteCC( take, n )
+                   --reaper.ShowConsoleMsg("deleted" .. "\n")
+                end
+              end
+            end
+          end
+        end
+      end
+      break
+    end
+  end  
+  
   ---------------------------------------------------  get last note hit and feed it into table 
   if loopCount < 500 then lastNote, lastVel = getLastNoteHit() end   -- if idle, stop getting lastnotehit                                                        
   x, y = reaper.GetMousePosition()                              -- mousepos
   _, info = reaper.GetThingFromPoint( x, y )                    -- mousedetails
-  local skip = 0                                                -- insert last-received MIDI into table
+  local skip = 0       
   
   if lastNote == -1 then pop = 0 end                            -- reset pop value (pop = incoming MIDI)
   if lastNote ~= -1 and lastNote ~= nil and take ~= nil and pop == 0 then
@@ -547,7 +593,15 @@ function loop()
       lastMIDI[1] = {lastNote, lastVel, 0, 0} 
       table.insert(showNotes, 1, lastMIDI[1])                   -- insert it
       showNotes[1][7] = ""                                      -- blank n/a text readout values
-      showNotes[1][8] = "" 
+      
+      _, sourceTrName = reaper.GetTrackName( track )            -- get the name of the track where the note originates
+      if sourceTrName == "sequencer" then                       -- if it's from a sequencer, 
+        local trName = getInstanceTrackName(lastNote)           -- detect trackname of RS5K instance
+        trName = "'" .. trName .. "'"                           -- pad with quote
+      end
+      
+      if trName == nil then trName = "" end                     -- if nil, write empty
+      showNotes[1][8] = trName                                  -- put into table
     end    
   
     octaveNote = math.floor(lastNote/12)-1                      -- get symbols for last-received MIDI
@@ -560,6 +614,7 @@ function loop()
   
   startTime, endTime = reaper.GetSet_ArrangeView2( 0, 0, 0, 0)      -- get arrangescreen pos
   arrangeTime = startTime + endTime                                 -- sum values to determine change
+  
   if arrangeTime ~= lastArrangeTime then            -- if arrange screen bounds have moved
     elapsed = 0                                     -- timer == 0
     time_start = reaper.time_precise()              -- start the clock
@@ -612,7 +667,7 @@ function loop()
     
     allAreas = start_pos + end_pos         -- get the full area span
     
-    if noteHoldNumber ~= nil and noteHoldNumber ~= -1 then      
+    if noteHoldNumber ~= nil and noteHoldNumber ~= -1 and elapsed > .2 then      
       if lastAllAreas ~= allAreas then
         --reaper.ShowConsoleMsg("areas is redrawn" .. "\n")
         lastAllAreas = allAreas
@@ -646,19 +701,20 @@ function loop()
                     if startppq > razorStart_ppq_pos and startppq < razorEnd_ppq_pos then  -- if in RE bounds
                       if noteHoldNumber == pitch then     -- if it's the targeted pitch
                         noteStartPos = reaper.MIDI_GetProjTimeFromPPQPos(take, startppq)  -- note pos of note under cursor
-                        noteEndPos = reaper.MIDI_GetProjTimeFromPPQPos(take, endppq)      -- note pos of note under cursor
+                        noteEndPos =   reaper.MIDI_GetProjTimeFromPPQPos(take, endppq)      -- note pos of note under cursor
                         targetNotePixel    = math.floor((noteStartPos -  start_pos) * zoom_lvl)  -- note start pixel
                         targetNotePixelEnd = math.floor((noteEndPos   -  start_pos) * zoom_lvl)  -- note end pixel
-                        
                         if targetNotePixel    < 0 then targetNotePixel    = 0 end   -- set bounds for target note
                         if targetNotePixelEnd < 0 then targetNotePixelEnd = 0 end   
                         pixelLength = targetNotePixelEnd-targetNotePixel    -- pixel length of note
                         -- red guidelines
-                        reaper.JS_LICE_Line( guideLines, targetNotePixel, 0, targetNotePixel, tcpHeight,  curColor, 1, "COPY", true )
+                        --reaper.JS_LICE_Line( guideLines, targetNotePixel, 0, targetNotePixel,     tcpHeight,   curColor, 1,    "COPY", true )
+                        reaper.JS_LICE_Line( guideLines, targetNotePixel,   0, targetNotePixelEnd+1 ,         0,            curColor, .25,       "COPY", true )  -- red guidelines
+                        
                         --reaper.JS_LICE_Line( guideLines, targetNotePixelEnd+1, 0, targetNotePixelEnd+1, tcpHeight,  curColor, 1, "COPY", true )
                         -- black guidelines
-                        reaper.JS_LICE_Line( guideLines, targetNotePixel+1, 0, targetNotePixel+1, tcpHeight,  0xFF000000, 1, "COPY", true )
-                        reaper.JS_LICE_Line( guideLines, targetNotePixelEnd, 0, targetNotePixelEnd, tcpHeight,  0xFF000000, 1, "COPY", true )
+                        reaper.JS_LICE_Line( guideLines, targetNotePixel+1, 0, targetNotePixel+1, tcpHeight,  0xFF000000, .1, "COPY", true )
+                        reaper.JS_LICE_Line( guideLines, targetNotePixelEnd+2, 0, targetNotePixelEnd+2, tcpHeight,  0xFF000000, .1, "COPY", true )
                       end  -- if MIDI note is targeted                 
                     end  -- if MIDI note is within RE bounds
                   end -- for each note
@@ -666,9 +722,7 @@ function loop()
               end -- for each take
             end -- for each item
           end -- if area isn't envelope
-          
         end -- for each area
-        --reaper.ShowConsoleMsg("printing" .. "\n")
         if tcpHeight == nil then tcpHeight = 0 end
         if trPos == nil then trPos = 0 end
         reaper.JS_Composite(track_window, areaStartPixel, trPos, areaLengthPixel+3, tcpHeight - 3, guideLines, 0, 0, areaLengthPixel+3, 1, true) -- DRAW          
@@ -679,35 +733,39 @@ function loop()
   else -- if RE doesn't exist
     reaper.JS_Composite_Unlink(track_window, guideLines, true)
     noteHoldNumber = -1
-  end  -- if RE exosts
+  end  -- if RE exists
 
 ---]]-----------------------------------------------------------------
 ----------------single target note------------------------------------  
 -- [[-----------------------------------------------------------------
-  if targetPitch == nil then lastPixelLength = -1 end  -- if no note is under cursor, set lastval to n/a
-                                                    -- if conditions for single target note are met,
-  if targetPitch ~= nil and RazorEditSelectionExists() == nil and info == "arrange" and take ~= nil and noteHoldNumber == -1 and elapsed > .2 then 
+ if targetPitch == nil then lastPixelLength = -1 end  -- if no note is under cursor, set lastval to n/a
+  if targetPitch ~= nil and info == "arrange" and take ~= nil and noteHoldNumber == -1 and elapsed > .2 then 
     if targetNotePos then                           -- if there's a note pos to target,
       local zoom_lvl = reaper.GetHZoomLevel()       -- get rpr zoom level
       targetNotePixel    = math.floor((targetNotePos - startTime) * zoom_lvl) -- get note start pixel
       targetNotePixelEnd = math.floor((targetEndPos  - startTime) * zoom_lvl) -- get note end pixel
       if targetNotePixel    < 0 then targetNotePixel    = 0 end   -- set bounds for target note
       if targetNotePixelEnd < 0 then targetNotePixelEnd = 0 end   
-      
       pixelLength = targetNotePixelEnd-targetNotePixel    -- get pixel length of note
-      if lastPixelLength ~= pixelLength then                        -- if the last pixel length is different than this one,
-        --reaper.ShowConsoleMsg("new BM created" .. "\n")
-        old_w = targetNotePixelEnd-targetNotePixel        -- set new to old
+      
+      alpha=1-((cursorPos-targetNotePos)/(targetEndPos-targetNotePos))
+      alpha = .2*alpha+.1
+      
+      if lastPixelLength ~= pixelLength or alpha ~= lastAlpha then              -- if the last pixel length is different than this one,
+        lastAlpha = alpha
+        lastPixelLength = pixelLength
         reaper.JS_Composite_Unlink(track_window, targetGuideline, true)   -- LICE: destroy prev BM, set up new one, 
         reaper.JS_LICE_DestroyBitmap(targetGuideline)                     -- and draw colored guidelines.    
         targetGuideline = reaper.JS_LICE_CreateBitmap(true, pixelLength+3, tcpHeight)
         reaper.JS_LICE_Clear(targetGuideline, 0 )   -- clear
-        reaper.JS_LICE_Line( targetGuideline, 0, 0, 0, tcpHeight,  curColor, 1, "COPY", true )  -- red guidelines
-        reaper.JS_LICE_Line( targetGuideline, pixelLength+1, 0, pixelLength+1, tcpHeight,  curColor, 1, "COPY", true )
-        reaper.JS_LICE_Line( targetGuideline, 1, 0, 1, tcpHeight,  0xFF000000, 1, "COPY", true ) -- black guidelines
-        reaper.JS_LICE_Line( targetGuideline, pixelLength, 0, pixelLength, tcpHeight,  0xFF000000, 1, "COPY", true )
-        reaper.JS_Composite(track_window, targetNotePixel, trPos, pixelLength+3, tcpHeight - 3, targetGuideline, 0, 0, pixelLength+3, 1, true) -- DRAW          redraw = nil
+        --reaper.JS_LICE_Line( bitmap,          x1, y1,             x2,          y2,          color,    alpha,    mode,  antialias )
+        --reaper.JS_LICE_Line( targetGuideline, 0,  0,              0,           tcpHeight,   curColor, 1,       "COPY", true )  -- red guidelines
+        reaper.JS_LICE_Line( targetGuideline, 0,  0,              pixelLength, 0,           curColor, alpha,       "COPY", true )  -- red guidelines
+        --reaper.JS_LICE_Line( targetGuideline, pixelLength+1, 0, pixelLength+1, tcpHeight,  curColor, 1, "COPY", true )
+        reaper.JS_LICE_Line( targetGuideline, 0, 0, 0, tcpHeight,  0xFF000000, .1, "COPY", true ) -- black guidelines
+        reaper.JS_LICE_Line( targetGuideline, pixelLength, 0, pixelLength, tcpHeight,  0xFF000000, .1, "COPY", true )
       end
+      reaper.JS_Composite(track_window, targetNotePixel, trPos, pixelLength+3, tcpHeight - 3, targetGuideline, 0, 0, pixelLength+3, 1, true) -- DRAW          redraw = nil
     end
   else  -- if single target note conditions not met,
     reaper.JS_Composite_Unlink(track_window, targetGuideline, true)
@@ -716,23 +774,23 @@ function loop()
     
   
 --]]------------------------------------------------------------------
-----------------READOUT: ReaImGUI note data display ------------------  
+----------------READOUT: ReaImGUI note data display ------------------
+--        this whole section, esp the spacing code, is clumsy
 -- [[-----------------------------------------------------------------
 
     if targetPitch ~= nil and info == "arrange" and take ~= nil and elapsed > .2 then
-      reaper.ImGui_SetNextWindowPos(ctx, x - 11, y + 55)
+      
+      local sx, sy = reaper.JS_Window_ClientToScreen( track_window, targetNotePixel-60, trPos+tcpHeight) 
+      reaper.ImGui_SetNextWindowPos(ctx, sx, sy)   -- getting screen pos for readout
       local rounding                          -- round window for mouse cursor, square for edit
       if cursorSource == 1 then rounding = 12 else rounding = 0 end
-  
       reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_WindowBg(), 0x00000000 | 0xFF)
       reaper.ImGui_PushStyleVar(ctx, reaper.ImGui_StyleVar_WindowRounding(), rounding)
-  
       if reaper.ImGui_Begin(ctx, 'Tooltip', false,
       reaper.ImGui_WindowFlags_NoFocusOnAppearing() |
       reaper.ImGui_WindowFlags_NoDecoration() |
       reaper.ImGui_WindowFlags_TopMost() |
       reaper.ImGui_WindowFlags_AlwaysAutoResize()) then
-      
         local octaveNote                                  -- variables for readout
         local noteSymbol                                  
         local color = 0xFFFFFFFF                          -- offwhite for non-target note readouts
@@ -743,7 +801,6 @@ function loop()
         local spacingCH = " "
         local postNote = "  "
         local pitchList = {"C ", "C#", "D ", "D#", "E ", "F ", "F#", "G ", "G#", "A ", "A#", "B "}
-        
         posStringSize, noteStringSize = {}
         for i = 1, #showNotes do
           posStringSize[i] = string.len(showNotes[i][7])
@@ -758,7 +815,7 @@ function loop()
               end
             end
             
-            octave = math.floor(showNotes[i][1]/12)-1                    -- establish the octave for readout
+            octave = math.floor(showNotes[i][1]/12)-1                               -- establish the octave for readout
             cursorNoteSymbol = pitchList[(showNotes[i][1] - 12*(octave+1)+1)]       -- establish the note symbol for readout
       
             if     showNotes[i][1] > -1  and showNotes[i][1] <  10 then spacingN = "  "     -- spacingN for the note readout
@@ -816,11 +873,13 @@ function loop()
         end                                               -- for each shown note
                
         if toggleNoteHold == 1 and noteHoldNumber ~= -1 then 
+          local trName = getInstanceTrackName(noteHoldNumber)
+          trName = "'" .. trName .. "'" 
           local togPad = ""
           for j = 1, posStringSize[#posStringSize] do togPad = " " .. togPad end
           octave = math.floor(noteHoldNumber/12)-1                    -- establish the octave for readout
           cursorNoteSymbol = pitchList[(noteHoldNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
-          reaper.ImGui_TextColored(ctx, 0x00FF45FF, togPad .. "n: " .. noteHoldNumber ..spacingO .. "(" .. cursorNoteSymbol ..  octave .. ")  " .. "(RE target note)"  ) 
+          reaper.ImGui_TextColored(ctx, 0x00FF45FF, togPad .. "n: " .. noteHoldNumber ..spacingO .. "(" .. cursorNoteSymbol ..  octave .. ")  " .. "(RE target note)       " .. trName  ) 
         end
         
         reaper.ImGui_End(ctx)
@@ -870,6 +929,16 @@ function loop()
 
 --[[
  * Changelog:
+* v1.79 (2023-11-20)
+  + changed placement of readout to below track (y) , and a little before the note (x) for less eye flicker
+  + replaced note on/off guidelines with note duration blocks: easier on the eyes and better at conveying targeted notes
+  + added an alpha gradient to redraw alpha of indicator block to be less if further away from note start
+  + added idleTask section. for now, it just cleans up a dummy CC that I use in my "copy MIDI in REs" script. 
+    + in the future, this could be a general sanitizer to clean up audio items without fades, etc
+    + i'll try to leave this off by default for public use but may occasionally forget
+  + added elapsed optimzer to prevent multi-guideline redrawing on arrange view change
+  + fixed tracks looking for other tracks' RS5K links for naming note instances
+    + now, only tracks named "sequencer" will do this. a coarse fix, mostly for me.
 * v1.78 (2023-11-16)
   + for "note hold" RE multi-targeting, improve text readout explaining what is happening
   + added multiple guidelines for when multiple notes are targeted in REs
