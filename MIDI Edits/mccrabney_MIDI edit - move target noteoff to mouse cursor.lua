@@ -9,7 +9,7 @@
  
 --[[
  * Changelog:
- * v1.0 (2023-06-12)
+ * v1.0 (2023-11-21)
    + Initial Release
 --]]
 
@@ -110,7 +110,7 @@ function main()
       reaper.SetExtState(extName, 'DoRefresh', '1', false)
       octave = math.floor(targetNoteNumber/12)-1                               -- establish the octave for readout
       cursorNoteSymbol = pitchList[(targetNoteNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
-      reaper.Undo_OnStateChange2(proj, "moved noteon to cursor:" .. targetNoteNumber .. ", (" .. cursorNoteSymbol .. octave .. ")")
+      reaper.Undo_OnStateChange2(proj, "moved noteoff to cursor:" .. targetNoteNumber .. ", (" .. cursorNoteSymbol .. octave .. ")")
     end
     
   end
