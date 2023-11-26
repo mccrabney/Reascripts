@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.2
+ * Version: 1.3
 --]]
  
 --[[
  * Changelog:
+ * v1.2 (2023-11-26)
+   + send refresh extstate to change indicator block in realtime
  * v1.2 (2023-5-29)
    + set extstate to persist
  * v1.1 (2023-5-27)
@@ -34,9 +36,8 @@ function main()
   reaper.PreventUIRefresh(1)
 
   reaper.SetExtState(extName, 'toggleCursor', 1, true)
+  reaper.SetExtState(extName, 'DoRefresh', 1, true)
   
-  --reaper.DeleteExtState(extName, 6, false) 
-    
 end
  
 main()
