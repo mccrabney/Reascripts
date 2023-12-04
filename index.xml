@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney scripts" commit="40a685795ea3ebfe83726c330521f56fb820c9bd">
+<index version="1" name="mccrabney scripts" commit="dbf31fcd128a811458b353b53f8282ca2854b039">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -172,95 +172,6 @@
       <version name="1.1" author="mccrabney" time="2023-07-20T20:53:35Z">
         <changelog><![CDATA[+ better RE behavior ]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/146c8a193758b19f6765b4e7b6fd84142171c4d5/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20select%20notes%20in%20editor.lua</source>
-      </version>
-    </reapack>
-    <reapack name="mccrabney_MIDI edit - show notes, under cursor and last-received.lua" type="script" desc="show notes, under cursor and last-received.lua">
-      <version name="1.62" author="mccrabney" time="2023-05-27T13:45:45Z">
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/4b25e29efee676c52dbd1255827f2365d74a70ff/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.63" author="mccrabney" time="2023-05-27T15:45:40Z">
-        <changelog><![CDATA[+ updated name of script, extstate 
-+ changed display for edit cursor mode: blue, vs red, and non-rounded tooltip corners
-+ v1.62 (2023-5-26)
-+ added "edit cursor mode" where edit cursor provides note data rather than mouse cursor
-+ v1.61 (2023-5-25)
-+ implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts"
-+ added note position readout, where time 1.1.000 begins at a marker named "start"
-if no marker named "start" is present, or if notes begin before "start" marker,
-then no time readout is displayed.
-+ v1.6 (2023-5-23)
-+ removed pause function, chasing an index as one note is nudged past another proved too difficult
-+ v1.511 (2023-5-22)
-+ minor typo fix
-+ v1.51 (2023-5-21)
-+ now reports toolbar button toggle state
-+ v1.50 (2023-5-20)
-+ added secondary script "pause show notes" to "hold" a target note in yellow
-+ issue, mouse must still be over target Take, fix eventually? 
-+ v1.45 (2023-5-09)
-+ added muted note coloration
-+ v1.44 (2023-5-07)
-+ added extstates to output notes under mouse to other scripts
-+ v1.43 (2023-5-05)
-+ fixed error message, improved spacing on readout
-+ v1.42 (2023-5-04)
-+ added note duration display, changed readout to conform to conventional MPC step edit screen]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/e7335b5450e99dc830f0e39c75f76e6a9aa8ac12/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.65" author="mccrabney" time="2023-06-04T00:12:59Z">
-        <changelog><![CDATA[+ fixed samedistance bug preventing closest note from being targeted]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/2708ac35e6aeca792f76799d3c2906703e589e34/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.66" author="mccrabney" time="2023-06-08T11:32:09Z">
-        <changelog><![CDATA[+ time display: add support for time signatures other than 4/4
-+ disable ghost cursor and text readout while left or middle clicking mouse]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/7b7dad8d546702022bab52cc84056df130004492/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.67" author="mccrabney" time="2023-06-08T14:11:50Z">
-        <changelog><![CDATA[+ added ghost cursor to show the noteOFF position]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/1d6e098585085a16bf47b743358c4ae0d9e8991a/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.67a" author="mccrabney" time="2023-06-08T16:20:59Z">
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/1f83b67df064f74bb237181c7676bf0f7df61396/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.69" author="mccrabney" time="2023-06-11T12:01:56Z">
-        <changelog><![CDATA[+ added ability to step through the notes/change target note currently under the cursor
-* use Script: mccrabney_MIDI edit - step through notes under cursor in 'show notes'.lua
-* targetNote will step through notes under cursor, closest to farthest.]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/2d710c47022ccca55fdf27afa84f55d67bc363d4/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.70" author="mccrabney" time="2023-06-12T23:32:34Z">
-        <changelog><![CDATA[+ ghost cursors drop shadows]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/abfee6c5899bdf5e791f3663d3e1c7049b6cfbe4/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.72" author="mccrabney" time="2023-07-20T18:05:35Z">
-        <changelog><![CDATA[+ transposing last-hit notes in RE now updates the last-hit note]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/7aa5705308172107f75c132612312fba391af97d/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.72a" author="mccrabney" time="2023-07-20T18:22:23Z">
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/b3d49dbf19650969df6b4d4168930f4285ab8ac3/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.72b" author="mccrabney" time="2023-10-16T11:03:40Z">
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/72824d75c70ff24c822a663285a592004c631943/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.73" author="mccrabney" time="2023-10-16T11:12:57Z">
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/0c6220411d9ffe570aa0480e394916f230e5197c/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.74c" author="mccrabney" time="2023-10-22T19:41:41Z">
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/6a5f108b586600b201fc2ce9226318e83fa200e5/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.74" author="mccrabney" time="2023-10-24T16:24:49Z">
-        <changelog><![CDATA[+ print named note or RS5K instance trackname to MIDI readout
-+ ]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/a963810ccbeafadecfa9d41f899335a9caaece5f/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.75" author="mccrabney" time="2023-11-06T13:36:18Z">
-        <changelog><![CDATA[+ when middle mouse scrolling (hand scroll in my setup), don't print ghost lines]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/364c5d46cbb262f2539aa8b36ff9c3b7d723a74b/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
-      </version>
-      <version name="1.77" author="mccrabney" time="2023-11-09T13:39:54Z">
-        <changelog><![CDATA[+ reverted mouse clearing in 1.75, and instead attempted blanking displays while screen scrolling via reaper.BR_GetArrangeView()]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/4e1a11f52fd0cecd16647dfcc78bdd33e3b13561/MIDI%20Edits/mccrabney_MIDI%20edit%20-%20show%20notes,%20under%20cursor%20and%20last-received.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_MIDI edit - split note under cursor, or notes in RE.lua" type="script" desc="split note under cursor, or notes in RE">
