@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.80
+ * Version: 1.81
 --]]
  
 -- discussion thread: https://forum.cockos.com/showthread.php?t=274257 
@@ -27,7 +27,7 @@ reaper.ClearConsole()
 
 --package.path = reaper.GetResourcePath() .. '/Scripts/sockmonkey72 Scripts/MIDI/?.lua'
 --local mu = require 'MIDIUtils'
-dofile(reaper.GetResourcePath().."/UserPlugins/ultraschall_api.lua")
+--dofile(reaper.GetResourcePath().."/UserPlugins/ultraschall_api.lua")
 dofile(reaper.GetResourcePath() .. '/Scripts/ReaTeam Extensions/API/imgui.lua')('0.8')
 
 extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
@@ -502,7 +502,7 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
-* v1.00 (2023-12-05)
+* v1.81 (2023-12-05)
   + "Fiddler v1"
   + renamed a bunch of these scripts to be more accurate, sorry for any shortcut chaos caused.
 * v1.80 (2023-12-??) 
