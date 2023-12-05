@@ -4,12 +4,12 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.38a
+ * Version: 1.39
 --]]
  
 --[[
  * Changelog:
- * v1.38a (2023-6-11)
+ * v1.39 (2023-6-11)
    + reset step upon nudge 
    + switch target cursor to edit cursor upon nudge - makes more predictable
  * v1.38 (2023-6-11)
