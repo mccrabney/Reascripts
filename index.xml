@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney scripts" commit="2ca381dbd594d0c3aaacb5e7242f98b008860f08">
+<index version="1" name="mccrabney scripts" commit="1e6c0eac6e1f00ffe0f7769cfd6adfb61796bbf9">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -28,20 +28,6 @@
     </reapack>
   </category>
   <category name="MIDI Edits">
-    <reapack name="mccrabney_Fiddler (arrange screen MIDI editing).lua" type="script" desc="mccrabney_Fiddler (arrange screen MIDI editing).lua">
-      <version name="1.80" author="mccrabney" time="2023-12-05T19:35:08Z">
-        <changelog><![CDATA[+ importing Sexan's area51 mouse functions
-+ organized functions into their own files in Modules folder
-+ better debug messaging system
-+ tons of fixes, refactoring, and optimizations]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/94b2c95b2e3a52b6068357dc9bdfdf723cb291cf/MIDI%20Edits/mccrabney_Fiddler%20(arrange%20screen%20MIDI%20editing).lua</source>
-      </version>
-      <version name="1.81" author="mccrabney" time="2023-12-05T19:55:01Z">
-        <changelog><![CDATA[+ "Fiddler v1"
-+ renamed a bunch of these scripts to be more accurate, sorry for any shortcut chaos caused.]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/2ca381dbd594d0c3aaacb5e7242f98b008860f08/MIDI%20Edits/mccrabney_Fiddler%20(arrange%20screen%20MIDI%20editing).lua</source>
-      </version>
-    </reapack>
     <reapack name="mccrabney_Fiddler - adjust increment change (mousewheel).lua" type="script" desc="adjust increment change">
       <version name="1.12" author="mccrabney" time="2023-12-05T19:35:08Z">
         <changelog><![CDATA[+ extstate sync fix]]></changelog>
