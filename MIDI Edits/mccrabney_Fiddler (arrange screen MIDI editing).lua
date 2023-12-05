@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.81
+ * Version: 1.82
  * Provides: Modules/*.lua
 --]]
  
@@ -22,8 +22,9 @@
 ---------------------------------------------------------------------
 -- Requires js_ReaScriptAPI extension: https://forum.cockos.com/showthread.php?t=212174
 
-idleTask = 1  -- run idle task or not
---dbg = 1       -- print debug messages or not
+idleTask = 1     -- run idle task or not
+cursorSource = 1 -- initialize cursorSource to Mouse, if not already set
+--dbg = 1        -- print debug messages or not
 reaper.ClearConsole()
 
 --package.path = reaper.GetResourcePath() .. '/Scripts/sockmonkey72 Scripts/MIDI/?.lua'
@@ -503,8 +504,10 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.82 (2023-12-05)
+  + initialize cursorSource to Mouse at first run
 * v1.81 (2023-12-05)
-  + "Fiddler v1"
+  + "Fiddler v1" but higher version numbers have more gravitas so i'm keeping it up
   + renamed a bunch of these scripts to be more accurate, sorry for any shortcut chaos caused.
 * v1.80 (2023-12-??) 
   + importing Sexan's area51 mouse functions
