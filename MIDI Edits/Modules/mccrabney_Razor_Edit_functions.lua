@@ -1,3 +1,12 @@
+--[[
+ * ReaScript Name: mccrabney_Razor_Edit_Functions
+ * Author: multiple
+ * Licence: GPL v3
+ * REAPER: 7.0
+ * Extensions: None
+ * Version: 1.00
+ * Provides: Modules/*.lua
+--]] 
 -----------------------------------------------------------
     --[[------------------------------[[--
          razor edit functions - thanks, BirdBird

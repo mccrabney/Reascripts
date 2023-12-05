@@ -1,9 +1,13 @@
 --[[
-   * Author: SeXan
-   * Licence: GPL v3
-   * Version: 0.06
-	 * NoIndex: true
---]]
+ * ReaScript Name: Sexan Area 51 mouse, mccrabney tweak
+ * Author: Sexan
+ * Licence: GPL v3
+ * REAPER: 7.0
+ * Extensions: None
+ * Version: 1.00
+ * Provides: Modules/*.lua
+--]] 
+
 local reaper = reaper
 local main_wnd        = reaper.GetMainHwnd()                            -- GET MAIN WINDOW
 local track_window = reaper.JS_Window_FindChildByID(main_wnd, 0x3E8) -- GET TRACK VIEW

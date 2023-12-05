@@ -1,7 +1,13 @@
----------------------------------------------------------------------
-    --[[------------------------------[[--
-          watch for last-hit note on dedicated track        
-    --]]------------------------------]]--
+--[[
+ * ReaScript Name: mccrabney_include
+ * Author: mccrabney
+ * Licence: GPL v3
+ * REAPER: 7.0
+ * Extensions: None
+ * Version: 1.00
+ * Provides: Modules/*.lua
+--]] 
+
 local incr = {1, 10, 24, 48, 96, 240, 480, 960}
 incrIndex = 2                   -- vars/setup for loop
 
