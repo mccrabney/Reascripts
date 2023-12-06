@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.1
+ * Version: 1.2
 --]]
  
 --[[
  * Changelog:
+ * v1.2
+  + added more user friendly ultraschall api checker
  * v1.1
   + if no razor edit exists, create one out of selected item
  * v1.0
@@ -21,7 +23,17 @@ script_folder = string.gsub(script_folder, "MIDI Edits\\", "")
 for key in pairs(reaper) do _G[key]=reaper[key]  end 
 local info = debug.getinfo(1,'S');
 dofile(script_folder .. "Razor Edits/mccrabney_Razor Edit Control Functions.lua")   
-dofile(reaper.GetResourcePath().."/UserPlugins/ultraschall_api.lua")
+
+ultraschall_path = reaper.GetResourcePath().."/UserPlugins/ultraschall_api.lua"
+if reaper.file_exists( ultraschall_path ) then
+  dofile( ultraschall_path )
+end
+
+if not ultraschall or not ultraschall.GetApiVersion then -- If ultraschall loading failed of if it doesn't have the functions you want to use
+  reaper.MB("Please install Ultraschall API, available via Reapack. Check online doc of the script for more infos.\nhttps://github.com/Ultraschall/ultraschall-lua-api-for-reaper", "Error", 0)
+  return
+end
+
 
 extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
 
