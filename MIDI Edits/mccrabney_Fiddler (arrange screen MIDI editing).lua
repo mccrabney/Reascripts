@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.83
+ * Version: 1.84
  * Provides: Modules/*.lua
 --]]
  
@@ -38,7 +38,7 @@ if reaper.HasExtState(extName, 8) then            -- get the cursorsource, if pr
 end
 
 resetCursor = 100  -- how many loopCounts should pass before cursor is reset from Edit to Mouse
-                  -- this resets cursor to mouse when idle
+                   -- this resets cursor to mouse when idle
 package.path = debug.getinfo(1, "S").source:match [[^@?(.*[\/])[^\/]-$]] .. "?.lua;"
 require("Modules/Sexan_Area_51_mouse_mccrabney_tweak")   -- GET DIRECTORY FOR REQUIRE  -- AREA MOUSE INPUT HANDLING
 require("Modules/mccrabney_Razor_Edit_functions")
@@ -341,8 +341,9 @@ function loop()
         reaper.JS_LICE_Line( targetGuideline, pixelLength+1, 0, pixelLength+1, tcpHeight,  curColor, 1, "COPY", true )
         --reaper.JS_LICE_Line( targetGuideline, 0, 0, 0, tcpHeight,  0xFF000000, .1, "COPY", true ) -- black guidelines
         --reaper.JS_LICE_Line( targetGuideline, pixelLength, 0, pixelLength, tcpHeight,  0xFF000000, .1, "COPY", true )
+        debug("printed single target note", 1)
+        reaper.JS_Composite(track_window, targetNotePixel, trPos, pixelLength+3, tcpHeight - 3, targetGuideline, 0, 0, pixelLength+3, 1, true) -- DRAW          redraw = nil
       end
-      reaper.JS_Composite(track_window, targetNotePixel, trPos, pixelLength+3, tcpHeight - 3, targetGuideline, 0, 0, pixelLength+3, 1, true) -- DRAW          redraw = nil
                        -- bmp,          dstx,           dsty,   dstw,           dsyh,         sysbm,     srcx, srcy, srcw,        srch, autoupdate
     end
   else  -- if single target note conditions not met,
@@ -452,7 +453,7 @@ function loop()
       end                                               -- for each shown note
               
       if toggleNoteHold == 1 and noteHoldNumber ~= -1 then   -- if notehold is on 
-        local trName = getInstanceTrackName(noteHoldNumber)  -- get tradck name of target note
+        local trName = getInstanceTrackName(noteHoldNumber)  -- get track name of target note
         trName = "'" .. trName .. "'"                        -- enquotate
         local togPad = ""
         for j = 1, posStringSize[#posStringSize] do togPad = " " .. togPad end
@@ -508,6 +509,9 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.84 (2023-12-06)
+  + print track name in readout, if note is not named. verbose, but worth it. 
+  + optimized single indicator block readout to only print once, instead of multiple times
 * v1.83 (2023-12-06)
   + indicator block drawing improvements: edges, reduced calls to JS_Composite
 * v1.82 (2023-12-05)
