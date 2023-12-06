@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.00
+ * Version: 1.02
  * Provides: Modules/*.lua
 --]]
 ---------------------------------------------------------------------
@@ -12,6 +12,7 @@
 
 local incr = {1, 10, 24, 48, 96, 240, 480, 960}
 incrIndex = 2                   -- vars/setup for loop
+dbg = 0        -- print debug messages or not
 
 function debug(statement, newLine)
   if dbg == 1 then
@@ -29,18 +30,31 @@ function extStates()
       --lastAllAreas = -1                                           -- allow reset after nudge for RE targeted notes
     --end
     reset = 1                                                   -- allow reset after nudge for cursor targeted notes
-    debug("doRefresh", 1)
+    --debug("doRefresh", 1)
   end  
  
- --[[
-  if reaper.HasExtState(extName, 'DoRefresh2') then              -- update display, called from child scripts
+  if reaper.HasExtState(extName, 'Refresh') then              -- update display, called from child scripts
+    lastPixelLength = -1
     take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos = getCursorInfo()
-    reaper.DeleteExtState(extName, 'DoRefresh2', false)
-    lastX = -1                                                  -- n/a x val fools the optimizer into resetting
-    reset = 1                                                   -- allow reset after nudge for cursor targeted notes
-    debug("doRefresh2", 1)
+    reaper.DeleteExtState(extName, 'Refresh', false)
+    lastAllAreas = -1     
+    debug("Refresh", 1)
   end        
- --]]
+
+  if not reaper.HasExtState(extName, 7) then                        -- set increment of nudge,
+    reaper.SetExtState(extName, 7, incr[incrIndex], true)       -- set incr extstatem, save between sessions
+  end   
+  
+  if reaper.HasExtState(extName, 'debug') then                        -- set increment of nudge,
+    if dbg == 1 then 
+      dbg = 0 
+    else 
+      dbg = 1 
+      reaper.ClearConsole()
+      debug("debug on", 1)
+    end
+    reaper.DeleteExtState(extName, 'debug', false)
+  end   
  
   if reaper.HasExtState(extName, 6) then                        -- set increment of nudge,
     q = tostring(reaper.GetExtState( extName, 6 ))              -- based on input from child script
@@ -49,7 +63,6 @@ function extStates()
     end
     reaper.SetExtState(extName, 7, incr[incrIndex], true)       -- set incr extstatem, save between sessions
     reaper.DeleteExtState(extName, 6, false)                    -- delete increment setting extstate
-
   end   
     
   if reaper.HasExtState(extName, 'toggleCursor') then           -- toggle whether focus is edit or mouse cursor                       
@@ -57,6 +70,7 @@ function extStates()
     elseif cursorSource == 1 then cursorSource = 0 end 
     reaper.SetExtState(extName, 8, cursorSource, true)          -- extstate management
     reaper.DeleteExtState(extName, 'toggleCursor', false)
+    reaper.SetExtState(extName, 'Refresh', '1', false)
   end 
   
   if reaper.HasExtState(extName, 'setCursorEdit') then          -- set cursor to edit
@@ -73,7 +87,7 @@ function extStates()
       cursorSource = 1                                          -- set cursor to mouse
       reaper.SetExtState(extName, 8, cursorSource, true)        -- set extstate to reflect the change
       debug("small idle, resetCursor" .. "\n")
-    reaper.SetExtState(extName, 'DoRefresh', '1', false)
+    reaper.SetExtState(extName, 'Refresh', '1', false)
     break
     end
   end
