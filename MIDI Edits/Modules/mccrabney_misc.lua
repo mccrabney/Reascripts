@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.02
+ * Version: 1.03
  * Provides: Modules/*.lua
 --]]
 ---------------------------------------------------------------------
@@ -30,7 +30,7 @@ function extStates()
       --lastAllAreas = -1                                           -- allow reset after nudge for RE targeted notes
     --end
     reset = 1                                                   -- allow reset after nudge for cursor targeted notes
-    --debug("doRefresh", 1)
+    debug("doRefresh", 1)
   end  
  
   if reaper.HasExtState(extName, 'Refresh') then              -- update display, called from child scripts
@@ -223,24 +223,21 @@ end
           get the track name of the target note if RS5K
     --]]------------------------------]]--
 
-function getInstanceTrackName(cursorNote)
-  if cursorNote then                                 -- if there's a note under the cursor
+function getInstanceTrackName(note)
+  if note then                                 -- if there's a note under the cursor
     for j = 1, reaper.CountTracks(0) do              -- for each track
       tr = reaper.GetTrack(0, j - 1)                 -- get track
       fxCount = reaper.TrackFX_GetCount(tr)          -- count fx on each instance track
-        
       for p = 0, fxCount-1 do                        -- for each fx
         retval, buf = reaper.TrackFX_GetNamedConfigParm( tr, p, "fx_name" )    -- get fx name
-      
         if buf:match("ReaSamplOmatic5000")  then     -- if RS5K
           local _, param = reaper.TrackFX_GetParamName(tr, p, 3)               -- get param name        
-          
           if param == "Note range start" then        -- if it's the right one, and if it's rs5k,
             noteStart = reaper.TrackFX_GetParam(tr, p, 3)        -- set/fix math for noteStart value
             noteStart = math.floor(noteStart*128) if noteStart == 128 then noteStart = noteStart - 1 end
-            
-            if cursorNote == noteStart then          -- if it's the same as our note under cursor,
-              _, trName = reaper.GetTrackName( tr )  -- get track name  
+            if note == noteStart then          -- if it's the same as our note under cursor,
+              _, trName = reaper.GetTrackName( tr )  -- get track name
+              --reaper.ShowConsoleMsg(trName .. "\n")
             end
           end
         end                                          -- if RS5K

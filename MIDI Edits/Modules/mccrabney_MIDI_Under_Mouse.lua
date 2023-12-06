@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.00
+ * Version: 1.01
  * Provides: Modules/*.lua
 --]] 
     
@@ -75,6 +75,7 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
           _, selected, muted, startppq, endppq, ch, pitch, vel = reaper.MIDI_GetNote(take, n)  -- get note data           
           if startppq <= position_ppq and endppq >= position_ppq then  -- is current note the note under the cursor?
             notePos = reaper.MIDI_GetProjTimeFromPPQPos( take, startppq)  -- note pos of note under cursor
+            
             if startMarkerPos ~= -1 and notePos >= startMarkerPos then   -- if after "start" marker
               ptidx = reaper.CountTempoTimeSigMarkers( proj )            
               if ptidx == 0 then 
@@ -109,12 +110,12 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
                                                 
                     -- if RS5k, this section shows either a named MIDI note or the track name display readout 
             userNoteName = reaper.GetTrackMIDINoteNameEx( 0, track, pitch, ch )  -- set up named note/track readout text
-            local displayName
-                                                                  -- if no named MIDI note, get track name
+            --local displayName
+            
             if userNoteName ~= nil 
               then displayName = userNoteName 
-            elseif trName == "sequencer" then
-              displayName = getInstanceTrackName(pitch) 
+            else   
+              displayName = getInstanceTrackName(pitch)
             end
             
             if displayName == nil then displayName = "" end       -- if no displayName, blank the readout value
@@ -137,13 +138,13 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
           if reaper.HasExtState(extName, 'stepIncr') then         -- update display, called from child scripts
             step = step + 1                                       -- proceed to next/previous note
             if step >= #showNotes then step = 0 end               -- if step exceeds number of notes, don't step
-            reaper.SetExtState(extName, 'step', step, false)      -- update step extstate
+            --reaper.SetExtState(extName, 'step', step, false)      -- update step extstate
             reaper.DeleteExtState(extName, 'stepIncr', false)     -- delete stepIncr extstate
           end
           
           if reaper.HasExtState(extName, 'stepDown') then         -- update display, called from child scripts
             step = 0
-            reaper.SetExtState(extName, 'step', step, false)
+            --reaper.SetExtState(extName, 'step', step, false)
             reaper.DeleteExtState(extName, 'stepDown', false)
           end
         end
