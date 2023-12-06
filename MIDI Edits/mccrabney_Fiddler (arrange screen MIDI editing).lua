@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.82
+ * Version: 1.83
  * Provides: Modules/*.lua
 --]]
  
@@ -24,7 +24,6 @@
 
 idleTask = 1     -- run idle task or not
 cursorSource = 1 -- initialize cursorSource to Mouse, if not already set
---dbg = 1        -- print debug messages or not
 reaper.ClearConsole()
 
 --package.path = reaper.GetResourcePath() .. '/Scripts/sockmonkey72 Scripts/MIDI/?.lua'
@@ -63,7 +62,6 @@ if not reaper.APIExists("JS_ReaScriptAPI_Version") then    -- js api check -----
     return reaper.defer(function() end)
   end
 end
-
 
 --]]-----------------------------------------------------------------------------------------
 ------------LOOP-----------------------------------------------------------------
@@ -218,6 +216,7 @@ function loop()
       if noteHoldNumber ~= nil and noteHoldNumber ~= -1 and elapsed > .2 then
         allAreas = start_pos + end_pos         -- get the full area span
         if lastAllAreas ~= allAreas then       -- if area size changed (or other triggers above)
+          if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end   -- set cursor colors
           doOnce = 1
           debug("area reset", 1)
           lastAllAreas = allAreas              -- do once
@@ -322,9 +321,14 @@ function loop()
       if targetNotePixel    < 0 then targetNotePixel    = 0 end   -- set bounds for target note
       if targetNotePixelEnd < 0 then targetNotePixelEnd = 0 end   
       pixelLength = targetNotePixelEnd-targetNotePixel    -- get pixel length of note
-      local alpha = 1 -((cursorPos-targetNotePos)/(targetEndPos-targetNotePos))
-      alpha = .2 * alpha + .1
-      if lastPixelLength ~= pixelLength or alpha ~= lastAlpha then              -- if the last pixel length is different than this one,
+      --local alpha = 1 -((cursorPos-targetNotePos)/(targetEndPos-targetNotePos))
+      --if alpha > .5 then alpha = 1 - alpha end 
+      ---reaper.ShowConsoleMsg(alpha .. "\n")
+      --alpha = .2 * alpha + .1
+      alpha = .25
+      --if lastPixelLength ~= pixelLength or alpha ~= lastAlpha then              -- if the last pixel length is different than this one,
+      if lastPixelLength ~= pixelLength then              -- if the last pixel length is different than this one,
+        if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end   -- set cursor colors
         lastAlpha = alpha
         lastPixelLength = pixelLength
         reaper.JS_Composite_Unlink(track_window, targetGuideline, true)   -- LICE: destroy prev BM, set up new one, 
@@ -332,11 +336,11 @@ function loop()
         targetGuideline = reaper.JS_LICE_CreateBitmap(true, pixelLength+3, tcpHeight)
         reaper.JS_LICE_Clear(targetGuideline, 0 )   -- clear
         --reaper.JS_LICE_Line( bitmap,          x1, y1,             x2,          y2,          color,    alpha,    mode,  antialias )
-        --reaper.JS_LICE_Line( targetGuideline, 0,  0,              0,           tcpHeight,   curColor, 1,       "COPY", true )  -- red guidelines
+        reaper.JS_LICE_Line( targetGuideline, 0,  0,              0,           tcpHeight,   curColor, 1,       "COPY", true )  -- red guidelines
         reaper.JS_LICE_Line( targetGuideline, 0, 0, pixelLength, 0, curColor, alpha, "COPY", true )  -- red guidelines
-        --reaper.JS_LICE_Line( targetGuideline, pixelLength+1, 0, pixelLength+1, tcpHeight,  curColor, 1, "COPY", true )
-        reaper.JS_LICE_Line( targetGuideline, 0, 0, 0, tcpHeight,  0xFF000000, .1, "COPY", true ) -- black guidelines
-        reaper.JS_LICE_Line( targetGuideline, pixelLength, 0, pixelLength, tcpHeight,  0xFF000000, .1, "COPY", true )
+        reaper.JS_LICE_Line( targetGuideline, pixelLength+1, 0, pixelLength+1, tcpHeight,  curColor, 1, "COPY", true )
+        --reaper.JS_LICE_Line( targetGuideline, 0, 0, 0, tcpHeight,  0xFF000000, .1, "COPY", true ) -- black guidelines
+        --reaper.JS_LICE_Line( targetGuideline, pixelLength, 0, pixelLength, tcpHeight,  0xFF000000, .1, "COPY", true )
       end
       reaper.JS_Composite(track_window, targetNotePixel, trPos, pixelLength+3, tcpHeight - 3, targetGuideline, 0, 0, pixelLength+3, 1, true) -- DRAW          redraw = nil
                        -- bmp,          dstx,           dsty,   dstw,           dsyh,         sysbm,     srcx, srcy, srcw,        srch, autoupdate
@@ -504,6 +508,8 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.83 (2023-12-06)
+  + indicator block drawing improvements: edges, reduced calls to JS_Composite
 * v1.82 (2023-12-05)
   + initialize cursorSource to Mouse at first run
 * v1.81 (2023-12-05)
