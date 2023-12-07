@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.84
+ * Version: 1.85
  * Provides: Modules/*.lua
 --]]
  
@@ -389,7 +389,7 @@ function loop()
         posStringSize[i] = string.len(showNotes[i][7])
       end
       table.sort(posStringSize)
-       
+     
       for i = #showNotes, 1, -1 do                   -- for each top-level entry in the showNotes table,
         if showNotes[1] and targetPitch then
           if showNotes[i][7] == "" then 
@@ -509,6 +509,8 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.85 (2023-12-07)
+  + improved note/track name readout logic
 * v1.84 (2023-12-06)
   + print track name in readout, if note is not named. verbose, but worth it. 
   + optimized single indicator block readout to only print once, instead of multiple times
