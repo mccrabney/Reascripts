@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney scripts" commit="9c0f03188ea41003e2706e63cb1931d854aab7d1">
+<index version="1" name="mccrabney scripts" commit="387765ab6676e8036cfcfc7f7fe84bb3a284dcc8">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -146,16 +146,6 @@
       <version name="1.12" author="mccrabney" time="2023-12-05T19:35:08Z">
         <changelog><![CDATA[+ updated name of parent script extstate ]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/94b2c95b2e3a52b6068357dc9bdfdf723cb291cf/MIDI%20Edits/mccrabney_Fiddler%20-%20mute%20target%20notes.lua</source>
-      </version>
-    </reapack>
-    <reapack name="mccrabney_Fiddler - nudge target notes (mousewheel).lua" type="script" desc="nudge target notes (mousewheel)">
-      <version name="1.38a" author="mccrabney" time="2023-12-05T19:35:08Z">
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/94b2c95b2e3a52b6068357dc9bdfdf723cb291cf/MIDI%20Edits/mccrabney_Fiddler%20-%20nudge%20target%20notes%20(mousewheel).lua</source>
-      </version>
-      <version name="1.39" author="mccrabney" time="2023-12-05T20:55:08Z">
-        <changelog><![CDATA[+ reset step upon nudge 
-+ switch target cursor to edit cursor upon nudge - makes more predictable]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/98ba0c32db6bb5276d8ad797be16483f811ffb6c/MIDI%20Edits/mccrabney_Fiddler%20-%20nudge%20target%20notes%20(mousewheel).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Fiddler - open RS5K instance of target note.lua" type="script" desc="open RS5K instance of target note">
