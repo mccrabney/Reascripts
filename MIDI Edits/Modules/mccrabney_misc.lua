@@ -1,11 +1,5 @@
 --[[
- * ReaScript Name: mccrabney_misc 
- * Author: mccrabney
- * Licence: GPL v3
- * REAPER: 7.0
- * Extensions: None
- * Version: 1.03
- * Provides: Modules/*.lua
+ * @noindex
 --]]
 ---------------------------------------------------------------------
 
@@ -26,9 +20,6 @@ function extStates()
     take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos = getCursorInfo()
     reaper.DeleteExtState(extName, 'DoRefresh', false)
     lastX = -1                                                -- n/a x val fools the optimizer into resetting
-    --if noteHoldNumber ~= -1 then
-      --lastAllAreas = -1                                           -- allow reset after nudge for RE targeted notes
-    --end
     reset = 1                                                   -- allow reset after nudge for cursor targeted notes
     debug("doRefresh", 1)
   end  

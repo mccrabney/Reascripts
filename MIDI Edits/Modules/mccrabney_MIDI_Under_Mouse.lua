@@ -1,10 +1,5 @@
 --[[
- * ReaScript Name: mccrabney_MIDI_Under_Mouse
- * Author: mccrabney
- * Licence: GPL v3
- * REAPER: 7.0
- * Extensions: None
- * Version: 1.03
+ * @noindex
 --]] 
     
 step = 0

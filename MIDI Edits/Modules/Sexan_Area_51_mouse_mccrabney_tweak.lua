@@ -1,11 +1,5 @@
 --[[
- * ReaScript Name: Sexan Area 51 mouse, mccrabney tweak
- * Author: Sexan
- * Licence: GPL v3
- * REAPER: 7.0
- * Extensions: None
- * Version: 1.00
- * Provides: Modules/*.lua
+ * @noindex
 --]] 
 
 local reaper = reaper
