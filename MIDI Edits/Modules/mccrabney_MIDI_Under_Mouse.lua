@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.01
+ * Version: 1.02
  * Provides: Modules/*.lua
 --]] 
     
@@ -112,10 +112,8 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
             userNoteName = reaper.GetTrackMIDINoteNameEx( 0, track, pitch, ch )  -- set up named note/track readout text
             --local displayName
             
-            if userNoteName ~= nil 
-              then displayName = userNoteName 
-            else   
-              displayName = getInstanceTrackName(pitch)
+            if userNoteName ~= nil then 
+              displayName = userNoteName 
             end
             
             if displayName == nil then displayName = "" end       -- if no displayName, blank the readout value
@@ -178,9 +176,14 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
       end           -- if take is MIDI
     end             -- if take not nil
 
+    
     table.sort(showNotes, function(a, b)                -- sort the shownotes table
       return a[1] < b[1]
     end)
+
+    if targetNoteIndex ~= nil then                      -- only print track name on target track in readout
+      showNotes[targetNoteIndex+1][8] = getInstanceTrackName(showNotes[targetNoteIndex+1][1])
+    end
 
     if targetNoteIndex then 
       _, _, _, targetPPQ, targetEndPPQ, _, _, _= reaper.MIDI_GetNote(take, targetNoteIndex) -- get note start/end position              
@@ -209,7 +212,7 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
       reaper.SetExtState(extName, 'step', step, false)            -- adjust step extstate
       reaper.SetExtState(extName, 5, targetNoteIndex, false)      -- what is the target index under mouse
     end
-    
+
     -- NOTE: extState 6 = +, - incrIndex. extState 7 = incr Value
     for i = 1, #showNotes do                             -- send off the table after all of the other variables
       reaper.SetExtState(extName, i + numVars, table.concat(showNotes[i],","), false)
