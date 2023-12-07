@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.85
+ * Version: 1.86
  * Provides: Modules/*.lua
 --]]
  
@@ -101,7 +101,6 @@ function loop()
       idleCount = 0                                             -- reset idlecount
       lastX = x                                                 -- set lastX mouse position
     else lastX = x end
-    if reset == 1 then reset = 0 end                            -- set reset
   end    
 
   extStates()                                                   -- communicate with other scripts
@@ -314,7 +313,6 @@ function loop()
   if targetPitch == nil then lastPixelLength = -1 end  -- if no note is under cursor, set lastval to n/a
   if targetPitch ~= nil and info == "arrange" and take ~= nil and noteHoldNumber == -1 and elapsed > .2 then 
     if targetNotePos then                           -- if there's a note pos to target,
-      --multiple = 0
       local zoom_lvl     = reaper.GetHZoomLevel()       -- get rpr zoom level
       targetNotePixel    = math.floor((targetNotePos - startTime) * zoom_lvl) -- get note start pixel
       targetNotePixelEnd = math.floor((targetEndPos  - startTime) * zoom_lvl) -- get note end pixel
@@ -327,7 +325,8 @@ function loop()
       --alpha = .2 * alpha + .1
       alpha = .25
       --if lastPixelLength ~= pixelLength or alpha ~= lastAlpha then              -- if the last pixel length is different than this one,
-      if lastPixelLength ~= pixelLength then              -- if the last pixel length is different than this one,
+      if cursorSource == 1 and lastPixelLength ~= pixelLength 
+      or cursorSource == 0 and reset == 1 then              -- if the last pixel length is different than this one,
         if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end   -- set cursor colors
         lastAlpha = alpha
         lastPixelLength = pixelLength
@@ -343,6 +342,7 @@ function loop()
         --reaper.JS_LICE_Line( targetGuideline, pixelLength, 0, pixelLength, tcpHeight,  0xFF000000, .1, "COPY", true )
         debug("printed single target note", 1)
         reaper.JS_Composite(track_window, targetNotePixel, trPos, pixelLength+3, tcpHeight - 3, targetGuideline, 0, 0, pixelLength+3, 1, true) -- DRAW          redraw = nil
+        reset = 0
       end
                        -- bmp,          dstx,           dsty,   dstw,           dsyh,         sysbm,     srcx, srcy, srcw,        srch, autoupdate
     end
@@ -509,6 +509,8 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.86 (2023-12-07)
+  + fixed "nudge" blue guideline getting de-synced
 * v1.85 (2023-12-07)
   + improved note/track name readout logic
 * v1.84 (2023-12-06)
