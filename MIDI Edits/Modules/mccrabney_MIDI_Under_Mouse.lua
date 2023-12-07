@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.02
+ * Version: 1.03
  * Provides: Modules/*.lua
 --]] 
     
@@ -20,7 +20,7 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
   local item, position_ppq, take
   track, window = reaper.GetThingFromPoint( mouse.x, mouse.y)
   local hZoom = reaper.GetHZoomLevel()
-
+  
   if window == "arrange" and hZoom > 2 then   -- if slightly zoomed into arrange,
     if track then                                                   -- if there is a track
       trackHeight = reaper.GetMediaTrackInfo_Value( track, "I_TCPH")  -- get track height
@@ -62,6 +62,8 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
     end
 
     if take and trackHeight > 10 then           -- if there is a take, and if track height isn't tiny
+      _, nm = reaper.GetTrackName(track)
+      
       if reaper.TakeIsMIDI(take) then           -- if take is midi
         local tr = reaper.GetMediaItemTake_Track( take )
         _, trName = reaper.GetTrackName( tr )
@@ -110,11 +112,13 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
                                                 
                     -- if RS5k, this section shows either a named MIDI note or the track name display readout 
             userNoteName = reaper.GetTrackMIDINoteNameEx( 0, track, pitch, ch )  -- set up named note/track readout text
-            --local displayName
+            
+            local displayName
             
             if userNoteName ~= nil then 
               displayName = userNoteName 
             end
+            
             
             if displayName == nil then displayName = "" end       -- if no displayName, blank the readout value
             if displayName ~= "" then                             -- if displayname is not blank, 
@@ -181,9 +185,22 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
       return a[1] < b[1]
     end)
 
-    if targetNoteIndex ~= nil then                      -- only print track name on target track in readout
-      showNotes[targetNoteIndex+1][8] = getInstanceTrackName(showNotes[targetNoteIndex+1][1])
-    end
+    --if nm ~= "sequencer" then                      -- only print track name on target track in readout
+      reaper.ShowConsoleMsg("true" .. "\n")
+      for i = #showNotes, 1, -1 do
+        if nm ~= "sequencer" then
+          if showNotes[i][1] == targetPitch then
+            if showNotes[i][8] == "" then
+              showNotes[i][8] = getInstanceTrackName(showNotes[i][1])
+            end
+          end
+        else
+          if showNotes[i][8] == "" then
+            showNotes[i][8] = getInstanceTrackName(showNotes[i][1])
+          end
+        end
+      end
+    --end
 
     if targetNoteIndex then 
       _, _, _, targetPPQ, targetEndPPQ, _, _, _= reaper.MIDI_GetNote(take, targetNoteIndex) -- get note start/end position              
