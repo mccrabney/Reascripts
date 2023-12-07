@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.86
+ * Version: 1.87
  * Provides: Modules/*.lua
 --]]
  
@@ -80,6 +80,7 @@ local elapsed
 mediaAreas = {} 
 targetTable = {} 
 multiple = 0
+reset = 0
 
     --[[------------------------------[[--
           loop and show tooltips, cursor as necessary  
@@ -184,13 +185,15 @@ function loop()
     if lastTCPheight ~= tcpHeight then     -- if height changed
       debug("tcpHeight updated", 1)
       lastTCPheight = tcpHeight
-      lastAllAreas = -1   
+      lastAllAreas = -1
+      reset = 1
     end
      
     if lasttrPos ~= trPos then             -- if track position has changed
       debug("trPos updated", 1)
       lasttrPos = trPos
       lastAllAreas = -1
+      reset = 1 
     end
     --]]
     
@@ -271,7 +274,6 @@ function loop()
               end -- for each item
             end -- if area isn't envelope
           end -- for each area
-          
                     
           if targetedNotes == 0 then noteHoldNumber = -1 end   -- if there aren't any of the targeted notes, exit notehold
           if tcpHeight == nil then tcpHeight = 0 end
@@ -306,11 +308,14 @@ function loop()
     multiple = 0
   end
   
- 
+
  ---]]-----------------------------------------------------------------
  ----------------single target note------------------------------------  
  -- [[-----------------------------------------------------------------
-  if targetPitch == nil then lastPixelLength = -1 end  -- if no note is under cursor, set lastval to n/a
+  if targetPitch == nil then 
+    lastPixelLength = -1 
+    lastTargetPitch = -1
+  end  -- if no note is under cursor, set lastval to n/a
   if targetPitch ~= nil and info == "arrange" and take ~= nil and noteHoldNumber == -1 and elapsed > .2 then 
     if targetNotePos then                           -- if there's a note pos to target,
       local zoom_lvl     = reaper.GetHZoomLevel()       -- get rpr zoom level
@@ -325,8 +330,10 @@ function loop()
       --alpha = .2 * alpha + .1
       alpha = .25
       --if lastPixelLength ~= pixelLength or alpha ~= lastAlpha then              -- if the last pixel length is different than this one,
-      if cursorSource == 1 and lastPixelLength ~= pixelLength 
-      or cursorSource == 0 and reset == 1 then              -- if the last pixel length is different than this one,
+      if cursorSource == 1 and lastPixelLength ~= pixelLength   -- if the last pixel length is different than this one,
+      or cursorSource == 0 and lastTargetPitch ~= targetPitch 
+      or reset == 1 and multiple == 0 then             
+        lastTargetPitch = targetPitch
         if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end   -- set cursor colors
         lastAlpha = alpha
         lastPixelLength = pixelLength
@@ -509,6 +516,8 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.87 (2023-12-07)
+  + fixed blue guideline not reprinting on mouse moving to/from another track
 * v1.86 (2023-12-07)
   + fixed "nudge" blue guideline getting de-synced
 * v1.85 (2023-12-07)
@@ -624,4 +633,3 @@ reaper.atexit(SetButtonOFF)
  * v1.0 (2023-03-12)
    + Initial Release -- "Crab Vision" (combined previous scripts)
 --]]
-
