@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.4
+ * Version: 1.5
 --]]
  
 --[[
@@ -38,7 +38,7 @@ function main()
   reaper.PreventUIRefresh(1)
 
   reaper.SetExtState(extName, 'toggleCursor', 1, true)
-  --reaper.SetExtState(extName, 'Refresh', 1, true)
+  reaper.SetExtState(extName, 'DoRefresh', 1, true)
   
 end
  

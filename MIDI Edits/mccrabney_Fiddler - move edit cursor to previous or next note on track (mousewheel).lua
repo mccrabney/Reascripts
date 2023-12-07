@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.4
+ * Version: 1.5
 --]]
  
 --[[
  * Changelog:
+ * v1.5 (2023-11-26)
+   + added dorefresh
  * v1.4 (2023-11-26)
    + switch to edit cursor target
  * v1.3 (2023-1-4)
@@ -139,7 +141,7 @@ if track then
   end
   
   
-  
+    reaper.SetExtState(extName, 'DoRefresh', 1, true)
   
   reaper.PreventUIRefresh(-1)  
   reaper.Undo_EndBlock(undoMessage ,-1)
