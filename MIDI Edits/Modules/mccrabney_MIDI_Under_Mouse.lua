@@ -5,7 +5,6 @@
  * REAPER: 7.0
  * Extensions: None
  * Version: 1.03
- * Provides: Modules/*.lua
 --]] 
     
 step = 0
@@ -185,23 +184,20 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
       return a[1] < b[1]
     end)
 
-    --if nm ~= "sequencer" then                      -- only print track name on target track in readout
-      reaper.ShowConsoleMsg("true" .. "\n")
-      for i = #showNotes, 1, -1 do
-        if nm ~= "sequencer" then
-          if showNotes[i][1] == targetPitch then
-            if showNotes[i][8] == "" then
-              showNotes[i][8] = getInstanceTrackName(showNotes[i][1])
-            end
-          end
-        else
+    for i = #showNotes, 1, -1 do
+      if nm ~= "sequencer" then
+        if showNotes[i][1] == targetPitch then
           if showNotes[i][8] == "" then
             showNotes[i][8] = getInstanceTrackName(showNotes[i][1])
           end
         end
+      else
+        if showNotes[i][8] == "" then
+          showNotes[i][8] = getInstanceTrackName(showNotes[i][1])
+        end
       end
-    --end
-
+    end
+    
     if targetNoteIndex then 
       _, _, _, targetPPQ, targetEndPPQ, _, _, _= reaper.MIDI_GetNote(take, targetNoteIndex) -- get note start/end position              
       targetNotePos = reaper.MIDI_GetProjTimeFromPPQPos( take, targetPPQ)     -- get target note project time
