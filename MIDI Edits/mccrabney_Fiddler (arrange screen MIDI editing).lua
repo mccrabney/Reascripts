@@ -1,10 +1,10 @@
 --[[
- * ReaScript Name: mccrabney_Fiddler (arrange screen MIDI editing).lua
+ * ReaScript Name: Fiddler (arrange screen MIDI editing).lua
  * Author: mccrabney
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.87
+ * Version: 1.88
  * Provides: Modules/*.lua
 --]]
  
@@ -316,6 +316,7 @@ function loop()
     lastPixelLength = -1 
     lastTargetPitch = -1
   end  -- if no note is under cursor, set lastval to n/a
+  
   if targetPitch ~= nil and info == "arrange" and take ~= nil and noteHoldNumber == -1 and elapsed > .2 then 
     if targetNotePos then                           -- if there's a note pos to target,
       local zoom_lvl     = reaper.GetHZoomLevel()       -- get rpr zoom level
@@ -324,15 +325,13 @@ function loop()
       if targetNotePixel    < 0 then targetNotePixel    = 0 end   -- set bounds for target note
       if targetNotePixelEnd < 0 then targetNotePixelEnd = 0 end   
       pixelLength = targetNotePixelEnd-targetNotePixel    -- get pixel length of note
-      --local alpha = 1 -((cursorPos-targetNotePos)/(targetEndPos-targetNotePos))
-      --if alpha > .5 then alpha = 1 - alpha end 
-      ---reaper.ShowConsoleMsg(alpha .. "\n")
-      --alpha = .2 * alpha + .1
       alpha = .25
-      --if lastPixelLength ~= pixelLength or alpha ~= lastAlpha then              -- if the last pixel length is different than this one,
-      if cursorSource == 1 and lastPixelLength ~= pixelLength   -- if the last pixel length is different than this one,
-      or cursorSource == 0 and lastTargetPitch ~= targetPitch 
+                        -- draw conditions --
+      if targetNotePos ~= lastTargetNotePos and elapsed > .2 -- then -- and lastPixelLength ~= pixelLength   -- if the last pixel length is different than this one,
+      or lastTargetPitch ~= targetPitch 
       or reset == 1 and multiple == 0 then             
+
+        lastTargetNotePos = targetNotePos 
         lastTargetPitch = targetPitch
         if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end   -- set cursor colors
         lastAlpha = alpha
@@ -347,7 +346,7 @@ function loop()
         reaper.JS_LICE_Line( targetGuideline, pixelLength+1, 0, pixelLength+1, tcpHeight,  curColor, 1, "COPY", true )
         --reaper.JS_LICE_Line( targetGuideline, 0, 0, 0, tcpHeight,  0xFF000000, .1, "COPY", true ) -- black guidelines
         --reaper.JS_LICE_Line( targetGuideline, pixelLength, 0, pixelLength, tcpHeight,  0xFF000000, .1, "COPY", true )
-        debug("printed single target note", 1)
+        --debug("printed single target note: " .. targetPitch, 1)
         reaper.JS_Composite(track_window, targetNotePixel, trPos, pixelLength+3, tcpHeight - 3, targetGuideline, 0, 0, pixelLength+3, 1, true) -- DRAW          redraw = nil
         reset = 0
       end
@@ -516,6 +515,8 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.88 (2023-12-08)
+  + more drawing improvements
 * v1.87 (2023-12-07)
   + fixed blue guideline not reprinting on mouse moving to/from another track
 * v1.86 (2023-12-07)
