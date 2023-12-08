@@ -4,13 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.40
+ * Version: 1.42
  * Provides: Modules/*.lua
 --]]
  
 --[[
  * Changelog:
- * v1.40 (2023-12-08)
+ * v1.42 (2023-12-08)
    + conform to changes in other scripts 
  * v1.39 (2023-6-11)
    + reset step upon nudge 
