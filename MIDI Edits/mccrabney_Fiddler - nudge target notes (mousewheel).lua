@@ -4,13 +4,19 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.42
- * Provides: Modules/*.lua
+ * Version: 1.40
+
+-- @provides
+--   Modules/Sexan_Area_51_mouse_mccrabney_tweak.lua > mccrabney_Fiddler - nudge target notes (mousewheel)/Sexan_Area_51_mouse_mccrabney_tweak.lua
+--   Modules/mccrabney_MIDI_Under_Mouse.lua          > mccrabney_Fiddler - nudge target notes (mousewheel)/mccrabney_MIDI_Under_Mouse.lua
+--   Modules/mccrabney_Razor_Edit_functions.lua      > mccrabney_Fiddler - nudge target notes (mousewheel)/mccrabney_Razor_Edit_functions.lua
+--   Modules/mccrabney_misc.lua                      > mccrabney_Fiddler - nudge target notes (mousewheel)/mccrabney_misc.lua
+
 --]]
  
 --[[
  * Changelog:
- * v1.42 (2023-12-08)
+ * v1.40 (2023-12-08)
    + conform to changes in other scripts 
  * v1.39 (2023-6-11)
    + reset step upon nudge 
