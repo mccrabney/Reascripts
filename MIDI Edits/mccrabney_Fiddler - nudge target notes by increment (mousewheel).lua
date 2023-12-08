@@ -1,5 +1,5 @@
 --[[
- * ReaScript Name: nudge target notes (mousewheel)
+ * ReaScript Name: nudge target notes by increment (mousewheel)
  * Author: mccrabney
  * Licence: GPL v3
  * REAPER: 6.0
