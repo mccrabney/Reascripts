@@ -4,12 +4,14 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.41
+ * Version: 1.40
  * Provides: Modules/*.lua
 --]]
  
 --[[
  * Changelog:
+ * v1.40 (2023-12-08)
+   + some update, not sure what 
  * v1.39 (2023-6-11)
    + reset step upon nudge 
    + switch target cursor to edit cursor upon nudge - makes more predictable
