@@ -2,6 +2,8 @@
  * @noindex
 --]] 
     
+-- dec 8 2023
+	
 step = 0
 function getCursorInfo()         -- this is a heavy action, run it as little as possible
   mouse = MouseInfo()            -- borrows Sexan's Area51 mouse module
