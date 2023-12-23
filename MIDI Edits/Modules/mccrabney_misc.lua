@@ -18,10 +18,11 @@ end
 function extStates()
   if reaper.HasExtState(extName, 'DoRefresh') then              -- update display, called from child scripts
     take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos = getCursorInfo()
-    reaper.DeleteExtState(extName, 'DoRefresh', false)
     lastX = -1                                                -- n/a x val fools the optimizer into resetting
     reset = 1                                                   -- allow reset after nudge for cursor targeted notes
     debug("doRefresh", 1)
+    debug(reset, 1)
+    reaper.DeleteExtState(extName, 'DoRefresh', false)
   end  
  
   if reaper.HasExtState(extName, 'Refresh') then              -- update display, called from child scripts
