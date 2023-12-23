@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.40
+ * Version: 1.41
 
 -- @provides
 --   Modules/Sexan_Area_51_mouse_mccrabney_tweak.lua > mccrabney_Fiddler - nudge target notes (mousewheel)/Sexan_Area_51_mouse_mccrabney_tweak.lua
@@ -16,6 +16,8 @@
  
 --[[
  * Changelog:
+ * v1.41 (2023-12-23)
+   + disable refresh (do in Fiddler script instead)
  * v1.40 (2023-12-08)
    + conform to changes in other scripts 
  * v1.39 (2023-6-11)
@@ -170,7 +172,7 @@ function main()
       reaper.Undo_OnStateChange2(proj, "nudged note " .. targetPitch .. "(" .. cursorNoteSymbol .. octave .. ")")
     end
     
-    reaper.SetExtState(extName, 'DoRefresh', '1', false)
+    --reaper.SetExtState(extName, 'DoRefresh', '1', false)
     reaper.PreventUIRefresh(-1)
     reaper.UpdateArrange()
   end

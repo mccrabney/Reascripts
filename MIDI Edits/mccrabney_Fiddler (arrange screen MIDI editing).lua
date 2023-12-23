@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.88
+ * Version: 1.89
  * Provides: Modules/*.lua
 --]]
  
@@ -151,6 +151,7 @@ function loop()
   
   if arrangeTime ~= lastArrangeTime then            -- if arrange screen bounds have moved
     elapsed = 0                                     -- timer == 0
+    reset = 1
     time_start = reaper.time_precise()              -- start the clock
     lastPixelLength = -1
     lastAllAreas = -1
@@ -215,7 +216,7 @@ function loop()
       mtcpHeight = reaper.GetMediaTrackInfo_Value( mTrack, "I_TCPH")  -- get track height
       mtrPos = reaper.GetMediaTrackInfo_Value( mTrack, 'I_TCPY' )     -- y pos of track TCP
 
-      if noteHoldNumber ~= nil and noteHoldNumber ~= -1 and elapsed > .2 then
+      if noteHoldNumber ~= nil and noteHoldNumber ~= -1 and elapsed > 0 then
         allAreas = start_pos + end_pos         -- get the full area span
         if lastAllAreas ~= allAreas then       -- if area size changed (or other triggers above)
           if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end   -- set cursor colors
@@ -317,7 +318,7 @@ function loop()
     lastTargetPitch = -1
   end  -- if no note is under cursor, set lastval to n/a
   
-  if targetPitch ~= nil and info == "arrange" and take ~= nil and noteHoldNumber == -1 and elapsed > .2 then 
+  if targetPitch ~= nil and info == "arrange" and take ~= nil and noteHoldNumber == -1 and elapsed > 0 then 
     if targetNotePos then                           -- if there's a note pos to target,
       local zoom_lvl     = reaper.GetHZoomLevel()       -- get rpr zoom level
       targetNotePixel    = math.floor((targetNotePos - startTime) * zoom_lvl) -- get note start pixel
@@ -327,14 +328,14 @@ function loop()
       pixelLength = targetNotePixelEnd-targetNotePixel    -- get pixel length of note
       alpha = .25
                         -- draw conditions --
-      if targetNotePos ~= lastTargetNotePos and elapsed > .2 -- then -- and lastPixelLength ~= pixelLength   -- if the last pixel length is different than this one,
-      or lastTargetPitch ~= targetPitch 
-      or reset == 1 and multiple == 0 then             
-
-        lastTargetNotePos = targetNotePos 
-        lastTargetPitch = targetPitch
+      if targetNotePos ~= lastTargetNotePos -- if the last pixel length is different than the newest,
+      or targetPitch ~= lastTargetPitch     -- if the last note is different than the newest
+      or reset == 1 and multiple == 0 then  -- if reset has been triggered by the above conditions           
+        debug("targetPitch: " .. targetPitch, 1)
+        lastTargetNotePos = targetNotePos   -- do this section once
+        lastTargetPitch = targetPitch       -- do this section once
         if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end   -- set cursor colors
-        lastAlpha = alpha
+        
         lastPixelLength = pixelLength
         reaper.JS_Composite_Unlink(track_window, targetGuideline, true)   -- LICE: destroy prev BM, set up new one, 
         reaper.JS_LICE_DestroyBitmap(targetGuideline)                     -- and draw colored guidelines.    
@@ -346,7 +347,7 @@ function loop()
         reaper.JS_LICE_Line( targetGuideline, pixelLength+1, 0, pixelLength+1, tcpHeight,  curColor, 1, "COPY", true )
         --reaper.JS_LICE_Line( targetGuideline, 0, 0, 0, tcpHeight,  0xFF000000, .1, "COPY", true ) -- black guidelines
         --reaper.JS_LICE_Line( targetGuideline, pixelLength, 0, pixelLength, tcpHeight,  0xFF000000, .1, "COPY", true )
-        --debug("printed single target note: " .. targetPitch, 1)
+        debug("printed single target note: " .. targetPitch, 1)
         reaper.JS_Composite(track_window, targetNotePixel, trPos, pixelLength+3, tcpHeight - 3, targetGuideline, 0, 0, pixelLength+3, 1, true) -- DRAW          redraw = nil
         reset = 0
       end
@@ -475,9 +476,6 @@ function loop()
   end           
    
   reaper.defer(loop)
-  --elapsed = 1
-  --lastArrangeTime = arrangeTime
-  --elapsed = 0
   editCurPosLast = reaper.GetCursorPosition()
 end
    --------------------------------------------
@@ -515,6 +513,8 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.89 (2023-12-23)
+  + debug messaging improvements, redraw/refresh improvements
 * v1.88 (2023-12-08)
   + more drawing improvements
 * v1.87 (2023-12-07)

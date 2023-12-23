@@ -1,14 +1,15 @@
 --[[
- * ReaScript Name: transpose note under cursor
+ * ReaScript Name: transpose target notes (mousewheel)
  * Author: mccrabney
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.11
+ * Version: 1.12
 --]]
  
 --[[
  * Changelog:
+ * v1.12 (2023-12-23)
  * v1.11 (2023-5-27)
    + updated name of parent script extstate 
  * v1.1 (2023-05-10)
@@ -110,7 +111,7 @@ function main()
       
       reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, nil, nil, nil, pitch, nil)
       reaper.MIDI_Sort(take)
-      reaper.SetExtState(extName, 'DoRefresh', '1', false)
+      reaper.SetExtState(extName, 'Refresh', '1', false)
       
       octave = math.floor(targetNoteNumber/12)-1                               -- establish the octave for readout
       cursorNoteSymbol = pitchList[(targetNoteNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout

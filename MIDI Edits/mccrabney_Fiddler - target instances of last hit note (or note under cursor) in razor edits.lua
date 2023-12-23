@@ -4,11 +4,15 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.2
+ * Version: 1.4
 --]]
  
 --[[
  * Changelog:
+ * v1.4
+  + deselect other notes and only select target notes
+ * v1.3
+  + fixed nil comparisons
  * v1.2
   + added more user friendly ultraschall api checker
  * v1.1
@@ -51,19 +55,17 @@ function main()
   
   if reI == -1 and num ~= 0 then 
     val = ultraschall.RazorEdit_Remove(RazorEditTable[1]["Track"])
-    --track, _ = reaper.GetThingFromPoint(reaper.GetMousePosition())
   end
   
   reaper.Main_OnCommand(40528, 0) -- select item under mouse
   item = reaper.GetSelectedMediaItem(0, 0)
-  take = reaper.GetActiveTake( item )
-  reaper.MIDI_SelectAll( take, 0 )
-  
+  if item ~= nil then  take = reaper.GetActiveTake( item ) end
+  if take ~= nil then 
+    reaper.MIDI_SelectAll( take, 0 ) 
+  end
   if track ~= nil then reaper.SetOnlyTrackSelected(track)end
-  
   RazorEditSelectionExists(1, 1)
   reaper.SetExtState(extName, 'toggleNoteHold', 1, false)
-  --reaper.DeleteExtState(extName, 6, false) 
 end
  
 main()
