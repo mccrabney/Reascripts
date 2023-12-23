@@ -21,16 +21,18 @@ function extStates()
     lastX = -1                                                -- n/a x val fools the optimizer into resetting
     reset = 1                                                   -- allow reset after nudge for cursor targeted notes
     debug("doRefresh", 1)
-    debug(reset, 1)
+    lastAllAreas = -1  
+    --debug(reset, 1)
     reaper.DeleteExtState(extName, 'DoRefresh', false)
   end  
  
   if reaper.HasExtState(extName, 'Refresh') then              -- update display, called from child scripts
     lastPixelLength = -1
     take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos = getCursorInfo()
-    reaper.DeleteExtState(extName, 'Refresh', false)
     lastAllAreas = -1     
     debug("Refresh", 1)
+    reaper.DeleteExtState(extName, 'Refresh', false)
+    
   end        
 
   if not reaper.HasExtState(extName, 7) then                        -- set increment of nudge,
@@ -92,7 +94,7 @@ function extStates()
       text = tostring("lastHold: " .. lastNoteHoldNumber .. " noteHold " .. noteHoldNumber)
       debug(text, 1)
       reaper.DeleteExtState(extName, 'noteHoldUpdate', false)
-      reaper.SetExtState(extName, 'DoRefresh', '1', false)
+      --reaper.SetExtState(extName, 'Refresh', '1', false)
   end       
   
   if reaper.HasExtState(extName, 'toggleNoteHold') then         -- if extstate says we are holding a note,
@@ -126,7 +128,6 @@ function extStates()
   end
   
   --if targetPitch == nil then targetPitch = -1 end
-  --reaper.ShowConsoleMsg(targetPitch .. " " .. toggleNoteHold .. " " .. noteHoldNumber .. "\n")
   
 end
     
@@ -182,7 +183,7 @@ function idleSensor()
   if idleTask == 1 then
     while idleCount > 100 do
       if idleCount > 101 then break end                 -- just do it once
-      --reaper.ShowConsoleMsg("idle" .."\n")
+      debug("idle", 1)
       for i = 1, reaper.CountTracks(0) do
         local tr = reaper.GetTrack(0,i-1)
         item_num = reaper.CountTrackMediaItems(tr)
@@ -195,9 +196,9 @@ function idleSensor()
               for n = 0, ccCount do
                 _, _, _, ppqpos, chanmsg, chan, msg2, msg3 = reaper.MIDI_GetCC( tk, n )
                 if chan == 15 and msg2 == 119 and msg3 == 1 then 
-                   reaper.MIDI_DeleteCC( tk, n )
-                   undo = 1
-           --reaper.ShowConsoleMsg("dummies deleted" .. "\n")
+                  reaper.MIDI_DeleteCC( tk, n )
+                  undo = 1
+                  debug("dummies deleted", 1)
                 end
               end
             end
@@ -229,7 +230,6 @@ function getInstanceTrackName(note)
             noteStart = math.floor(noteStart*128) if noteStart == 128 then noteStart = noteStart - 1 end
             if note == noteStart then          -- if it's the same as our note under cursor,
               _, trName = reaper.GetTrackName( tr )  -- get track name
-              --reaper.ShowConsoleMsg(trName .. "\n")
             end
           end
         end                                          -- if RS5K
