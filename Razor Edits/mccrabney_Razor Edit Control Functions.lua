@@ -4,12 +4,14 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.15
+ * Version: 1.16
  * donation link: 
 --]]
 
 --[[
  * Changelog:
+ * v1.16 (2023-11-28)
+    + another minor improvement to transpose function
  * v1.15 (2023-11-28)
     + minor changes to transpose function
  * v1.14 (2023-11-19)
@@ -334,7 +336,7 @@ function MIDINotesInRE(task)
 
                 -- EDIT: transpose notes whose noteons exist within Razer Edits
                 elseif task == 21 then
-                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and noteHoldNumber ~= -1 and sel == true 
+                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and noteHoldNumber ~= -1 and sel == true
                   or startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and noteHoldNumber == -1 then 
                     local ogPitch = pitch
                     pitch = pitch + incr
@@ -345,11 +347,8 @@ function MIDINotesInRE(task)
                     if noteHoldNumber == ogPitch then
                       reaper.SetExtState(extName, "noteHold", pitch, false)
                       reaper.SetExtState(extName, "noteHoldUpdate", incr, false)
-                      --reaper.SetExtState(extName, 'DoRefresh2', '1', false)      
-                    elseif noteHoldNumber == -1 then
-                      --reaper.SetExtState(extName, 'DoRefresh', '1', false)      
+                      reaper.SetExtState(extName, 'DoRefresh2', '1', false)      
                     end
-                    
                   end
                     
                 -- split notes whose noteons exist within Razor Edit at mouse cursor
