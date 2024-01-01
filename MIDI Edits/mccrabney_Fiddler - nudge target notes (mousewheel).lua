@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.41
+ * Version: 1.42
 
 -- @provides
 --   Modules/Sexan_Area_51_mouse_mccrabney_tweak.lua > mccrabney_Fiddler - nudge target notes (mousewheel)/Sexan_Area_51_mouse_mccrabney_tweak.lua
@@ -16,6 +16,8 @@
  
 --[[
  * Changelog:
+ * v1.42 (2023-12-23)
+   + fixed loss of target note if "step" function has been engaged
  * v1.41 (2023-12-23)
    + disable refresh (do in Fiddler script instead)
  * v1.40 (2023-12-08)
@@ -83,13 +85,41 @@ function RazorEditSelectionExists()
   end
 end                                 
   
+  
+function getNotesUnderMouseCursor()
+  
+  showNotes = {}
+  numVars = tonumber(reaper.GetExtState(extName, 1 ))
+  tableSize = tonumber(reaper.GetExtState(extName, 2 ))
+  guidString = reaper.GetExtState(extName, 3 )
+  take = reaper.SNM_GetMediaItemTakeByGUID( 0, guidString )
+  
+  targetNoteNumber = tonumber(reaper.GetExtState(extName, 4 ))
+  targetNoteIndex = tonumber(reaper.GetExtState(extName, 5 ))
+  
+  if tableSize ~= nil then 
+    for t = 1, tableSize do
+      showNotes[t] = {}
+      if reaper.HasExtState(extName, t+numVars) then
+        for i in string.gmatch(reaper.GetExtState(extName, t+numVars), "-?%d+,?") do
+          table.insert(showNotes[t], tonumber(string.match(i, "-?%d+")))
+        end
+      end
+    end
+  end
+  
+  return take, targetNoteNumber, targetNoteIndex
+end
+
+
 ---------------------------------------------------------------------
     --[[------------------------------[[--
           nudge notes whose ons are in RE if present, else nudge note under mouse, closest first
     --]]------------------------------]]--
 
 function main()
-  
+  step = tonumber(reaper.GetExtState(extName, 0 ))
+  --reaper.ShowConsoleMsg("step " .. step .. "\n")
   --reaper.SetExtState(extName, 'DoRefresh', '1', false)
   --reaper.SetExtState(extName, 'SlowRefresh', '1', false)
     
@@ -99,6 +129,8 @@ function main()
   
   --take, targetPitch, targetNoteIndex, targetNotePos, track, tcpHeight, cursorSource = getCursorInfo()
   take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos = getCursorInfo() 
+  --_, _, targetNoteIndex = getNotesUnderMouseCursor()
+  --reaper.ShowConsoleMsg("nudge - " .. targetPitch .. "\n")
   
   _,_,a,b,c,device,direction  = reaper.get_action_context() 
   --reaper.ShowConsoleMsg(a .. " | " .. b .. " | " .. c .. " | " .. device .. " | " .. direction .. "\n")
