@@ -3,8 +3,9 @@
 --]] 
     
 -- dec 8 2023
-	
+  
 step = 0
+
 function getCursorInfo()         -- this is a heavy action, run it as little as possible
   mouse = MouseInfo()            -- borrows Sexan's Area51 mouse module
   local pitchUnderCursor = {}    -- pitches of notes under the cursor (for undo)
@@ -135,12 +136,16 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
         if #showNotes then                                        -- if showNotes array is populated
           if reaper.HasExtState(extName, 'stepIncr') then         -- update display, called from child scripts
             step = step + 1                                       -- proceed to next/previous note
-            if step >= #showNotes then step = 0 end               -- if step exceeds number of notes, don't step
+            if step >= #showNotes then 
+              debug("STEP RESET", 1)
+              step = 0 
+            end               -- if step exceeds number of notes, don't step
             --reaper.SetExtState(extName, 'step', step, false)      -- update step extstate
             reaper.DeleteExtState(extName, 'stepIncr', false)     -- delete stepIncr extstate
           end
           
           if reaper.HasExtState(extName, 'stepDown') then         -- update display, called from child scripts
+            debug("STEP RESET", 1)
             step = 0
             --reaper.SetExtState(extName, 'step', step, false)
             reaper.DeleteExtState(extName, 'stepDown', false)
@@ -166,7 +171,10 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
         --~~~~~~~ find closest note
         for i = #distanceFromCursor, 1, -1 do                       -- for each entry in the unsorted distance array
           if targetNoteDistance == distanceFromCursor[i] then       -- if targetnotedistance is found in the distance array
-            if #showNotes == 1 then step = 0 end                    
+            if #showNotes == 1 then
+              debug("STEP RESET", 1)
+              step = 0 
+            end                    
             if #showNotes > i-1  + step then
               targetNoteIndex = showNotes[i + step][5]
               targetPitch = showNotes[i + step][1]                  -- get the pitch value of the closest note
@@ -206,7 +214,7 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
     
     -------------------------------------------- set up extstate to communicate with other scripts
     local numVars = 8                                             -- see below
-    
+    reaper.SetExtState(extName, 0, step, false)                -- how many variables are we sending via extstates
     reaper.SetExtState(extName, 1, numVars, false)                -- how many variables are we sending via extstates
     reaper.SetExtState(extName, 2, #showNotes, false)             -- how many notes are under mouse
     guidString = reaper.BR_GetMediaItemTakeGUID( take )           -- get guidString from take
@@ -217,6 +225,7 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
       reaper.SetExtState(extName, 5, targetNoteIndex, false)      -- what is the target index under mouse
     elseif targetNoteIndex == nil then 
       targetNoteIndex = -1
+      debug("STEP RESET", 1)
       step = 0
       reaper.DeleteExtState(extName, 4, false)                    -- what is the target pitch under mouse
       reaper.SetExtState(extName, 'step', step, false)            -- adjust step extstate
@@ -228,6 +237,6 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
       reaper.SetExtState(extName, i + numVars, table.concat(showNotes[i],","), false)
     end
 
-    return take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos
+    return take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos, step
   end
 end

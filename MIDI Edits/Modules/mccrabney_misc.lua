@@ -30,6 +30,7 @@ function extStates()
     lastPixelLength = -1
     take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos = getCursorInfo()
     lastAllAreas = -1     
+    debug("step -" .. step, 1)
     debug("Refresh", 1)
     reaper.DeleteExtState(extName, 'Refresh', false)
     
