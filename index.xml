@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney scripts" commit="a95a7fd5318d5af4e5ee6f6d14c89e179eee4811">
+<index version="1" name="mccrabney scripts" commit="409a00fc40bca028fe7c890dece739252c0549b8">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -104,6 +104,14 @@
         <source file="Modules/mccrabney_MIDI_Under_Mouse.lua">https://github.com/mccrabney/Reascripts/raw/424dee26561055e908cd4f34cbc327b3eca99a0d/MIDI%20Edits/Modules/mccrabney_MIDI_Under_Mouse.lua</source>
         <source file="Modules/mccrabney_Razor_Edit_functions.lua">https://github.com/mccrabney/Reascripts/raw/424dee26561055e908cd4f34cbc327b3eca99a0d/MIDI%20Edits/Modules/mccrabney_Razor_Edit_functions.lua</source>
         <source file="Modules/mccrabney_misc.lua">https://github.com/mccrabney/Reascripts/raw/424dee26561055e908cd4f34cbc327b3eca99a0d/MIDI%20Edits/Modules/mccrabney_misc.lua</source>
+      </version>
+      <version name="1.90" author="mccrabney" time="2024-01-04T12:31:54Z">
+        <changelog><![CDATA[+ play cursor was deleting indicator blocks]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/409a00fc40bca028fe7c890dece739252c0549b8/MIDI%20Edits/mccrabney_Fiddler%20(arrange%20screen%20MIDI%20editing).lua</source>
+        <source file="Modules/Sexan_Area_51_mouse_mccrabney_tweak.lua">https://github.com/mccrabney/Reascripts/raw/409a00fc40bca028fe7c890dece739252c0549b8/MIDI%20Edits/Modules/Sexan_Area_51_mouse_mccrabney_tweak.lua</source>
+        <source file="Modules/mccrabney_MIDI_Under_Mouse.lua">https://github.com/mccrabney/Reascripts/raw/409a00fc40bca028fe7c890dece739252c0549b8/MIDI%20Edits/Modules/mccrabney_MIDI_Under_Mouse.lua</source>
+        <source file="Modules/mccrabney_Razor_Edit_functions.lua">https://github.com/mccrabney/Reascripts/raw/409a00fc40bca028fe7c890dece739252c0549b8/MIDI%20Edits/Modules/mccrabney_Razor_Edit_functions.lua</source>
+        <source file="Modules/mccrabney_misc.lua">https://github.com/mccrabney/Reascripts/raw/409a00fc40bca028fe7c890dece739252c0549b8/MIDI%20Edits/Modules/mccrabney_misc.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Fiddler - adjust increment change (mousewheel).lua" type="script" desc="adjust increment change">
