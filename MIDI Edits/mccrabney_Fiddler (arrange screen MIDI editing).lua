@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.89
+ * Version: 1.90
  * Provides: Modules/*.lua
 --]]
  
@@ -211,6 +211,7 @@ function loop()
     end 
     
     if mTrack ~= nil  then                  -- if we have a multiple-target track
+      --debug("multiple targets identified", 1)
       unlinked = 0                          -- turnoff flag
       multiple = 1                          -- multiple flag
       mtcpHeight = reaper.GetMediaTrackInfo_Value( mTrack, "I_TCPH")  -- get track height
@@ -292,7 +293,7 @@ function loop()
           reaper.JS_Composite_Unlink(track_window, guideLines, true)
           reaper.JS_LICE_DestroyBitmap(guideLines)                          -- destroy prev BM
           reaper.Undo_EndBlock( "released note target", -1 )
-          --reaper.Undo_OnStateChange2(proj, "released note target")
+          --reaper.Undo_OnStateChange2(pro j, "released note target")
           unlinked = 1
           doOnce   = 0
         end
@@ -319,19 +320,23 @@ function loop()
   end  -- if no note is under cursor, set lastval to n/a
   
   if targetPitch ~= nil and info == "arrange" and take ~= nil and noteHoldNumber == -1 and elapsed > 0 then 
-    if targetNotePos then                           -- if there's a note pos to target,
-      local zoom_lvl     = reaper.GetHZoomLevel()       -- get rpr zoom level
+    if targetNotePos then                                   -- if there's a note pos to target,
+      --local playPPQ = reaper.MIDI_GetPPQPosFromProjTime(take, reaper.GetPlayPosition()) 
+      local zoom_lvl     = reaper.GetHZoomLevel()           -- get rpr zoom level
+      playPixel          = math.floor((reaper.GetPlayPosition() - startTime) * zoom_lvl) -- get note start pixel
       targetNotePixel    = math.floor((targetNotePos - startTime) * zoom_lvl) -- get note start pixel
       targetNotePixelEnd = math.floor((targetEndPos  - startTime) * zoom_lvl) -- get note end pixel
       if targetNotePixel    < 0 then targetNotePixel    = 0 end   -- set bounds for target note
       if targetNotePixelEnd < 0 then targetNotePixelEnd = 0 end   
       pixelLength = targetNotePixelEnd-targetNotePixel    -- get pixel length of note
       alpha = .25
+                        
                         -- draw conditions --
       if targetNotePos ~= lastTargetNotePos -- if the last pixel length is different than the newest,
       or targetPitch ~= lastTargetPitch     -- if the last note is different than the newest
+      or playPixel >= targetNotePixel and playPixel <= targetNotePixelEnd -- if play cursor is in note
       or reset == 1 and multiple == 0 then  -- if reset has been triggered by the above conditions           
-        debug("targetPitch: " .. targetPitch, 1)
+        --debug("targetPitch: " .. targetPitch, 1)
         lastTargetNotePos = targetNotePos   -- do this section once
         lastTargetPitch = targetPitch       -- do this section once
         if cursorSource == 1 then curColor = 0xFFFF0000 else curColor = 0xFF0033FF end   -- set cursor colors
@@ -513,6 +518,8 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.90 (2024-1-4)
+  + play cursor was deleting indicator blocks
 * v1.89 (2023-12-23)
   + debug messaging improvements, redraw/refresh improvements
 * v1.88 (2023-12-08)
