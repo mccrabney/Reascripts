@@ -2,9 +2,9 @@
  * ReaScript Name: nudge target notes (mousewheel)
  * Author: mccrabney
  * Licence: GPL v3
- * REAPER: 6.0
+ * REAPER: 7.0
  * Extensions: None
- * Version: 1.42
+ * Version: 1.43
 
 -- @provides
 --   Modules/Sexan_Area_51_mouse_mccrabney_tweak.lua > mccrabney_Fiddler - nudge target notes (mousewheel)/Sexan_Area_51_mouse_mccrabney_tweak.lua
@@ -16,6 +16,9 @@
  
 --[[
  * Changelog:
+ 
+ * v1.43 (2024-4-7)
+   + nudge increments now snap to next/prev increment division 
  * v1.42 (2023-12-23)
    + fixed loss of target note if "step" function has been engaged
  * v1.41 (2023-12-23)
@@ -122,7 +125,7 @@ function main()
   --reaper.ShowConsoleMsg("step " .. step .. "\n")
   --reaper.SetExtState(extName, 'DoRefresh', '1', false)
   --reaper.SetExtState(extName, 'SlowRefresh', '1', false)
-    
+  reaper.ClearConsole()  
   reaper.PreventUIRefresh(1)
   incr = tonumber(reaper.GetExtState(extName, 7 ))
   if incr == nil then incr = 0 end
@@ -154,36 +157,63 @@ function main()
     
     if take ~= nil and targetNoteIndex ~= nil and targetNoteIndex ~= -1 then
       _, _, _, startppqpos, endposppq, _, pitch, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
-     
+
+      --reaper.ShowConsoleMsg("targetnoteindex: " .. targetNoteIndex .. "\n")
+      --reaper.ShowConsoleMsg("start: " .. startppqpos .. "\n")
+      --reaper.ShowConsoleMsg("incr: " .. incr .. "\n")
+      
+      comp = math.fmod(startppqpos, math.abs(incr))
+
+      --reaper.ShowConsoleMsg("comp: " .. comp .. "\n")
+      
+      --if targetNoteIndex - 1 == -1 then reaper.ShowConsoleMsg("-1" .. "\n") end
+      if targetNoteIndex == -1 then pitch2 = -1 end
+      
       if incr > 0 then 
+        if comp ~= 0 then 
+          incr = incr - comp 
+        end
+
         _, _, _, startppqposNext, _, _, pitch2, _ = reaper.MIDI_GetNote( take, targetNoteIndex +1 )      
         _, _, _, startppqposPrev, endposppqPrev, _, _, _ = reaper.MIDI_GetNote( take, targetNoteIndex -1 )
+        --reaper.ShowConsoleMsg("startppqposPrev: " .. targetNoteIndex - 1 .. " " .. startppqposPrev .. "\n")
+        
         if pitch == pitch2 and endposppq + incr < startppqposNext then 
           reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
         end
       end
       
       if incr < 0 then
+        if comp ~= 0 then 
+          incr = comp*-1
+        end
+        
+--      if targetNoteIndex - 1 or targetNoteIndex +1  == 0
         _, _, _, startppqposPrev, endposppqPrev, _, pitch2, _ = reaper.MIDI_GetNote( take, targetNoteIndex -1 ) 
         _, _, _, startppqposNext, _, _, _, _ = reaper.MIDI_GetNote( take, targetNoteIndex +1 )
+        
         if pitch == pitch2 and startppqpos + incr > endposppqPrev then 
           reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
         end
       end
       
+      --reaper.ShowConsoleMsg("amount added: " .. incr .. "\n")
+      --reaper.ShowConsoleMsg(notePPQ .. "\n")
+      
       local targetChange = 0
-      if pitch ~= pitch2 then             -- if two different notes
-        if incr > 0 then                  -- if moving forwards
+      if pitch ~= pitch2 then                                     -- if two different notes
+        if incr > 0 and startppqposNext ~= 0 then                 -- if moving forwards
           if startppqpos + incr == startppqposNext then           -- if nudge encroaches on next note 
             targetChange = 1
             incr = incr + 1                                       -- add 1 tick to incr
           end
-        elseif incr < 0 then                                      -- if nudge encroaches on prev note
+        elseif incr < 0 and startppqposPrev ~= 0 then             -- if nudge encroaches on prev note
           if startppqpos + incr == startppqposPrev then           -- subtract 1 tick to incr
             targetChange = -1
             incr = incr - 1
           end
         end
+        
         reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
       end
 
