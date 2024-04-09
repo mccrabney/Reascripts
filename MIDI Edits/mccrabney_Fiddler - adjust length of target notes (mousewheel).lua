@@ -2,13 +2,15 @@
  * ReaScript Name: adjust length of target notes (mousewheel)
  * Author: mccrabney
  * Licence: GPL v3
- * REAPER: 6.0
+ * REAPER: 7.0
  * Extensions: None
- * Version: 1.31
+ * Version: 1.32
 --]]
  
 --[[
  * Changelog:
+ * v1.32 (2024-4-9)
+   + nudge increments now snap to next/prev increment division 
  * v1.31 (2023-5-27)
    + updated name of parent script extstate
  * v1.3 (2023-05-26)
@@ -104,7 +106,14 @@ function main()
       _, _, _, startppqpos, endppqpos, _, pitch, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
       _, _, _, startppqposNext, _, _, pitchNext, _ = reaper.MIDI_GetNote( take, targetNoteIndex+1 )
       
+      comp = math.fmod(endppqpos, math.abs(incr))
+      
       if endppqpos-startppqpos + incr > 10 then 
+        
+        if comp ~= 0 then 
+          incr = incr - comp 
+        end
+        
         if pitch ~= pitchNext then
             reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, nil, endppqpos + incr, nil, nil, nil, nil)
         else 
