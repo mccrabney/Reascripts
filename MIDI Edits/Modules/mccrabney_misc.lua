@@ -30,7 +30,7 @@ function extStates()
     lastPixelLength = -1
     take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos = getCursorInfo()
     lastAllAreas = -1     
-    debug("step -" .. step, 1)
+    debug("step: " .. step, 1)
     debug("Refresh", 1)
     reaper.DeleteExtState(extName, 'Refresh', false)
     
@@ -61,8 +61,13 @@ function extStates()
   end   
     
   if reaper.HasExtState(extName, 'toggleCursor') then           -- toggle whether focus is edit or mouse cursor                       
-    if cursorSource ~= 1 then cursorSource = 1                                          
-    elseif cursorSource == 1 then cursorSource = 0 end 
+    if cursorSource ~= 1 then 
+      cursorSource = 1                                          
+    elseif cursorSource == 1 then 
+      cursorSource = 0 
+    end 
+    
+    debug("cursorSource is " .. cursorSource, 1)
     reaper.SetExtState(extName, 8, cursorSource, true)          -- extstate management
     reaper.DeleteExtState(extName, 'toggleCursor', false)
     reaper.SetExtState(extName, 'Refresh', '1', false)
@@ -71,20 +76,28 @@ function extStates()
   if reaper.HasExtState(extName, 'setCursorEdit') then          -- set cursor to edit
     if cursorSource ~= 0 then                                   
       cursorSource = 0                                         
-    reaper.SetExtState(extName, 8, cursorSource, true)        -- extstate management
+      reaper.SetExtState(extName, 8, cursorSource, true)        -- extstate management
     end
-  reaper.DeleteExtState(extName, 'setCursorEdit', false)
+    reaper.DeleteExtState(extName, 'setCursorEdit', false)
   end
   
   if loopCount > resetCursor and cursorSource == 0 then                               -- if idle, reset cursor
   while loopCount > resetCursor do
-      if loopCount > resetCursor+1 then break end               -- just do it once
-      cursorSource = 1                                          -- set cursor to mouse
-      reaper.SetExtState(extName, 8, cursorSource, true)        -- set extstate to reflect the change
-      debug("small idle, resetCursor" .. "\n")
+    if loopCount > resetCursor+1 then break end               -- just do it once
+    cursorSource = 1                                          -- set cursor to mouse
+    reaper.SetExtState(extName, 8, cursorSource, true)        -- set extstate to reflect the change
+    debug("small idle, resetCursor" .. "\n")
     reaper.SetExtState(extName, 'Refresh', '1', false)
-    break
-    end
+    break end
+  end
+  
+  if loopCount > resetCursor and cursorSource == 1 then                               -- if idle, reset cursor
+  while loopCount > resetCursor do
+    if loopCount > resetCursor+1 then break end               -- just do it once
+    reaper.SetExtState(extName, 8, cursorSource, true)        -- set extstate to reflect the change
+    debug("small idle, resetCursor" .. "\n")
+    reaper.SetExtState(extName, 'Refresh', '1', false)
+    break end
   end
   
   ------------------------------------------------------------- are we holding a note?                                        
@@ -174,7 +187,7 @@ function getLastNoteHit()  -- what is the last note that has been struck on our 
     reaper.SetMediaTrackInfo_Value( controller, 'I_RECMON', 1 )  -- turn rec mon on
                                         -- turn rec mon on, set to all MIDI inputs
     reaper.SetMediaTrackInfo_Value( controller, 'I_RECINPUT', 4096 | 0 | (63 << 5) ) 
-    reaper.ShowMessageBox("A folder has been created to watch your MIDI controllers.\n", "No MIDI reference", 0)  
+    --reaper.ShowMessageBox("A folder has been created to watch your MIDI controllers.\n", "No MIDI reference", 0)  
   end
   
   return lastNote, lastVel         
@@ -192,7 +205,7 @@ function idleSensor()
           itm = reaper.GetTrackMediaItem(tr, j)
           for t = 0, reaper.CountTakes(itm)-1 do       -- for each take,
             tk = reaper.GetTake(itm, t)              -- get take
-            if reaper.TakeIsMIDI(tk) then             -- if it's MIDI, get RE PPQ values
+            if tk ~= nil and reaper.TakeIsMIDI(tk) then             -- if it's MIDI, get RE PPQ values
               _, ccCount, _ = reaper.MIDI_CountEvts(tk) -- count notes in current take 
               for n = 0, ccCount do
                 _, _, _, ppqpos, chanmsg, chan, msg2, msg3 = reaper.MIDI_GetCC( tk, n )
