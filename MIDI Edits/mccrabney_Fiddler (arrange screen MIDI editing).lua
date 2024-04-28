@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.90
+ * Version: 1.91
  * Provides: Modules/*.lua
 --]]
  
@@ -96,7 +96,7 @@ function loop()
                                                                 -- optimizer to reduce calls to getCursorInfo
   if loopCount >= 3 and info == "arrange" and lastX ~= x and pop == 0   -- if we're in the right place, and on the move
   or editCurPos ~= editCurPosLast then                                 -- or if the edit cursor has moved,
-    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos = getCursorInfo() 
+    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos, _, numNotes = getCursorInfo() 
     if take ~= nil and reaper.TakeIsMIDI(take) then             -- if take is MIDI
       loopCount = 0                                             -- reset loopcount
       idleCount = 0                                             -- reset idlecount
@@ -108,6 +108,7 @@ function loop()
   idleSensor()                      
   
   ---------------------------------------------------  get last note hit and feed it into table 
+  
   if loopCount < 500 then lastNote, lastVel = getLastNoteHit() end   -- if idle, stop getting lastnotehit                                                        
   x, y = reaper.GetMousePosition()                              -- mousepos
   _, info = reaper.GetThingFromPoint( x, y )                    -- mousedetails
@@ -310,7 +311,6 @@ function loop()
     multiple = 0
   end
   
-
  ---]]-----------------------------------------------------------------
  ----------------single target note------------------------------------  
  -- [[-----------------------------------------------------------------
@@ -346,10 +346,12 @@ function loop()
         reaper.JS_LICE_DestroyBitmap(targetGuideline)                     -- and draw colored guidelines.    
         targetGuideline = reaper.JS_LICE_CreateBitmap(true, pixelLength+3, tcpHeight)
         reaper.JS_LICE_Clear(targetGuideline, 0 )   -- clear
+        
         --reaper.JS_LICE_Line( bitmap,          x1, y1,             x2,          y2,          color,    alpha,    mode,  antialias )
-        reaper.JS_LICE_Line( targetGuideline, 0,  0,              0,           tcpHeight,   curColor, 1,       "COPY", true )  -- red guidelines
+        reaper.JS_LICE_Line( targetGuideline, 0, 0, 0, tcpHeight, curColor, 1, "COPY", true )  -- red guidelines
         reaper.JS_LICE_Line( targetGuideline, 0, 0, pixelLength, 0, curColor, alpha, "COPY", true )  -- red guidelines
         reaper.JS_LICE_Line( targetGuideline, pixelLength+1, 0, pixelLength+1, tcpHeight,  curColor, 1, "COPY", true )
+        
         --reaper.JS_LICE_Line( targetGuideline, 0, 0, 0, tcpHeight,  0xFF000000, .1, "COPY", true ) -- black guidelines
         --reaper.JS_LICE_Line( targetGuideline, pixelLength, 0, pixelLength, tcpHeight,  0xFF000000, .1, "COPY", true )
         debug("printed single target note: " .. targetPitch, 1)
@@ -518,6 +520,8 @@ reaper.atexit(SetButtonOFF)
 
 --[[
  * Changelog:
+* v1.91 (2024-4-28)
+  + removed popup message when "lastmidi" folder created
 * v1.90 (2024-1-4)
   + play cursor was deleting indicator blocks
 * v1.89 (2023-12-23)
