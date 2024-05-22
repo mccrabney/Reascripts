@@ -4,12 +4,12 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.5
+ * Version: 1.6
 --]]
  
 --[[
  * Changelog:
- * v1.5 (2024-5-21)
+ * v1.6 (2024-5-21)
    + switch to using local Razor Edit Function module 
  * v1.4 (2023-12-06)
    + handed refresh duty to misc module
