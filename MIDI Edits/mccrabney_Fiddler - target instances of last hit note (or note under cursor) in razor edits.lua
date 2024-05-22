@@ -9,6 +9,8 @@
  
 --[[
  * Changelog:
+ * v1.5 (2024-5-21)
+   + switch to using local Razor Edit Function module 
  * v1.4
   + deselect other notes and only select target notes
  * v1.3
@@ -23,10 +25,9 @@
 
 ---------------------------------------------------------------------
 local script_folder = debug.getinfo(1).source:match("@?(.*[\\|/])")
-script_folder = string.gsub(script_folder, "MIDI Edits\\", "")
 for key in pairs(reaper) do _G[key]=reaper[key]  end 
 local info = debug.getinfo(1,'S');
-dofile(script_folder .. "Razor Edits/mccrabney_Razor Edit Control Functions.lua")   
+dofile(script_folder .. "Modules/mccrabney_Razor_Edit_functions.lua")   
 
 ultraschall_path = reaper.GetResourcePath().."/UserPlugins/ultraschall_api.lua"
 if reaper.file_exists( ultraschall_path ) then

@@ -9,16 +9,19 @@
  
 --[[
  * Changelog:
+ * v1.1 (2024-5-21)
+   + switch to using local Razor Edit Function module 
  * v1.0 (2023-06-12)
    + Initial Release
 --]]
 
+package.path = debug.getinfo(1, "S").source:match [[^@?(.*[\/])[^\/]-$]] .. "?.lua;"
+require("Modules/Sexan_Area_51_mouse_mccrabney_tweak")   -- GET DIRECTORY FOR REQUIRE  -- AREA MOUSE INPUT HANDLING
+
 local script_folder = debug.getinfo(1).source:match("@?(.*[\\|/])")
-script_folder = string.gsub(script_folder, "MIDI Edits\\", "")
 for key in pairs(reaper) do _G[key]=reaper[key]  end 
 local info = debug.getinfo(1,'S');
-dofile(script_folder .. "Razor Edits/mccrabney_Razor Edit Control Functions.lua")   
-local script_folder = debug.getinfo(1).source:match("@?(.*[\\|/])")
+dofile(script_folder .. "Modules/mccrabney_Razor_Edit_functions.lua")   
 extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
 
 
@@ -36,7 +39,6 @@ function RazorEditSelectionExists()
   end
 end                                 
   
-
 ---------------------------------------------------------------------
     --[[------------------------------[[--
           refer to extstates to get MIDI under mouse
@@ -73,7 +75,7 @@ end
     --]]------------------------------]]--
 function main()
   reaper.PreventUIRefresh(1)
- 
+  
   cursorSource = tonumber(reaper.GetExtState(extName, 8 ))
   
   if RazorEditSelectionExists() then
@@ -84,7 +86,10 @@ function main()
     take, targetNoteNumber, targetNoteIndex = getNotesUnderCursor()
     
     if cursorSource == 1 then
+      --mouse = MouseInfo()            -- borrows Sexan's Area51 mouse module
+      
       cursorPos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position
+      --reaper.ShowConsoleMsg(cursorPos .. "\n")
     else
       cursorPos = reaper.GetCursorPosition()   -- get pos at edit cursor
     end
@@ -92,8 +97,8 @@ function main()
     local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"} 
     
     if take ~= nil and targetNoteIndex ~= -1 then
-      if cursorSource == 0 then cursorPos = reaper.GetCursorPosition() 
-      else cursorx, y = reaper.GetMousePosition()
+      if cursorSource == 0 then 
+        cursorPos = reaper.GetCursorPosition() 
       end
       -- get edit cursor position
       editCursor_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, cursorPos) -- convert project time to PPQ
@@ -101,7 +106,7 @@ function main()
       for n = notesCount-1, 0, -1 do
         _, sel, mute, startppqposOut, endppqposOut, chan, pitch, vel, _ = reaper.MIDI_GetNote(take, n) -- get note start/end position
         if startppqposOut < editCursor_ppq_pos and editCursor_ppq_pos < endppqposOut and n == targetNoteIndex then
-          reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut, editCursor_ppq_pos-96, nil, nil, nil, nil)
+          reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut, editCursor_ppq_pos, nil, nil, nil, nil)
           reaper.MIDI_InsertNote( take, sel, mute, editCursor_ppq_pos, endppqposOut, chan, pitch, vel, nil)
           reaper.MIDI_Sort(take)
         end

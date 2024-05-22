@@ -16,7 +16,9 @@
  
 --[[
  * Changelog:
- 
+
+ * v1.44 (2024-5-21)
+   + switch to using local Razor Edit Function module 
  * v1.43 (2024-4-7)
    + nudge increments now snap to next/prev increment division 
  * v1.42 (2023-12-23)
@@ -58,10 +60,9 @@
 
 ---------------------------------------------------------------------
 local script_folder = debug.getinfo(1).source:match("@?(.*[\\|/])")
-script_folder = string.gsub(script_folder, "MIDI Edits\\", "")
 for key in pairs(reaper) do _G[key]=reaper[key]  end 
 local info = debug.getinfo(1,'S');
-dofile(script_folder .. "Razor Edits/mccrabney_Razor Edit Control Functions.lua")   
+dofile(script_folder .. "Modules/mccrabney_Razor_Edit_functions.lua")   
 extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
 
 package.path = debug.getinfo(1, "S").source:match [[^@?(.*[\/])[^\/]-$]] .. "?.lua;"
@@ -164,14 +165,15 @@ function main()
       
       comp = math.fmod(startppqpos, math.abs(incr))
 
-      --reaper.ShowConsoleMsg("comp: " .. comp .. "\n")
       
       --if targetNoteIndex - 1 == -1 then reaper.ShowConsoleMsg("-1" .. "\n") end
-      if targetNoteIndex == -1 then pitch2 = -1 end
+      if targetNoteIndex - 1 == -1 then pitch2 = -1 end
       
       if incr > 0 then 
         if comp ~= 0 then 
           incr = incr - comp 
+          --reaper.ShowConsoleMsg("comp: " .. comp .. "\n")
+          
         end
 
         _, _, _, startppqposNext, _, _, pitch2, _ = reaper.MIDI_GetNote( take, targetNoteIndex +1 )      
@@ -185,7 +187,7 @@ function main()
       
       if incr < 0 then
         if comp ~= 0 then 
-          incr = comp*-1
+          incr = comp * -1
         end
         
 --      if targetNoteIndex - 1 or targetNoteIndex +1  == 0
@@ -201,7 +203,7 @@ function main()
       --reaper.ShowConsoleMsg(notePPQ .. "\n")
       
       local targetChange = 0
-      if pitch ~= pitch2 then                                     -- if two different notes
+      if pitch ~= pitch2 and pitch2 ~= -1 then                                     -- if two different notes
         if incr > 0 and startppqposNext ~= 0 then                 -- if moving forwards
           if startppqpos + incr == startppqposNext then           -- if nudge encroaches on next note 
             targetChange = 1
@@ -213,6 +215,8 @@ function main()
             incr = incr - 1
           end
         end
+        
+        --reaper.ShowConsoleMsg(incr .. "\n")
         
         reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
       end

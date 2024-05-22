@@ -9,6 +9,8 @@
  
 --[[
  * Changelog:
+ * v1.13 (2024-5-21)
+   + switch to using local Razor Edit Function module 
  * v1.12 (2023-12-23)
  * v1.11 (2023-5-27)
    + updated name of parent script extstate 
@@ -20,10 +22,9 @@
 
 ---------------------------------------------------------------------
 local script_folder = debug.getinfo(1).source:match("@?(.*[\\|/])")
-script_folder = string.gsub(script_folder, "MIDI Edits\\", "")
 for key in pairs(reaper) do _G[key]=reaper[key]  end 
 local info = debug.getinfo(1,'S');
-dofile(script_folder .. "Razor Edits/mccrabney_Razor Edit Control Functions.lua")   
+dofile(script_folder .. "Modules/mccrabney_Razor_Edit_functions.lua")   
 extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
 
 -----------------------------------------------------------

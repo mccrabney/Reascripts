@@ -1,5 +1,5 @@
 --[[
- * ReaScript Name: toggle debug messages
+ * ReaScript Name: doRefresh
  * Author: mccrabney
  * Licence: GPL v3
  * REAPER: 7.0
@@ -8,9 +8,9 @@
 --]]
  
 --[[
- * Changelog: 
+ * Changelog:
  * v1.4 (2024-5-21)
-   + switch to using local Razor Edit Function module
+   + switch to using local Razor Edit Function module 
  * v1.3 (2023-11-26)
    + send refresh extstate to change indicator block in realtime
  * v1.2 (2023-5-29)
@@ -36,7 +36,7 @@ extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
 function main()
   reaper.PreventUIRefresh(1)
 
-  reaper.SetExtState(extName, 'debug', 1, false)
+  reaper.SetExtState(extName, 'DoRefresh', 1, false)
   
 end
  

@@ -9,6 +9,8 @@
  
 --[[
  * Changelog:
+ * v1.2 (2024-5-21)
+   + switch to using local Razor Edit Function module 
  * v1.1 (2023-07-20)
    + better RE behavior 
  * v1.0 (2021-04-02)
@@ -20,12 +22,10 @@
     --[[------------------------------[[--
           get note and item under mouse   -- mccrabney      
     --]]------------------------------]]--
-
 local script_folder = debug.getinfo(1).source:match("@?(.*[\\|/])")
-script_folder = string.gsub(script_folder, "MIDI Edits\\", "")
 for key in pairs(reaper) do _G[key]=reaper[key]  end 
 local info = debug.getinfo(1,'S');
-dofile(script_folder .. "Razor Edits/mccrabney_Razor Edit Control Functions.lua")   
+dofile(script_folder .. "Modules/mccrabney_Razor_Edit_functions.lua")   
 extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
 
 -----------------------------------------------------------
