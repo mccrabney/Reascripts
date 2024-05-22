@@ -8,8 +8,8 @@
     --]]------------------------------]]--
 
 function SetGlobalParam(job, task, clear, val, incr)   -- get job and details from child scripts
-  
   --reaper.ClearConsole()
+  reaper.ShowConsoleMsg("SetGlobalParam" .. "\n")
   if clear == 1 then unselectAllMIDIinTrack() end     -- deselect MIDI in every item on selected track
   if job == 1 then MIDINotesInRE(task) end
   if job == 2 then muteREcontents() end                   -- RE movement/size controls
@@ -26,7 +26,7 @@ end
 
 noteHoldNumber = -1
 function MIDINotesInRE(task)
-
+  reaper.ShowConsoleMsg("MIDINotesInRE" .. "\n")
   local mouseNote                 -- note under mouse cursor
   local mouseTake                 -- take under mouse
   local mouseItem                 -- item under mouse
@@ -44,7 +44,7 @@ function MIDINotesInRE(task)
                   -- if it's not MIDI, or of there's no item under cursor, quit everything
   --if mouseTake ~= nil and reaper.TakeIsMIDI(mouseTake) == 0 then return end      
   
-  if RazorEditSelectionExists(1, 1) then      -- if no razor edit, create one out of selected item                                         -- if no item is selected, select item under mouse 
+  if RazorEditSelectionExistsPlus(1, 1) then      -- if no razor edit, create one out of selected item                                         -- if no item is selected, select item under mouse 
     local areas = GetRazorEdits()          -- get all areas 
     for i = 1, #areas do                   -- for each razor edit, get each item
       local areaData = areas[i]
@@ -306,7 +306,8 @@ end                                         -- end function MIDINotesInRE()
           get note, take, item, and ppq position under mouse   -- mccrabney      
     --]]------------------------------]]--
     
-function getMouseInfo()    
+function getMouseInfo()
+  reaper.ShowConsoleMsg("getMouseInfo" .. "\n")
   local item, position_ppq, take, note
   window, _, details = reaper.BR_GetMouseCursorContext() -- initialize cursor context
   local mouse_pos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position
@@ -335,6 +336,7 @@ end
     --]]------------------------------]]--
 
 function unselectAllMIDIinTrack()
+  --reaper.ShowConsoleMsg("unselectAllMIDIinTrack")
   reaper.Main_OnCommand(41238, 0)         -- save item selection? isn't working
   selected_tracks_count = reaper.CountSelectedTracks(0)
 
@@ -360,9 +362,10 @@ end        -- function
     --]]------------------------------]]--
 
 function copySelectedMIDIinRE()
+  --reaper.ShowConsoleMsg("")
   reaper.PreventUIRefresh(1)
   MIDINotesInRE(5)                            -- select RE-enclosed notes
-  if RazorEditSelectionExists(0,1) then       -- if RE exists (don't make if not) -- unnecessary?
+  if RazorEditSelectionExistsPlus(0,1) then       -- if RE exists (don't make if not) -- unnecessary?
     local areas = GetRazorEdits()             -- get all areas 
     local areaData = areas[1]                 -- look at the first area
     local aStart
@@ -413,7 +416,7 @@ end                                       -- function
 function resizeREbyVisibleGrid(job, incr)    -- where param informs direction of movement
   reaper.PreventUIRefresh(1)
   gridval = GetVisibleGridDivision()
-  if RazorEditSelectionExists(0) then      -- if a razor edit exists (else donothing)
+  if RazorEditSelectionExistsPlus(0) then      -- if a razor edit exists (else donothing)
     local areas = GetRazorEdits()
     for i=1, #areas do                      -- for each area
       local area = areas[i];
@@ -487,7 +490,7 @@ function moveREbyVisibleGrid(incr)
   local direction = incr
   gridval = GetVisibleGridDivision()
     
-  if RazorEditSelectionExists(0) then
+  if RazorEditSelectionExistsPlus(0) then
     local test, position = GetRazorEdits()
     local areas = GetRazorEdits()
 
@@ -528,7 +531,7 @@ function moveREwithcursor(incr)
     --reaper.PreventUIRefresh(1)
     --reaper.PreventUIRefresh(-1)
     local direction = incr
-    if RazorEditSelectionExists(0) then
+    if RazorEditSelectionExistsPlus(0) then
         if incr == 1 then reaper.Main_OnCommand(42399, 0) end -- move RE forwards without content
         if incr == -1 then reaper.Main_OnCommand(42400, 0) end -- backwards
          
@@ -603,6 +606,7 @@ local function geq( a, b ) -- a greater than or equal to b
 end
 
 local function GetItemsInRange(track, areaStart, areaEnd)
+  reaper.ShowConsoleMsg("GetItemsInRange" .. "\n")  
   local items, it = {}, 0
   for k = 0, reaper.CountTrackMediaItems(track) - 1 do 
     local item = reaper.GetTrackMediaItem(track, k)
@@ -645,7 +649,7 @@ end
     
 
 function RazorEditSelectionExists()
- 
+  reaper.ShowConsoleMsg("RazorEditSelectionExists" .. "\n") 
   for i = 0, reaper.CountTracks(0)-1 do          -- for each track, check if RE is present
     local retval, x = reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(0,i), "P_RAZOREDITS", "string", false)
     if x ~= "" then return true end              -- if present, return true 
@@ -657,6 +661,7 @@ end
 ------------------------------------
 
 function GetRazorEdits()
+  reaper.ShowConsoleMsg("GetRazorEdits" .. "\n")
   local trackCount = reaper.CountTracks(0)
   local areaMap = {}
   for i = 0, trackCount - 1 do
@@ -711,7 +716,8 @@ extNameB = 'mccrabney: target notes'
     --]]------------------------------]]--
 
 function SetTrackRazorEdit(track, areaStart, areaEnd, clearSelection)
-    if clearSelection == nil then clearSelection = false end
+  reaper.ShowConsoleMsg("SetTrackRazorEdit" .. "\n")    
+	if clearSelection == nil then clearSelection = false end
     
     if clearSelection then
         local ret, area = reaper.GetSetMediaTrackInfo_String(track, 'P_RAZOREDITS', '', false)
@@ -858,7 +864,8 @@ end
           RE exist? if not/if desired, create them  -- thanks, sonictim and julian sader!          
     --]]------------------------------]]--
 
-function RazorEditSelectionExists(make,itemType)    ---itemType: 0 for audio, 1 for MIDI
+function RazorEditSelectionExistsPlus(make,itemType)    ---itemType: 0 for audio, 1 for MIDI
+  reaper.ShowConsoleMsg("RazorEditSelectionExistsPlus" .. "\n")  
   reaper.Undo_BeginBlock2(0)          -- make them from selected items.
   local midiFlag = 0
   local itemUnderMouse
@@ -960,20 +967,6 @@ function GetVisibleGridDivision()  ----
 end -- GetVisibleGridDivision()
 
 
----------------------------------------------------------------------   
-    --[[------------------------------[[--
-                MAIN
-    --]]------------------------------]]--
-    
-function Main()
-end
 
-
----------------------------------------------------------------------
-    --[[------------------------------[[--
-                loop
-    --]]------------------------------]]--
-    
-Main()
 
 
