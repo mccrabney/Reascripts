@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.91
+ * Version: 1.92
  * Provides: Modules/*.lua
 --]]
  
@@ -334,6 +334,7 @@ function loop()
                         -- draw conditions --
       if targetNotePos ~= lastTargetNotePos -- if the last pixel length is different than the newest,
       or targetPitch ~= lastTargetPitch     -- if the last note is different than the newest
+      --or x ~= lastX
       or playPixel >= targetNotePixel and playPixel <= targetNotePixelEnd -- if play cursor is in note
       or reset == 1 and multiple == 0 then  -- if reset has been triggered by the above conditions           
         --debug("targetPitch: " .. targetPitch, 1)
@@ -519,7 +520,9 @@ SetButtonON()
 reaper.atexit(SetButtonOFF)
 
 --[[
- * Changelog:
+ * Changelog: 
+* v1.92 (2024-5-22)
+  + fixed poorly linked dependency to Razor Edit Control Functions, should now be contained in Razor Edit Functions module
 * v1.91 (2024-4-28)
   + removed popup message when "lastmidi" folder created
 * v1.90 (2024-1-4)
