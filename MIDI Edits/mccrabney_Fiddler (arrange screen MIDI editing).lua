@@ -4,9 +4,17 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.92
+ * Version: 1.93
  * Provides: Modules/*.lua
 --]]
+
+--[[
+* Changelog: 
+* v1.93 (2024-5-23)
+  + commented out stray debug messages
+* v1.92 (2024-5-22)
+  + fixed poorly linked dependency to Razor Edit Control Functions, should now be contained in Razor Edit Functions module
+]]--
  
 -- discussion thread: https://forum.cockos.com/showthread.php?t=274257 
 
@@ -520,9 +528,7 @@ SetButtonON()
 reaper.atexit(SetButtonOFF)
 
 --[[
- * Changelog: 
-* v1.92 (2024-5-22)
-  + fixed poorly linked dependency to Razor Edit Control Functions, should now be contained in Razor Edit Functions module
+ * old Changelog: 
 * v1.91 (2024-4-28)
   + removed popup message when "lastmidi" folder created
 * v1.90 (2024-1-4)
