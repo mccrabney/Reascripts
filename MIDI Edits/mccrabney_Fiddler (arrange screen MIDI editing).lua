@@ -4,17 +4,19 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.93
+ * Version: 1.94
  * Provides: Modules/*.lua
 --]]
 
 --[[
 * Changelog: 
+* v1.94 (2024-5-23)
+  + updated dependency
 * v1.93 (2024-5-23)
   + commented out stray debug messages
 * v1.92 (2024-5-22)
   + fixed poorly linked dependency to Razor Edit Control Functions, should now be contained in Razor Edit Functions module
-]]--
+--]]
  
 -- discussion thread: https://forum.cockos.com/showthread.php?t=274257 
 
