@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.5
+ * Version: 1.51
 --]]
  
 --[[
  * Changelog:
+ * v1.51 (2024-5-21)
+   + fix use of local Razor Edit Function module, removed local duplicate function
  * v1.5 (2024-5-21)
    + switch to using local Razor Edit Function module 
  * v1.4
@@ -65,61 +67,12 @@ function main()
     reaper.MIDI_SelectAll( take, 0 ) 
   end
   if track ~= nil then reaper.SetOnlyTrackSelected(track)end
-  RazorEditSelectionExists(1, 1)
+  RazorEditSelectionExistsPlus(1, 1)
   reaper.SetExtState(extName, 'toggleNoteHold', 1, false)
 end
  
 main()
 
-function RazorEditSelectionExists(make,itemType)    ---itemType: 0 for audio, 1 for MIDI
-  reaper.Undo_BeginBlock2(0)          -- make them from selected items.
-  local midiFlag = 0
-  local itemUnderMouse
-  local itemCount = reaper.CountSelectedMediaItems(0)  -- how many items are selected
 
-  if itemCount == 0 then                               -- if none,
-    _, _, itemUnderMouse, _ = getMouseInfo()           -- get item under mouse
-    if itemUnderMouse ~= nil then 
-      reaper.SetMediaItemSelected( itemUnderMouse, true )  -- set it selected
-      itemCount = 1
-    end                                        -- update item count
-  end
-  
-  for i=0, reaper.CountTracks(0)-1 do          -- for each track, check if RE is present
-    local retval, x = reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(0,i), "P_RAZOREDITS", "string", false)
-    if x ~= "" then return true end            -- if present, return true
-  end                                          -- end for each track
-    
-  if x == nil and make == 1 and itemCount ~= 0 then  -- if no RE, but one is needed,
-    --if itemUnderMouse ~= nil then
-      tS = {}
-    for i = 0, itemCount -1 do               -- for each selected item
-      item = reaper.GetSelectedMediaItem(0, i)      -- get its dimensions
-      take = reaper.GetActiveTake(item)
-      if reaper.TakeIsMIDI(take) then midiFlag = 1 end
-      left = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
-      right = left + reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
-      track = reaper.GetMediaItemTrack(item)
-      tS[track] = (tS[track] or "") .. string.format([[%.16f %.16f "" ]], left, right)
-    end
-  
-    for track, str in pairs(tS) do
-      if itemType == 1 and midiFlag == 1 then          -- if MIDI and MIDI is present
-        reaper.GetSetMediaTrackInfo_String(track, "P_RAZOREDITS", str, true)
-      end
-      if itemType == 0 and midiFlag == 0 then          -- if audio and MIDI is not present
-        reaper.GetSetMediaTrackInfo_String(track, "P_RAZOREDITS", str, true)
-      end
-      if itemType == 0 and midiFlag == 1 then return false end     -- if audio and MIDI is present
-      if itemType == 1 and midiFlag == 0 then return false end     -- if MIDI and MIDI not present
-    end
-    reaper.UpdateArrange()
-    reaper.Undo_EndBlock2(0, "Enclose items in minimal razor areas", -1)
-    return true                    -- return that yes, RE exists now
-  
-    else if x == nil and make == 0 then
-      return false 
-    end                  -- return that no RE exists
-  end                               -- end if/else
-end                                 -- end RazorEditSelectionExists()
+
 
