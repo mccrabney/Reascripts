@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney scripts" commit="6edcab6574974f9749842b8b034f2af10d97ee62">
+<index version="1" name="mccrabney scripts" commit="84267e76132bca41f5a50c88b21640a2681faf17">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -319,6 +319,10 @@
       <version name="1.5" author="mccrabney" time="2024-05-22T15:27:01Z">
         <changelog><![CDATA[+ switch to using local Razor Edit Function module ]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/3c7e8fa24caf4ee26a68b662694deb72f4a5847c/MIDI%20Edits/mccrabney_Fiddler%20-%20target%20instances%20of%20last%20hit%20note%20(or%20note%20under%20cursor)%20in%20razor%20edits.lua</source>
+      </version>
+      <version name="1.51" author="mccrabney" time="2024-05-24T21:34:34Z">
+        <changelog><![CDATA[+ fix use of local Razor Edit Function module, removed local duplicate function]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/84267e76132bca41f5a50c88b21640a2681faf17/MIDI%20Edits/mccrabney_Fiddler%20-%20target%20instances%20of%20last%20hit%20note%20(or%20note%20under%20cursor)%20in%20razor%20edits.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Fiddler - toggle targeting cursor (edit or mouse).lua" type="script" desc="toggle targeting cursor (edit or mouse)">
