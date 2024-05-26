@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.1
+ * Version: 1.2
 --]]
  
 --[[
  * Changelog:
+ * v1.2 (2024-5-26)
+   + fix missing BR mouse call when using mouse cursor as split target point 
  * v1.1 (2024-5-21)
    + switch to using local Razor Edit Function module 
  * v1.0 (2023-06-12)
@@ -86,10 +88,8 @@ function main()
     take, targetNoteNumber, targetNoteIndex = getNotesUnderCursor()
     
     if cursorSource == 1 then
-      --mouse = MouseInfo()            -- borrows Sexan's Area51 mouse module
-      
+      window, segment, details = reaper.BR_GetMouseCursorContext()
       cursorPos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position
-      --reaper.ShowConsoleMsg(cursorPos .. "\n")
     else
       cursorPos = reaper.GetCursorPosition()   -- get pos at edit cursor
     end
