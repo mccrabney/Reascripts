@@ -9,8 +9,7 @@ incrIndex = 2                   -- vars/setup for loop
 dbg = 0        -- print debug messages or not
 
 function debug(statement, newLine)
-  if dbg == 1 then
-    reaper.ShowConsoleMsg(statement)
+  if dbg == 1 then reaper.ShowConsoleMsg(statement)
     if newLine == 1 then reaper.ShowConsoleMsg("\n") end
   end
 end
@@ -21,17 +20,15 @@ function extStates()
     lastX = -1                                                -- n/a x val fools the optimizer into resetting
     reset = 1                                                   -- allow reset after nudge for cursor targeted notes
     debug("doRefresh", 1)
-    lastAllAreas = -1  
-    --debug(reset, 1)
     reaper.DeleteExtState(extName, 'DoRefresh', false)
   end  
  
   if reaper.HasExtState(extName, 'Refresh') then              -- update display, called from child scripts
-    lastPixelLength = -1
+    --lastPixelLength = -1
     take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos = getCursorInfo()
-    lastAllAreas = -1     
     debug("step: " .. step, 1)
     debug("Refresh", 1)
+    
     reaper.DeleteExtState(extName, 'Refresh', false)
     
   end        
@@ -41,8 +38,7 @@ function extStates()
   end   
   
   if reaper.HasExtState(extName, 'debug') then                        -- set increment of nudge,
-    if dbg == 1 then 
-      dbg = 0 
+    if dbg == 1 then dbg = 0 
     else 
       dbg = 1 
       reaper.ClearConsole()
@@ -63,14 +59,14 @@ function extStates()
   if reaper.HasExtState(extName, 'toggleCursor') then           -- toggle whether focus is edit or mouse cursor                       
     if cursorSource ~= 1 then 
       cursorSource = 1                                          
+      reaper.SetExtState(extName, 'Refresh', '1', false)
     elseif cursorSource == 1 then 
       cursorSource = 0 
+      reaper.SetExtState(extName, 'Refresh', '1', false)
     end 
-    
     debug("cursorSource is " .. cursorSource, 1)
     reaper.SetExtState(extName, 8, cursorSource, true)          -- extstate management
     reaper.DeleteExtState(extName, 'toggleCursor', false)
-    reaper.SetExtState(extName, 'Refresh', '1', false)
   end 
   
   if reaper.HasExtState(extName, 'setCursorEdit') then          -- set cursor to edit
@@ -81,20 +77,20 @@ function extStates()
     reaper.DeleteExtState(extName, 'setCursorEdit', false)
   end
   
-  if loopCount > resetCursor and cursorSource == 0 then                               -- if idle, reset cursor
+  if loopCount > resetCursor and cursorSource == 0 then         -- if idle, reset cursor
   while loopCount > resetCursor do
-    if loopCount > resetCursor+1 then break end               -- just do it once
-    cursorSource = 1                                          -- set cursor to mouse
-    reaper.SetExtState(extName, 8, cursorSource, true)        -- set extstate to reflect the change
+    if loopCount > resetCursor+1 then break end                 -- just do it once
+    cursorSource = 1                                            -- set cursor to mouse
+    reaper.SetExtState(extName, 8, cursorSource, true)          -- set extstate to reflect the change
     debug("small idle, resetCursor" .. "\n")
     reaper.SetExtState(extName, 'Refresh', '1', false)
     break end
   end
   
-  if loopCount > resetCursor and cursorSource == 1 then                               -- if idle, reset cursor
+  if loopCount > resetCursor and cursorSource == 1 then         -- if idle, reset cursor
   while loopCount > resetCursor do
-    if loopCount > resetCursor+1 then break end               -- just do it once
-    reaper.SetExtState(extName, 8, cursorSource, true)        -- set extstate to reflect the change
+    if loopCount > resetCursor+1 then break end                 -- just do it once
+    reaper.SetExtState(extName, 8, cursorSource, true)          -- set extstate to reflect the change
     debug("small idle, resetCursor" .. "\n")
     reaper.SetExtState(extName, 'Refresh', '1', false)
     break end
@@ -102,13 +98,9 @@ function extStates()
   
   ------------------------------------------------------------- are we holding a note?                                        
   if reaper.HasExtState(extName, 'noteHoldUpdate') then         
-    --if multiple == 1 then
-      noteHoldNumber = tostring(math.floor(reaper.GetExtState(extName, 'noteHold')))
-      lastNoteHoldNumber = noteHoldNumber
-      text = tostring("lastHold: " .. lastNoteHoldNumber .. " noteHold " .. noteHoldNumber)
-      debug(text, 1)
+      noteHoldNumber = math.floor(reaper.GetExtState(extName, 'noteHold'))
+      lastX = -1
       reaper.DeleteExtState(extName, 'noteHoldUpdate', false)
-      --reaper.SetExtState(extName, 'Refresh', '1', false)
   end       
   
   if reaper.HasExtState(extName, 'toggleNoteHold') then         -- if extstate says we are holding a note,
