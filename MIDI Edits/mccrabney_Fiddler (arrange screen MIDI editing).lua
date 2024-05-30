@@ -4,12 +4,15 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.97
+ * Version: 1.98
  * Provides: Modules/*.lua
 --]]
 
 --[[
  * Changelog: 
+ * v1.98 (2024-5-26)
+   + added gray colored boxes if note is muted
+   + added single target note display in white 
  * v1.97 (2024-5-26)
    + cleanup, comments
    + fixed transposing multiple notes (would lose target indicators)
@@ -72,9 +75,12 @@ local pitchList = {"C ", "C#", "D ", "D#", "E ", "F ", "F#", "G ", "G#", "A ", "
 local main_wnd = reaper.GetMainHwnd()                                -- GET MAIN WINDOW
 local track_window = reaper.JS_Window_FindChildByID(main_wnd, 0x3E8) -- GET TRACK VIEW
 local ctx = ImGui.CreateContext('MIDI Note Overlay', ImGui.ConfigFlags_NoSavedSettings)
+--local ctx2 = ImGui.CreateContext('notes', ImGui.ConfigFlags_NoSavedSettings)
 
-local sans_serif = reaper.ImGui_CreateFont('sans-serif', 13)
-reaper.ImGui_Attach(ctx, sans_serif)
+--local sans_serif = reaper.ImGui_CreateFont('sans-serif', 13)
+--local monospace = reaper.ImGui_CreateFont('monospace', 26)
+--reaper.ImGui_Attach(ctx, sans_serif)
+--reaper.ImGui_Attach(ctx, monospace)
 
 if not reaper.APIExists("JS_ReaScriptAPI_Version") then    -- js api check --------------
   reaper.MB( "JS_ReaScriptAPI is required for this script", "Please download it from ReaPack", 0 )
@@ -87,26 +93,27 @@ if not reaper.APIExists("JS_ReaScriptAPI_Version") then    -- js api check -----
   end
 end
 
---]]-----------------------------------------------------------------------------------------
-------------LOOP-----------------------------------------------------------------
+--]]------------------------------------------------------------------
+------------LOOP------------------------------------------------------
 -- [[-----------------------------------------------------------------
-loopCount = 0
-idleCount = 0
+loopCount = 0         -- loop iteration
+idleCount = 0         -- idle-specfic loop counter
 pop = 0 
-elapsed = 0
-reset = 0
-arrangeTime = 0
+elapsed = 0           -- how much time has elapsed 
+reset = 0             -- trigger a graphics reset
+arrangeTime = 0       -- what time is contained within Arrange
 
-lastArrangeTime = 0
-editCurPosLast = -1
-lastX = 0
-lastRE = 0
-toggleNoteHold = 0                              -- set notehold off by default
-noteHoldNumber = -1                             -- default notehold number to an inapplicable value
-mediaAreas = {} 
-targetTable = {} 
-multiple = 0
-targetedNotes = 0  
+lastArrangeTime = 0   -- comparison values
+editCurPosLast = -1   -- ^
+lastX = 0             -- ^
+lastRE = 0            -- ^
+
+toggleNoteHold = 0    -- set notehold off by default
+noteHoldNumber = -1   -- default notehold number to an inapplicable value
+mediaAreas = {}       -- table for all of the Razor Edit media areas
+targetTable = {}      -- table for targeted notes in multi-mode
+multiple = 0          -- are we in multi-mode or no
+targetedNotes = 0     -- how many notes are targeted
 
     --[[------------------------------[[--
           loop and show tooltips, cursor as necessary  
@@ -123,7 +130,7 @@ function loop()
                                                                 -- optimizer to reduce calls to getCursorInfo
   if loopCount >= 3 and info == "arrange" and lastX ~= x and pop == 0  -- if we're in the right place, and on the move
   or editCurPos ~= editCurPosLast then                                 -- or if the edit cursor has moved,
-    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos, _, numNotes = getCursorInfo() 
+    take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos, _, targetMute = getCursorInfo() 
     if take ~= nil and reaper.TakeIsMIDI(take) then             -- if take is MIDI
       loopCount = 0                                             -- reset loopcount
       idleCount = 0                                             -- reset idlecount
@@ -189,16 +196,6 @@ function loop()
     elapsed = reaper.time_precise() - time_start    -- set elapsed time since arrange hasn't moved
   end
   lastArrangeTime = arrangeTime                     -- get last arrangetime value
-  
-  if cursorSource == 1 then                         -- set cursor colors
-    outlineColor = 0xFF0000FF
-    curColor     = 0xFF000031
-    curColor2    = 0xFF000060
-  else
-    outlineColor = 0x0040FFFF
-    curColor2    = 0x0040FF31
-    curColor     = 0x0040FF91
-  end   
 
   --]]--------------------------------  ----------------------------------
   ----------------multiple target notes in RE --------------------------  
@@ -237,8 +234,9 @@ function loop()
           lastNoteHoldNumber = noteHoldNumber
           if trName ~= nil then targetTrack = trName end
           if tcpHeight ~= nil then targetHeight = tcpHeight end
+          noteHoldUpdate = 0
         end 
-          
+        
         allAreas = start_pos + end_pos         -- get the full area span
         areaStartPixel = math.floor((start_pos - startTime) * zoom_lvl)   -- get the pixel for area start BM
         areaEndPixel   = math.floor((end_pos   - startTime) * zoom_lvl)   -- get the pixel for area end BM
@@ -252,21 +250,24 @@ function loop()
             reStart = areaData.areaStart                   -- get local area start
             reEnd = areaData.areaEnd                       -- get local area end
             local items = areaData.items                   -- get local area items
+            
             for j = 1, #items do                           -- for each area item, 
+              
               local item = items[j]                        -- get item from array
               local itemStart = reaper.GetMediaItemInfo_Value(item, "D_POSITION")  -- get item start, end
               local itemEnd = itemStart+ reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
               for t = 0, reaper.CountTakes(item)-1 do      -- for each take,
-                if trName == targetTrack then 
+                
+                --if trName ~= nil and trName == targetTrack then 
                   targetTake = reaper.GetTake(item, t)     -- get take
-                end
+                --end
                   
-                if reaper.TakeIsMIDI(targetTake) then      -- if it's MIDI, get RE PPQ values
+                if targetTake ~= nil and reaper.TakeIsMIDI(targetTake) then      -- if it's MIDI, get RE PPQ values
                   razorStart_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(targetTake, reStart) 
                   razorEnd_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(targetTake, reEnd) 
                   notesCount, _, _ = reaper.MIDI_CountEvts(targetTake) -- count notes in current take                    
                   for n = notesCount-1, 0, -1 do           -- for each note, from back to front
-                    _, _, _, startppq, endppq, _, pitch, _ = reaper.MIDI_GetNote(targetTake, n)  -- get note data           
+                    _, _, muteState, startppq, endppq, _, pitch, _ = reaper.MIDI_GetNote(targetTake, n)  -- get note data           
                     if startppq >= razorStart_ppq_pos and startppq < razorEnd_ppq_pos then  -- if in RE bounds
                       if noteHoldNumber == pitch then      -- if it's the targeted pitch
                         reaper.MIDI_SetNote( targetTake, n, 1, nil, nil, nil, nil, nil, nil)    -- set note selected
@@ -278,11 +279,11 @@ function loop()
                         if targetNotePixel    < 0 then targetNotePixel    = 0 end               -- set bounds for target note start
                         if targetNotePixelEnd < 0 then targetNotePixelEnd = 0 end               -- set bounds for target note end
                         pixelLength = targetNotePixelEnd-targetNotePixel                        -- pixel length of note
-                      
+                        
                         if targetNotePixel ~= nil and trPos ~= nil then       -- if track and target, build a table of notes to print
                           sx,    sy = reaper.JS_Window_ClientToScreen( track_window, targetNotePixel, mtrPos )
                           sxEnd,  _ = reaper.JS_Window_ClientToScreen( track_window, targetNotePixelEnd, mtrPos )
-                          noteTable[targetedNotes] = {sx, sxEnd, sy, sy+targetHeight}
+                          noteTable[targetedNotes] = {sx, sxEnd, sy, sy+targetHeight, muteState}
                         end  -- if on track/with target
                       end  -- if MIDI note is targeted                 
                     end  -- if MIDI note is within RE bounds
@@ -305,7 +306,7 @@ function loop()
   end  -- if RE exists
   
   if not RazorEditSelectionExists() and lastRE == 1 then 
-    --lastRE = 0
+    lastNoteHoldNumber = -1
     debug("unlinked: mouseclick, or no RE", 1)
     noteHoldNumber = -1
     multiple = 0
@@ -327,7 +328,7 @@ function loop()
       if targetNotePixel ~= nil then
         local sx, sy = reaper.JS_Window_ClientToScreen( track_window, targetNotePixel, trPos )
         local sxEnd, _= reaper.JS_Window_ClientToScreen( track_window, targetNotePixelEnd, trPos )
-        noteTable[1] = {sx, sxEnd, sy, sy+tcpHeight}
+        noteTable[1] = {sx, sxEnd, sy, sy + tcpHeight, targetMute}
       end
     end
   end
@@ -341,7 +342,7 @@ function loop()
       hwndID = reaper.JS_Window_GetTitle( hwnd )              -- get their IDs, exclude irrelevant windows
       --debug("hwndID: " .. hwndID, 1)
 
-      if hwndID ~= 'Overlay' and hwndID ~= 'Tooltip' and hwndID ~= 'ReaScript console output' then 
+      if hwndID ~= 'Overlay' and hwndID ~= 'Tooltip' and hwndID ~= 'ReaScript console output' and hwndID ~= 'note' then 
         if hwndID ~= nil then 
           windows = windows + 1                               -- count number of windows
           _, left, top, right, bottom = reaper.JS_Window_GetClientRect(hwnd) -- get their dimensions
@@ -378,22 +379,79 @@ function loop()
   --- draw the boxes  ---
   
   if ImGui.Begin(ctx, 'Overlay', nil,                              -- open a new ReaImGUI window
-    ImGui.WindowFlags_NoInputs | ImGui.WindowFlags_NoFocusOnAppearing | 
-    ImGui.WindowFlags_NoDecoration |
-    ImGui.WindowFlags_NoMove   | ImGui.WindowFlags_NoBackground) then
+    ImGui.WindowFlags_NoInputs | 
+    ImGui.WindowFlags_NoFocusOnAppearing | 
+    ImGui.WindowFlags_NoDecoration |  
+    ImGui.WindowFlags_NoMove   | 
+    ImGui.WindowFlags_NoBackground) then
+    
     for n = targetedNotes, 1, -1  do                                -- for each targeted note, in reverse order
       if noteTable[n] ~= nil then     -- if not nil
-        ImGui.DrawList_AddRect(draw_list, noteTable[n][1], noteTable[n][3], noteTable[n][2]+2, noteTable[n][4], outlineColor, 0)
-        if multiple == 1 then
-          ImGui.DrawList_AddRectFilledMultiColor(draw_list, noteTable[n][1], noteTable[n][3], noteTable[n][2]+1, noteTable[n][4], curColor2, curColor, curColor2, curColor)
+        --if targetMute == nil then targetMute = false end
+        if cursorSource == 1 then          -- if mouse cursor is source, set cursor colors (red)
+          noteTable[n][6] = 0xFF0000FF     -- outline color
+          noteTable[n][7] = 0xFF000031     -- inside color
+          noteTable[n][8] = 0xFF000060     -- outside color
+        end
+        if cursorSource == 0 then          -- if edit cursor is source, set cursor colors (blue)
+          --noteTable[n][6] = 0x0040FFFF     -- outline color
+          noteTable[n][6] = 0xFFFFFFFF     -- outline color
+          noteTable[n][8] = 0x0040FF31     -- outside color
+          noteTable[n][7] = 0x0040FF91     -- inside color
+        end
+        if multiple == 1 and noteTable[n][5] == true or targetMute == true and multiple == 0 then 
+                                           -- if multiple notes and note is muted, set notebox gray
+          noteTable[n][6] = 0xFFFFFFFF     -- outline color
+          noteTable[n][8] = 0x7C7C7CBC     -- outside color
+          noteTable[n][7] = 0x7C7C7C7E     -- inside color
+        end
+        if multiple == 1 then              -- if multiple notes targeted, set outline to green
+          noteTable[n][6] = 0x00FF45FF     -- outline color
+        end
+        ImGui.DrawList_AddRect(draw_list, noteTable[n][1], noteTable[n][3], noteTable[n][2]+2, noteTable[n][4], noteTable[n][6], 0) -- draw the outline
+        
+        if multiple == 1 then               -- draw the box fill colors, for multiple or single targets
+          ImGui.DrawList_AddRectFilledMultiColor(draw_list, noteTable[n][1], noteTable[n][3], noteTable[n][2]+1, noteTable[n][4], noteTable[n][8], noteTable[n][7], noteTable[n][8], noteTable[n][7])
         else
-          ImGui.DrawList_AddRectFilledMultiColor(draw_list, noteTable[n][1], noteTable[n][3], noteTable[n][2]+1, noteTable[n][4], curColor, curColor2, curColor, curColor2)
+          ImGui.DrawList_AddRectFilledMultiColor(draw_list, noteTable[n][1], noteTable[n][3], noteTable[n][2]+1, noteTable[n][4], noteTable[n][7], noteTable[n][8], noteTable[n][7], noteTable[n][8])
         end
       end  -- if not nil
     end  -- for each targeted note
   end  -- end ReaImGUI window
+  
   ImGui.End(ctx)
-     
+  
+  -----------------------------------
+  ----- draw quick note display -----
+  
+  local octaveNote                                -- variables for readout
+  local noteSymbol                                  
+  
+  if multiple == 0 and targetPitch ~= nil and info == "arrange" and take ~= nil and elapsed > .2 then
+    --sx, sy = reaper.JS_Window_ClientToScreen( track_window, targetNotePixel-5, y+tcpHeight/2-trPos) 
+    sx, sy = reaper.JS_Window_ClientToScreen( track_window, targetNotePixel-5, trPos) 
+    reaper.ImGui_SetNextWindowPos(ctx, sx, sy-10)   -- readout appears at note x position
+    
+    octave = math.floor(targetPitch/12)-1                               -- establish the octave for readout
+    cursorNoteSymbol = pitchList[targetPitch - 12*(octave+1)+1]       -- establish the note symbol for readout
+    
+    if ImGui.Begin(ctx, 'note', nil,                              -- open a new ReaImGUI window 
+      ImGui.FontFlags_Bold |
+      ImGui.WindowFlags_AlwaysAutoResize |
+      ImGui.WindowFlags_NoInputs | 
+      ImGui.WindowFlags_NoFocusOnAppearing | 
+      ImGui.WindowFlags_NoDecoration |  
+      ImGui.WindowFlags_NoBackground) 
+      and pixelLength >= 20 then
+      --ImGui.PushFont(ctx, monospace) 
+      
+      ImGui.TextColored( ctx, 0xFFFFFFFF, cursorNoteSymbol .. octave)
+    end
+    
+    ImGui.End(ctx)
+  end
+  
+  
   --]]------------------------------------------------------------------
   ----------------READOUT: ReaImGUI note data display ------------------
   -- [[-----------------------------------------------------------------
@@ -410,16 +468,17 @@ function loop()
      
     local rounding                       -- round window for mouse cursor, square for edit
     if cursorSource == 1 then rounding = 12 else rounding = 0 end
+    
+    
     reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_WindowBg(), 0x00000000 | 0xFF)
     reaper.ImGui_PushStyleVar(ctx, reaper.ImGui_StyleVar_WindowRounding(), rounding)
     if reaper.ImGui_Begin(ctx, 'Tooltip', false,
-    reaper.ImGui_WindowFlags_NoFocusOnAppearing() |
-    reaper.ImGui_WindowFlags_NoDecoration() |
-    reaper.ImGui_WindowFlags_NoInputs() |
-    reaper.ImGui_WindowFlags_TopMost() |
-    reaper.ImGui_WindowFlags_AlwaysAutoResize()) then
-      local octaveNote                                -- variables for readout
-      local noteSymbol                                  
+      reaper.ImGui_WindowFlags_NoFocusOnAppearing() |
+      reaper.ImGui_WindowFlags_NoDecoration() |
+      reaper.ImGui_WindowFlags_NoInputs() |
+      reaper.ImGui_WindowFlags_TopMost() |
+      reaper.ImGui_WindowFlags_AlwaysAutoResize()) then
+      --
       local color = 0xFFFFFFFF                        -- offwhite for non-target note readouts
       local spacingO = " "
       local spacingN = ""
@@ -427,7 +486,6 @@ function loop()
       local spacingD = ""
       local spacingCH = " "
       local postNote = "  "
-      local pitchList = {"C ", "C#", "D ", "D#", "E ", "F ", "F#", "G ", "G#", "A ", "A#", "B "}
       posStringSize, noteStringSize = {}
       for i = 1, #showNotes do
         posStringSize[i] = string.len(showNotes[i][7])
@@ -475,10 +533,10 @@ function loop()
             increment = "-" .. reaper.GetExtState(extName, 7 )
           elseif showNotes[i][1] == lastNote and pop == 1 then      -- if note is received from controller
             notePresent = 1
-            showNotes[i][2] = lastVel                               -- set incoming velocity
-            showNotes[i][3] = ""                                    -- duration
+            showNotes[i][2] = lastVel                     -- set incoming velocity
+            showNotes[i][3] = ""                          -- duration
             showNotes[i][4] = "in"
-            increment = "" --incr[incrIndex] = ""
+            increment = ""                                
             color = 0x00FF45FF                            -- green for incoming
           elseif showNotes[i][1] ~= lastNote then 
             color = 0xFFFFFFFF                            -- white for non-target
@@ -547,4 +605,3 @@ end
 _, _, sec, cmd = reaper.get_action_context()
 SetButtonON()
 reaper.atexit(SetButtonOFF)
-
