@@ -12,7 +12,7 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
   local showNotes = {}           -- table consisting of sub-tables grouping Pitch and Vel
   local trackHeight              
   local take, takes, channel
-  local targetNoteIndex, targetPitch  -- initialize target variable
+  local targetNoteIndex, targetPitch, targetMute  -- initialize target variable
   local numberNotes = 0
   local item, position_ppq, take
   track, window = reaper.GetThingFromPoint( mouse.x, mouse.y)
@@ -116,7 +116,6 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
               displayName = userNoteName 
             end
             
-            
             if displayName == nil then displayName = "" end       -- if no displayName, blank the readout value
             if displayName ~= "" then                             -- if displayname is not blank, 
               displayName = "'" .. displayName .. "'"             -- add quotes to displayname
@@ -137,7 +136,7 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
           if reaper.HasExtState(extName, 'stepIncr') then         -- update display, called from child scripts
             step = step + 1                                       -- proceed to next/previous note
             if step >= #showNotes then 
-              debug("STEP RESET", 1)
+              --debug("STEP RESET", 1)
               step = 0 
             end               -- if step exceeds number of notes, don't step
             --reaper.SetExtState(extName, 'step', step, false)      -- update step extstate
@@ -145,7 +144,7 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
           end
           
           if reaper.HasExtState(extName, 'stepDown') then         -- update display, called from child scripts
-            debug("STEP RESET", 1)
+            --debug("STEP RESET", 1)
             step = 0
             --reaper.SetExtState(extName, 'step', step, false)
             reaper.DeleteExtState(extName, 'stepDown', false)
@@ -172,7 +171,7 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
         for i = #distanceFromCursor, 1, -1 do                       -- for each entry in the unsorted distance array
           if targetNoteDistance == distanceFromCursor[i] then       -- if targetnotedistance is found in the distance array
             if #showNotes == 1 then
-              debug("STEP RESET", 1)
+              --debug("STEP RESET", 1)
               step = 0 
             end                    
             if #showNotes > i-1  + step then
@@ -204,7 +203,7 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
     end
     
     if targetNoteIndex then 
-      _, _, _, targetPPQ, targetEndPPQ, _, _, _= reaper.MIDI_GetNote(take, targetNoteIndex) -- get note start/end position              
+      _, _, targetMute, targetPPQ, targetEndPPQ, _, _, _= reaper.MIDI_GetNote(take, targetNoteIndex) -- get note start/end position              
       targetNotePos = reaper.MIDI_GetProjTimeFromPPQPos( take, targetPPQ)     -- get target note project time
       targetEndPos = reaper.MIDI_GetProjTimeFromPPQPos( take, targetEndPPQ)   -- get target note end position
       track = reaper.GetMediaItemTake_Track( take )                           -- get track
@@ -225,7 +224,7 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
       reaper.SetExtState(extName, 5, targetNoteIndex, false)      -- what is the target index under mouse
     elseif targetNoteIndex == nil then 
       targetNoteIndex = -1
-      debug("STEP RESET", 1)
+      --debug("STEP RESET", 1)
       step = 0
       reaper.DeleteExtState(extName, 4, false)                    -- what is the target pitch under mouse
       reaper.SetExtState(extName, 'step', step, false)            -- adjust step extstate
@@ -237,6 +236,6 @@ function getCursorInfo()         -- this is a heavy action, run it as little as 
       reaper.SetExtState(extName, i + numVars, table.concat(showNotes[i],","), false)
     end
 
-    return take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos, step
+    return take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos, step, targetMute
   end
 end

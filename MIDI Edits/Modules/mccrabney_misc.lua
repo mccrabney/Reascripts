@@ -7,6 +7,7 @@
 local incr = {1, 10, 24, 48, 96, 240, 480, 960}
 incrIndex = 2                   -- vars/setup for loop
 dbg = 0        -- print debug messages or not
+noteHoldUpdate = 0
 
 function debug(statement, newLine)
   if dbg == 1 then reaper.ShowConsoleMsg(statement)
@@ -104,12 +105,15 @@ function extStates()
   end       
   
   if reaper.HasExtState(extName, 'toggleNoteHold') then         -- if extstate says we are holding a note,
+    noteHoldUpdate = 1
     --if toggleNoteHold == 0 and RazorEditSelectionExists() then  -- if RE exists but notehold is 0
-    --lastX = -1
+    lastX = -1
     reaper.SetExtState(extName, 'DoRefresh', '1', false)
     --lastAllAreas = -1  
     if toggleNoteHold == 0 and RazorEditSelectionExists() and track ~= nil  
-    or toggleNoteHold == 1 and lastTargetPitch ~= targetPitch and track ~= nil then -- if RE exists but notehold is 0
+    or toggleNoteHold == 1 and lastTargetPitch ~= targetPitch and track ~= nil -- if RE exists but notehold is 0
+    or toggleNoteHold == 1 and lastTargetPitch == targetPitch and track ~= nil and noteHoldUpdate == 1 then -- if RE exists but notehold is 0
+      noteHoldUpdate = 0
       toggleNoteHold = 1                                        -- set notehold to 1
       mTrack = track
       _, mTrackName = reaper.GetTrackName(mTrack)
@@ -122,6 +126,7 @@ function extStates()
     elseif toggleNoteHold == 1 then                             -- toggle note hold value if 1
       toggleNoteHold = 0
       noteHoldNumber = -1
+      lastNoteHoldNumber = -1
       reaper.SetExtState(extName, "noteHold", -1, false)        -- write the note hold number
     end
     reaper.DeleteExtState(extName, 'toggleNoteHold', false)     -- cleanup extstate

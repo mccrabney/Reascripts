@@ -44,7 +44,7 @@ function MIDINotesInRE(task)
                   -- if it's not MIDI, or of there's no item under cursor, quit everything
   --if mouseTake ~= nil and reaper.TakeIsMIDI(mouseTake) == 0 then return end      
   
-  if RazorEditSelectionExistsPlus(1, 1) then      -- if no razor edit, create one out of selected item                                         -- if no item is selected, select item under mouse 
+  if RazorEditSelectionExistsPlus(1, 1) then      -- if no razor edit, create one out of selected item                   
     local areas = GetRazorEdits()          -- get all areas 
     for i = 1, #areas do                   -- for each razor edit, get each item
       local areaData = areas[i]
@@ -659,9 +659,8 @@ function RazorEditSelectionExists()
 end    
 
 ------------------------------------
-
+--
 function GetRazorEdits()
-  --reaper.ShowConsoleMsg("GetRazorEdits" .. "\n")
   local trackCount = reaper.CountTracks(0)
   local areaMap = {}
   for i = 0, trackCount - 1 do
@@ -704,6 +703,73 @@ function GetRazorEdits()
 
   return areaMap
 end
+--
+
+--[[
+function GetRazorEdits()
+  --reaper.ShowConsoleMsg("GetRazorEdits" .. "\n")
+    local trackCount = reaper.CountTracks(0)
+    local areaMap = {}
+    for i = 0, trackCount - 1 do
+        local track = reaper.GetTrack(0, i)
+        local ret, area = reaper.GetSetMediaTrackInfo_String(track, 'P_RAZOREDITS', '', false)
+        if area ~= '' then
+            --PARSE STRING
+            local str = {}
+            for j in string.gmatch(area, "%S+") do
+                table.insert(str, j)  
+            end
+        
+            --FILL AREA DATA
+            local j = 1
+            while j <= #str do
+                --area data
+                local areaStart = tonumber(str[j])
+                local areaEnd = tonumber(str[j+1])
+                local GUID = str[j+2]
+                local isEnvelope = GUID ~= '""'
+
+                --get item/envelope data
+                local items = {}
+                local envelopeName, envelope
+                local envelopePoints
+                
+                if not isEnvelope then
+                    items = GetItemsInRange(track, areaStart, areaEnd)
+                else
+                    envelope = reaper.GetTrackEnvelopeByChunkName(track, GUID:sub(2, -2))
+                    local ret, envName = reaper.GetEnvelopeName(envelope)
+
+                    envelopeName = envName
+                    envelopePoints = GetEnvelopePointsInRange(envelope, areaStart, areaEnd)
+                end
+
+                local areaData = {
+                    areaStart = areaStart,
+                    areaEnd = areaEnd,
+                    
+                    track = track,
+                    items = items,
+                    
+                    --envelope data
+                    isEnvelope = isEnvelope,
+                    envelope = envelope,
+                    envelopeName = envelopeName,
+                    envelopePoints = envelopePoints,
+                    GUID = GUID:sub(2, -2)
+                }
+
+                table.insert(areaMap, areaData)
+
+                j = j + 3
+            end
+        end
+    end
+
+    return areaMap
+end
+
+--]]
 
 extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'  
 extNameB = 'mccrabney: target notes'  
@@ -717,7 +783,7 @@ extNameB = 'mccrabney: target notes'
 
 function SetTrackRazorEdit(track, areaStart, areaEnd, clearSelection)
   --reaper.ShowConsoleMsg("SetTrackRazorEdit" .. "\n")    
-	if clearSelection == nil then clearSelection = false end
+  if clearSelection == nil then clearSelection = false end
     
     if clearSelection then
         local ret, area = reaper.GetSetMediaTrackInfo_String(track, 'P_RAZOREDITS', '', false)
