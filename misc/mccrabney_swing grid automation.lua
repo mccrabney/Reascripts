@@ -30,7 +30,7 @@
    + initial release
 --]]
 ---------------------------------------------------------------------------------------    
---positiveOnly = false
+positiveOnly = false
 
 jsfx={}
 jsfx.name="swing grid automator"
