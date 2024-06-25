@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.01
+ * Version: 1.02
 --]]
 
 --[[ instructions: 
@@ -26,8 +26,10 @@
 
 --[[
  * Changelog: 
+ * v1.02 (2024-06-25)
+  + bug where non-swing-grid track AI couldn't be moved
  * v1.01 (2024-06-25)
- + bugfixes
+  + bugfixes
  * v1.0 (2024-06-23)
    + initial release
 --]]
@@ -68,8 +70,8 @@ function trackHack()            -- check swing grid track for instructions
     local track = reaper.GetTrack(0,i-1)
     local _, tr_name = reaper.GetSetMediaTrackInfo_String( track, 'P_NAME', '', 0 )
     
-    if tr_name:lower():find("swing grid") then    -- if swing track available
-      tr = track                                  -- assign track
+    if tr_name:lower():find("swing grid") then      -- if swing track available
+      tr = track                                    -- assign track
       retval = reaper.TrackFX_GetParam( tr, 0, 0 )  -- get swing param val
     end -- if grid track available
   end -- for each track
@@ -87,15 +89,14 @@ function trackHack()            -- check swing grid track for instructions
   end
     
   _, _, swingMode, swingAmount = reaper.GetSetProjectGrid(0, false)
-    
+  
+  --[[
   if swingMode == 1 then                        -- if swing grid is on
     reaper.TrackFX_SetParam( tr, 0, 0, swingAmount*100 ) -- set swing
     env = reaper.GetFXEnvelope( tr, 0, 0, true)  -- create envelope
   end -- if swing grid is on
+  --]]
     
-  
-  
-  
   envCount = reaper.CountTrackEnvelopes( tr )             -- count envelopes
   if envCount == 0 then                                   -- if no envelopes
     _, _, swingMode, swingAmount = reaper.GetSetProjectGrid(0, false)
@@ -117,14 +118,15 @@ function main()
   gridTrack, swingParam, env = trackHack()
   
   if curPos ~= lastCurPos or swingParam ~= lastSwingParam then   -- update on edit cursor/swing param change
+    --reaper.ShowConsoleMsg("update" .. "\n")
     if gridTrack then       -- if target track, set swing grid amount using track envelope
       _, division, swingMode, swingAmount = reaper.GetSetProjectGrid(0, false)  -- get current grid details
-      
+       
       automationItemCount = reaper.CountAutomationItems( env )  -- how many AI on relevant envelope
       if automationItemCount ~= 0 and envBypass == 4 then       -- if there's an AI and underlying env bypassed
         for j = automationItemCount-1, 0, -1 do                 -- for each AI, get details
           automationItemStart = reaper.GetSetAutomationItemInfo( env, j, "D_POSITION", 0, 0)
-          length   = reaper.GetSetAutomationItemInfo( env, j, "D_LENGTH" , 0, 0)
+          length = reaper.GetSetAutomationItemInfo( env, j, "D_LENGTH" , 0, 0)
           automationItemEnd = automationItemStart + length
           
           if curPos >= automationItemStart and curPos < automationItemEnd then  -- if cursor is within AI bounds
