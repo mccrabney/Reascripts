@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney scripts" commit="62bc9b35fb78e7fbf168850b2bb462f1235d6446">
+<index version="1" name="mccrabney scripts" commit="af1ed2afd4130154615c0a0acc4f697f7569e006">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -507,6 +507,9 @@
       </version>
       <version name="1.01" author="mccrabney" time="2024-06-25T19:02:49Z">
         <source main="main">https://github.com/mccrabney/Reascripts/raw/62bc9b35fb78e7fbf168850b2bb462f1235d6446/misc/mccrabney_swing%20grid%20automation.lua</source>
+      </version>
+      <version name="1.02" author="mccrabney" time="2024-06-25T20:03:28Z">
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/af1ed2afd4130154615c0a0acc4f697f7569e006/misc/mccrabney_swing%20grid%20automation.lua</source>
       </version>
     </reapack>
   </category>
