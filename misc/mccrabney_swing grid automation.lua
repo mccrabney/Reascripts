@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.00
+ * Version: 1.01
 --]]
 
 --[[ instructions: 
@@ -26,11 +26,13 @@
 
 --[[
  * Changelog: 
+ * v1.01 (2024-06-25)
+ + bugfixes
  * v1.0 (2024-06-23)
    + initial release
 --]]
 ---------------------------------------------------------------------------------------    
-positiveOnly = false
+--positiveOnly = false
 
 jsfx={}
 jsfx.name="swing grid automator"
@@ -101,6 +103,7 @@ function trackHack()            -- check swing grid track for instructions
     env = reaper.GetFXEnvelope( tr, 0, 0, true)         -- create envelope
     if envBypass == 4 then                              -- if using detached envelopes
       reaper.InsertAutomationItem( env, 1, curPos, 0)   -- insert an automation item at curPos
+      --reaper.InsertAutomationItem( env, 1, 0, 0)        -- insert an automation item at prj start
     end
   else -- if envelopes exist, get it by name
     env = reaper.GetTrackEnvelopeByName( tr, "swing grid amount / swing grid automator" )
@@ -130,7 +133,11 @@ function main()
           end -- if cursor is in AI
         end -- for each AI
       else -- if no AI, or if background envelopes not bypassed
-        _, value = reaper.Envelope_Evaluate( envelope, curPos, 0, 0)        -- get envelope value at curPos
+        if automationItemCount == 0 and envBypass == 4 then
+          reaper.InsertAutomationItem( env, 1, curPos, 0)   -- insert an automation item at curPos
+        end
+        
+        _, value = reaper.Envelope_Evaluate( env, curPos, 0, 0)        -- get envelope value at curPos
         reaper.GetSetProjectGrid( 0, 1, division, swingmode, value/100 )    -- set grid swing to env value
       end -- if there's automation items
     end -- if gridTrack is present
