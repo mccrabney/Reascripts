@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 6.0
  * Extensions: None
- * Version: 1.0
+ * Version: 1.1
 --]]
  
 --[[
  * Changelog:
+ * v1.1 (2024-10-19)
+   + added missing null variable
  * v1.0 (2021-03-22)
    + Initial Release
 --]]
@@ -26,5 +28,5 @@
     SetGlobalParam(job, _, _, _, incr)
   end
   ----------------------------
-  main()
+  defer(main)
 
