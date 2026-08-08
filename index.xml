@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney scripts" commit="7b74014f53f4d478a494d358b683e86638254c05">
+<index version="1" name="mccrabney scripts" commit="9c5c40b5a4cd21db2d15444a8ba937f3842ff85f">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -481,6 +481,12 @@
     <reapack name="mccrabney_Pincher (delete controller-specified MIDI notes under play cursor).lua" type="script" desc="Pincher (delete controller-specific MIDI notes under play cursor)">
       <version name="1.00" author="mccrabney" time="2024-01-22T17:38:33Z">
         <source main="main">https://github.com/mccrabney/Reascripts/raw/708454d1a63523b2c9fd6dbceaec36f27b17ebab/MIDI%20Edits/mccrabney_Pincher%20(delete%20controller-specified%20MIDI%20notes%20under%20play%20cursor).lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_swing grid automation.lua" type="script" desc="swing grid automation">
+      <version name="1.02" author="mccrabney" time="2026-08-08T18:59:26Z">
+        <changelog><![CDATA[+ bug where non-swing-grid track AI couldn't be moved]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/9c5c40b5a4cd21db2d15444a8ba937f3842ff85f/MIDI%20Edits/mccrabney_swing%20grid%20automation.lua</source>
       </version>
     </reapack>
   </category>
