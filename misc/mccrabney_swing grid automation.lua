@@ -42,9 +42,9 @@ local positiveOnly = true
 
 reaper.set_action_options(1)
 
-local profiler = dofile(reaper.GetResourcePath() ..
-  '/Scripts/ReaTeam Scripts/Development/cfillion_Lua profiler.lua')
-reaper.defer = profiler.defer
+--local profiler = dofile(reaper.GetResourcePath() ..
+--  '/Scripts/ReaTeam Scripts/Development/cfillion_Lua profiler.lua')
+--reaper.defer = profiler.defer
 
 ---------------------------------------------------
 jsfx={}
