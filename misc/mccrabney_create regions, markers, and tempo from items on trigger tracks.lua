@@ -4,8 +4,17 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.00
+ * Version: 1.2
 --]]
+
+--[[
+ * Changelog:
+ * v1.1 (2026-08-21)
+   + misc bug fixes and commenting
+ * v1.1 (2025-10-22)
+   + add tempo marker at time 0 to change project tempo
+--]]
+
      
 ---------------------------------------------------------------------------------------    
 -- add three tracks, respectively titled "markers" and "regions" and "tempo/time" to the top of your project. 
@@ -38,11 +47,18 @@ denominator = reaper.SNM_GetIntConfigVar( projtsdenom, 0 )
 
 deleteMarkers(markersAndRegions)
 deleteTempoMarkers(ts)
-tsTable = {}
+
+reaper.ClearConsole()
+
+pos = reaper.GetCursorPosition()
+
 
 for i = 1, reaper.CountTracks(0) do               -- for each track
-  if targetTracks > 2 then return end             -- quit when target tracks exhausted
-  track = reaper.GetTrack(0,i-1)                  -- get track, name
+  if targetTracks > 2 then 
+    reaper.Undo_OnStateChange2(proj, "updated markers, regions, and tempo")
+    return 
+  end             -- quit when target tracks exhausted
+  track = reaper.GetTrack(0, i-1)                  -- get track, name
   _, tr_name = reaper.GetSetMediaTrackInfo_String( track, 'P_NAME', '', 0 ) -- get trackname
 
   if tr_name:lower():find("tempo/time") then      -- if track name is "markers"
@@ -55,20 +71,21 @@ for i = 1, reaper.CountTracks(0) do               -- for each track
         take = reaper.GetActiveTake(item)         -- get take
         takeName = reaper.GetTakeName( take )     -- get take details, add marker
         pos = reaper.GetMediaItemInfo_Value( item, "D_POSITION" )
-        length = reaper.GetMediaItemInfo_Value( item, "D_LENGTH" )
+      
         if reaper.GetMediaItemInfo_Value( item, "B_MUTE") ~= 1 then -- if not muted
           local j = 0
           for param in string.gmatch(takeName, '([^,/%s]+)') do  -- get a table from string
             j = j + 1
             if tonumber(param) ~= nil then tsTable[j] = tonumber(param) end
           end
-          if #tsTable == 2 then 
-            reaper.AddTempoTimeSigMarker(0, pos, tsTable[1], numerator, denominator, true)
-          elseif #tsTable == 1 then 
-            reaper.AddTempoTimeSigMarker(0, pos, tsTable[1], numerator, denominator, false)
-          end -- tsTable conditions
+          local gradual = false
+          if j == 2 then gradual = true end
+          reaper.AddTempoTimeSigMarker(0, pos, tsTable[1], numerator, denominator, gradual)
         end -- if item is not muted
       end -- if it's an item
+      if p == 0 and pos ~= 0 and #tsTable ~= 0 then
+        reaper.AddTempoTimeSigMarker(0, 0, tsTable[1], numerator, denominator, false)
+      end
     end -- for each item
     reaper.UpdateTimeline()
   end -- if correct track
@@ -101,14 +118,15 @@ for i = 1, reaper.CountTracks(0) do               -- for each track
         pos = reaper.GetMediaItemInfo_Value( item, "D_POSITION" )
         name = reaper.GetMediaItemInfo_Value( item, "D_NAME" )
         color = reaper.GetDisplayedMediaItemColor(item)
-        reaper.AddProjectMarker2( 0, false, pos, 0, takeName, i+1, color )
+        if reaper.GetMediaItemInfo_Value( item, "B_MUTE") ~= 1 then -- if not muted
+          reaper.AddProjectMarker2( 0, false, pos, 0, takeName, i+1, color )
+        end
       end -- if it's an item
     end -- for each item
   end -- if correct track
 end -- for each track
-reaper.Undo_OnStateChange2(proj, "updated markers, regions, and tempo")
 
---[[  an attempt to handle time signature changes - issue is that changing ts
+--[[  an attempt to handle time signature changes
 
           if #tsTable == 4 then
             if tsTable[2] ~= nil then tsTable[2] = true else tsTable[2] = false end
