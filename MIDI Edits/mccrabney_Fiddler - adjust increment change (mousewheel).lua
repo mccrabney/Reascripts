@@ -2,13 +2,15 @@
  * ReaScript Name: adjust increment change
  * Author: mccrabney
  * Licence: GPL v3
- * REAPER: 6.0
+ * REAPER: 7.0
  * Extensions: None
- * Version: 1.13
+ * Version: 1.14
 --]]
  
 --[[
  * Changelog:
+ * v1.14 (2025-1-4)
+   + reaper.set_action_options(1)
  * v1.13 (2024-5-21)
    + switch to using local Razor Edit Function module
  * v1.12 (2023-6-3)
@@ -27,7 +29,7 @@ for key in pairs(reaper) do _G[key]=reaper[key]  end
 local info = debug.getinfo(1,'S');
 dofile(script_folder .. "Modules/mccrabney_Razor_Edit_functions.lua")   
 extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
-
+reaper.set_action_options(1)
 ---------------------------------------------------------------------
     --[[------------------------------[[--
           adjust incr
@@ -58,7 +60,7 @@ function main()
   end  
   
   reaper.SetExtState(extName, 6, incr, true)
-  
+  reaper.Undo_OnStateChange2(proj, "incr change")
   --reaper.DeleteExtState(extName, 6, false) 
     
 end
