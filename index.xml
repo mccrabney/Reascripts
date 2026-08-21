@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney scripts" commit="69873d50d3df7dda8213a41d6ba0abb110d41b32">
+<index version="1" name="mccrabney scripts" commit="90f67dc6408f2ec654256b504fda4e5c57d97218">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -202,6 +202,10 @@
         <changelog><![CDATA[+ switch to using local Razor Edit Function module]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/3c7e8fa24caf4ee26a68b662694deb72f4a5847c/MIDI%20Edits/mccrabney_Fiddler%20-%20adjust%20increment%20change%20(mousewheel).lua</source>
       </version>
+      <version name="1.14" author="mccrabney" time="2026-08-21T17:09:26Z">
+        <changelog><![CDATA[+ reaper.set_action_options(1)]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/a1022077488c688bdd1959ae6b346041f83052ef/MIDI%20Edits/mccrabney_Fiddler%20-%20adjust%20increment%20change%20(mousewheel).lua</source>
+      </version>
     </reapack>
     <reapack name="mccrabney_Fiddler - adjust length of target notes (mousewheel).lua" type="script" desc="adjust length of target notes (mousewheel)">
       <version name="1.31" author="mccrabney" time="2023-12-05T19:35:08Z">
@@ -215,6 +219,11 @@
       <version name="1.33" author="mccrabney" time="2024-05-22T15:27:01Z">
         <changelog><![CDATA[+ switch to using local Razor Edit Function module]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/3c7e8fa24caf4ee26a68b662694deb72f4a5847c/MIDI%20Edits/mccrabney_Fiddler%20-%20adjust%20length%20of%20target%20notes%20(mousewheel).lua</source>
+      </version>
+      <version name="1.4" author="mccrabney" time="2026-08-21T17:10:31Z">
+        <changelog><![CDATA[+ better RazorEditSelectionExists function
++ fixed multi-selected note ends]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/90f67dc6408f2ec654256b504fda4e5c57d97218/MIDI%20Edits/mccrabney_Fiddler%20-%20adjust%20length%20of%20target%20notes%20(mousewheel).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Fiddler - adjust velocity of target notes (mousewheel).lua" type="script" desc="adjust velocity of target notes (mousewheel)">
