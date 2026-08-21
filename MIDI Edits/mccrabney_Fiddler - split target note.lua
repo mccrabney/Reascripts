@@ -2,13 +2,17 @@
  * ReaScript Name: split target note
  * Author: mccrabney
  * Licence: GPL v3
- * REAPER: 6.0
+ * REAPER: 7.0
  * Extensions: None
- * Version: 1.2
+ * Version: 1.4
 --]]
  
 --[[
  * Changelog:
+ * v1.4 (2026-08-21)
+   + better RazorEditSelectionExists function
+ * v1.3 (2025-_-_)
+   + work on editcursorpos only
  * v1.2 (2024-5-26)
    + fix missing BR mouse call when using mouse cursor as split target point 
  * v1.1 (2024-5-21)
@@ -25,7 +29,7 @@ for key in pairs(reaper) do _G[key]=reaper[key]  end
 local info = debug.getinfo(1,'S');
 dofile(script_folder .. "Modules/mccrabney_Razor_Edit_functions.lua")   
 extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
-
+reaper.set_action_options(1)
 
 -----------------------------------------------------------
     --[[------------------------------[[--
@@ -33,34 +37,34 @@ extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
     --]]------------------------------]]--
     
 function RazorEditSelectionExists()
- 
-  for i = 0, reaper.CountTracks(0)-1 do          -- for each track, check if RE is present
+  for i = 0, reaper.CountTracks(0)-1 do
     local retval, x = reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(0,i), "P_RAZOREDITS", "string", false)
-    if x ~= "" then return true end              -- if present, return true 
-    if x == nil then return false end            -- return that no RE exists
-  end
-end                                 
+    if x ~= "" then 
+    return true end
+  end--for  
+  return false
+end                              
+                                  
   
 ---------------------------------------------------------------------
     --[[------------------------------[[--
           refer to extstates to get MIDI under mouse
     --]]------------------------------]]--
     
-function getNotesUnderCursor()
-  
+function getNotesUnderMouseCursor()
   showNotes = {}
   numVars = tonumber(reaper.GetExtState(extName, 1 ))
   tableSize = tonumber(reaper.GetExtState(extName, 2 ))
   guidString = reaper.GetExtState(extName, 3 )
   take = reaper.SNM_GetMediaItemTakeByGUID( 0, guidString )
-  
   targetNoteNumber = tonumber(reaper.GetExtState(extName, 4 ))
   targetNoteIndex = tonumber(reaper.GetExtState(extName, 5 ))
+  cursorSource = tonumber(reaper.GetExtState(extName, 8 ))
   
   if tableSize ~= nil then 
     for t = 1, tableSize do
       showNotes[t] = {}
-      if reaper.HasExtState(extName, t+numVars) then
+      if reaper.HasExtState(extName, t+4) then
         for i in string.gmatch(reaper.GetExtState(extName, t+numVars), "-?%d+,?") do
           table.insert(showNotes[t], tonumber(string.match(i, "-?%d+")))
         end
@@ -69,7 +73,7 @@ function getNotesUnderCursor()
   end
   
   return take, targetNoteNumber, targetNoteIndex
-end
+end    
 
 ---------------------------------------------------------------------
     --[[------------------------------[[--
@@ -85,21 +89,11 @@ function main()
     --job = 1
     --SetGlobalParam(job, task, _)
   else
-    take, targetNoteNumber, targetNoteIndex = getNotesUnderCursor()
-    
-    if cursorSource == 1 then
-      window, segment, details = reaper.BR_GetMouseCursorContext()
-      cursorPos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position
-    else
-      cursorPos = reaper.GetCursorPosition()   -- get pos at edit cursor
-    end
-    
+    take, targetNoteNumber, targetNoteIndex = getNotesUnderMouseCursor()
+    cursorPos = reaper.GetCursorPosition()   -- get pos at edit cursor
     local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"} 
     
     if take ~= nil and targetNoteIndex ~= -1 then
-      if cursorSource == 0 then 
-        cursorPos = reaper.GetCursorPosition() 
-      end
       -- get edit cursor position
       editCursor_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, cursorPos) -- convert project time to PPQ
       notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take
@@ -113,7 +107,7 @@ function main()
         
       end
       reaper.MIDI_Sort(take)
-      reaper.SetExtState(extName, 'DoRefresh', '1', false)
+      --reaper.SetExtState(extName, 'DoRefresh', '1', false)
       octave = math.floor(targetNoteNumber/12)-1                               -- establish the octave for readout
       cursorNoteSymbol = pitchList[(targetNoteNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
       reaper.Undo_OnStateChange2(proj, "split note" .. targetNoteNumber .. ", (" .. cursorNoteSymbol .. octave .. ")")
