@@ -16,7 +16,7 @@
  
 --[[
  * Changelog:
- * v1.1 (
+ * v1.1 (2026-08-21)
    + works on all selected notes, disregards razor edits.
    + better RazorEditSelectionExists function
  * v1.0 (2025-06-11)
