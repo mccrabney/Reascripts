@@ -4,12 +4,12 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.4
+ * Version: 1.6
 --]]
  
 --[[
  * Changelog:
- * v1.6 (2025-_-_)
+ * v1.6 (2026-08-21)
    + better RazorEditSelectionExists function
    + move from for getnote to while enumSel to speed up script
  * v1.5 (2025-_-_)
