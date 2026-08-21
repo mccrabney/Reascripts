@@ -4,12 +4,12 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.4
+ * Version: 1.35
 --]]
  
 --[[
  * Changelog:
- * v1.4 (2026-08-21)
+ * v1.35 (2026-08-21)
    + better RazorEditSelectionExists function
    + fixed multi-selected note ends
  * v1.34 (2025-1-3)
