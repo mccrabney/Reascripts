@@ -11,10 +11,10 @@ function SetGlobalParam(job, task, clear, val, incr)   -- get job and details fr
   --reaper.ClearConsole()
   --reaper.ShowConsoleMsg("SetGlobalParam" .. "\n")
   if clear == 1 then unselectAllMIDIinTrack() end     -- deselect MIDI in every item on selected track
-  if job == 1 then MIDINotesInRE(task) end
-  if job == 2 then muteREcontents() end                   -- RE movement/size controls
-  if job == 3 then moveREbyVisibleGrid(incr) end
-  if job == 4 then moveREwithcursor(val) end
+  if job == 1 then MIDINotesInRE(task) end            -- various MIDI edits
+  if job == 2 then muteREcontents() end               -- RE mute
+  if job == 3 then moveREbyVisibleGrid(incr) end      -- RE movement/size controls
+  if job == 4 then moveREwithcursor(val) end          
   if job == 5 or                                        
      job == 6 then resizeREbyVisibleGrid(job, val) end
 end
@@ -24,16 +24,13 @@ end
           do edits to notes in RE   -- mccrabney        
     --]]------------------------------]]--    
 
-noteHoldNumber = -1
+local noteHoldNumber = -1
 function MIDINotesInRE(task)
-  --reaper.ShowConsoleMsg("MIDINotesInRE" .. "\n")
   local mouseNote                 -- note under mouse cursor
   local mouseTake                 -- take under mouse
   local mouseItem                 -- item under mouse
   local mouse_position_ppq        -- ppq pos of mouse at function call
-  cursorSource = tonumber(reaper.GetExtState(extName, 8 ))
-  noteHoldNumber = tonumber(reaper.GetExtState(extName, 'noteHold' ))
-  --reaper.ShowConsoleMsg(noteHoldNumber.. "\n")
+  noteHoldNumber = tonumber(reaper.GetExtState(extName, 'noteHoldNumber' ))
   local count = 0
   local targetedNotes = 0
   reaper.PreventUIRefresh(1)
@@ -55,19 +52,15 @@ function MIDINotesInRE(task)
         
         for j = 1, #items do                           -- for each item, 
           local item = items[j]
-          local itemStart = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
-          local itemEnd = itemStart+ reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
-                        
           for t = 0, reaper.CountTakes(item)-1 do       -- for each take,
             take = reaper.GetTake(item, t)              -- get take
             if reaper.TakeIsMIDI(take) then             -- if it's MIDI, get RE PPQ values
-              itemStart_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, itemStart) 
-              itemEnd_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, itemEnd) 
-              razorStart_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, start_pos) 
-              razorEnd_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, end_pos) 
-              notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take                    
-              doOnce = 0 
- 
+              local itemStart = reaper.GetMediaItemInfo_Value(item, "D_POSITION")
+              local itemEnd = itemStart+ reaper.GetMediaItemInfo_Value(item, "D_LENGTH")
+              local razorStart_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, start_pos) 
+              local razorEnd_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, end_pos) 
+              local notesCount, _, _ = reaper.MIDI_CountEvts(take) -- count notes in current take                    
+              
               -----------------------------------------------------------------------                
               -- the MIDI task switch section: performs edits on MIDI in RE selection 
               ----------------------------------------------------------------------- 
@@ -75,215 +68,204 @@ function MIDINotesInRE(task)
               -- EDIT: nudge notes whose noteons exist within Razor Edit backwards 
               if task == 6 and incr < 0 then
                 for n = 0, notesCount do         --- for each note, starting with first in item
-                  _, _, muted, startppqposOut, endppqposOut, _, pitch, vel = reaper.MIDI_GetNote(take, n) -- get note info
+                  local _, _, muted, startppqposOut, endppqposOut, _, pitch, vel = reaper.MIDI_GetNote(take, n) -- get note info
                   if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then
                     if noteHoldNumber == -1 then
-                      reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
+                      reaper.MIDI_SetNote( take, n, true, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
                     elseif noteHoldNumber == pitch then
                       reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
                     end
-                    reaper.SetExtState(extName, 'DoRefresh', '1', false)      
+                    --reaper.SetExtState(extName, 'DoRefresh', '1', false)      
                     undoMessage = "nudge notes in REs"
                   end
                 end
               end
               
-              for n = notesCount-1, 0, -1 do         --- for each note, starting with last in item
-                _, sel, muted, startppqposOut, endppqposOut, chan, pitch, vel = reaper.MIDI_GetNote(take, n) -- get note info
-                
-              -- delete notes with razor edits:
-                
-                  -- EDIT: delete all notes whose noteons exist within Razor Edit
-                if task == 1 then   
-                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    if noteHoldNumber == -1 then
-                      reaper.MIDI_DeleteNote( take, n )
-                    elseif noteHoldNumber == pitch then
-                      reaper.MIDI_DeleteNote( take, n )
-                    end
-                    reaper.SetExtState(extName, 'DoRefresh', '1', false)      
-                    undoMessage = "delete notes in RE"
-                  end
-                
-                -- EDIT: delete all notes greater/equal than last-hit whose noteons exist within Razor Edit
-                elseif task == 2 then   
-                  if pitch >= lastNoteHit and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_DeleteNote( take, n )
-                    reaper.SetExtState(extName, 'DoRefresh', '1', false)      
-                    undoMessage = "delete notes higher than lasthit in RE" 
-                  end
-                
-                -- EDIT: delete all notes less/equal than last-hit whose noteons exist within Razor Edit
-                elseif task == 3 then   
-                  if pitch <= lastNoteHit and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    reaper.MIDI_DeleteNote( take, n )
-                    reaper.SetExtState(extName, 'DoRefresh', '1', false)      
-                    undoMessage = "delete notes lower than lasthit in RE" 
-                  end 
-
-                -- EDIT: delete all notes whose noteons AND noteoffs exist within Razor Edit
-                elseif task == 8 then   
-                  if startppqposOut >= razorStart_ppq_pos and endppqposOut < razorEnd_ppq_pos then 
-                    if noteHoldNumber == -1 then
-                      reaper.MIDI_DeleteNote( take, n )
-                    elseif noteHoldNumber == pitch then
-                      reaper.MIDI_DeleteNote( take, n )
-                    end                    
-                    reaper.SetExtState(extName, 'DoRefresh', '1', false)      
-                    undoMessage = "delete notes contained within RE" 
-                  end
-                    
-                -- EDIT: delete all notes < note under mouse cursor whose noteons exist within Razor Edit
-                elseif task == 9 then   
-                  if mouseNote ~= nil and
-                    startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch > mouseNote then 
-                    reaper.MIDI_DeleteNote( take, n )
-                    reaper.SetExtState(extName, 'DoRefresh', '1', false)      
-                    undoMessage = "delete notes <= note under mouse cursor in RE" 
-                  end     
-                    
-                -- EDIT: delete all notes > note under mouse cursor whose noteons exist within Razor Edit
-                elseif task == 10 then   
-                  if mouseNote ~= nil and
-                    startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch < mouseNote then 
-                    reaper.MIDI_DeleteNote( take, n ) 
-                    reaper.SetExtState(extName, 'DoRefresh', '1', false)      
-                    undoMessage = "delete notes >= note under mouse cursor in RE" 
-                  end
-                  
-                -- EDIT: delete all notes <= note under mouse cursor whose noteons exist within Razor Edit
-                elseif task == 15 then   
-                  if mouseNote ~= nil and
-                    startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch >= mouseNote then 
-                    reaper.MIDI_DeleteNote( take, n )
-                    undoMessage = "delete notes <= note under mouse cursor in RE" 
-                    reaper.SetExtState(extName, 'DoRefresh', '1', false)      
-
-                  end     
-                    
-                -- EDIT: delete all notes >= note under mouse cursor whose noteons exist within Razor Edit
-                elseif task == 16 then   
-                  if mouseNote ~= nil and
-                    startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch <= mouseNote then 
-                    reaper.MIDI_DeleteNote( take, n ) 
-                    undoMessage = "delete notes >= note under mouse cursor in RE" 
-                    reaper.SetExtState(extName, 'DoRefresh', '1', false)      
-                    
-                  end
-                                    
-           -----------------------------------------------------------------------
-              -- select notes with razor edits:
-                         
-                -- EDIT: select all notes whose noteons exist within Razor Edit
-                elseif task == 5 then
-                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
-                    if noteHoldNumber == -1 then
-                      reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, nil, nil)
-                    elseif noteHoldNumber == pitch then
-                      reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, nil, nil)
-                    end
-                  end
-                  undoMessage = "select all notes in RE"
-                  
-           -----------------------------------------------------------------------
-              -- nudge notes with razor edits:
+              if not noteHoldNumber then noteHoldNumber = -1 end
               
-                -- EDIT: nudge notes whose noteons exist within Razor Edit forwards 
-               elseif task == 6 and incr > 0 then
-                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
-                    if noteHoldNumber == -1 then                    
-                      reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
-                    elseif noteHoldNumber == pitch then
-                      reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
-                    end
-                    reaper.SetExtState(extName, 'DoRefresh', '1', false)      
-                    if n == 0 then undoMessage = "nudge notes in REs" end
-                  end
-
-                -- EDIT: nudge noteoffs whose noteons exist within Razor Edit forwards and backwards
-                elseif task == 18 then  
-                  --reaper.ShowConsoleMsg(incr .. "\n")
-                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    if noteHoldNumber == -1 then                    
-                      reaper.MIDI_SetNote( take, n, nil, nil, nil, endppqposOut+incr, nil, nil, nil, nil)
-                    elseif noteHoldNumber == pitch then
-                      reaper.MIDI_SetNote( take, n, nil, nil, nil, endppqposOut+incr, nil, nil, nil, nil)
-                    end
-                    undoMessage = "adjust length of notes in RE" 
-                    reaper.SetExtState(extName, 'DoRefresh', '1', false)      
-                  end
-                  
-              -- toggle mute notes with razor edits:
-                elseif task == 17 then  
-                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
-                    if noteHoldNumber == -1 then                    
-                      if muted == false then reaper.MIDI_SetNote( take, n, nil, true, nil, nil, nil, nil, nil, nil)
-                      else reaper.MIDI_SetNote( take, n, nil, false, nil, nil, nil, nil, nil, nil)
+              for n = notesCount-1, 0, -1 do         --- for each note, starting with last in item
+                local _, sel, muted, startppqposOut, endppqposOut, chan, pitch, vel = reaper.MIDI_GetNote(take, n) -- get note info
+                local notePos = reaper.MIDI_GetProjTimeFromPPQPos(take, startppqposOut)
+                -- delete notes with razor edits:
+                  -- EDIT: delete all notes whose noteons exist within Razor Edit
+                  if task == 1 then   
+                    if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
+                      --if noteHoldNumber == -1 then
+                      --  reaper.MIDI_DeleteNote( take, n )
+                      --elseif noteHoldNumber == pitch then
+                      if sel == true then  
+                        reaper.MIDI_DeleteNote( take, n )
                       end
-                    elseif noteHoldNumber == pitch then
-                      if muted == false then reaper.MIDI_SetNote( take, n, nil, true, nil, nil, nil, nil, nil, nil)
-                      else reaper.MIDI_SetNote( take, n, nil, false, nil, nil, nil, nil, nil, nil)
-                      end
+                      undoMessage = "delete notes in RE"
                     end
-                    reaper.SetExtState(extName, 'DoRefresh', '1', false)      
-                    undoMessage = "mute notes in RE" 
-                  end
                   
-                -- EDIT: change velocity of notes whose noteons exist within Razer Edits
-                elseif task == 20 then  
-                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
-                    vel = vel+incr
-                    if vel > 127 then vel = 127 end
-                    if vel < 1 then vel = 1 end
-                    if noteHoldNumber == -1 then                    
-                      reaper.MIDI_SetNote( take, n, nil, nil, nil, nil, nil, nil, vel)
-                    elseif noteHoldNumber == pitch then
-                      reaper.MIDI_SetNote( take, n, nil, nil, nil, nil, nil, nil, vel)
+                  -- EDIT: delete all notes greater/equal than last-hit whose noteons exist within Razor Edit
+                  elseif task == 2 then   
+                    if pitch >= lastNoteHit and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
+                      reaper.MIDI_DeleteNote( take, n )
+                      undoMessage = "delete notes higher than lasthit in RE" 
                     end
-                    reaper.SetExtState(extName, 'DoRefresh', '1', false)      
-                    undoMessage = "changed velocity of notes in REs"
-                  end       
-
-                -- EDIT: transpose notes whose noteons exist within Razer Edits
-                elseif task == 21 then
-                  if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and noteHoldNumber ~= -1 and sel == true
-                  or startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and noteHoldNumber == -1 then 
-                    local ogPitch = pitch
-                    pitch = pitch + incr
-                    if pitch > 127 then pitch = 127 end
-                    if pitch < 0 then pitch = 0 end
-                    reaper.MIDI_SetNote( take, n, nil, nil, nil, nil, nil, pitch, nil)
-                    undoMessage = "transposed notes in REs"
-                    if noteHoldNumber == ogPitch then
-                      reaper.SetExtState(extName, "noteHold", pitch, false)
-                      reaper.SetExtState(extName, "noteHoldUpdate", incr, false)
-                      reaper.SetExtState(extName, 'DoRefresh2', '1', false)      
+                  
+                  -- EDIT: delete all notes less/equal than last-hit whose noteons exist within Razor Edit
+                  elseif task == 3 then   
+                    if pitch <= lastNoteHit and startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
+                      reaper.MIDI_DeleteNote( take, n )
+   
+                      undoMessage = "delete notes lower than lasthit in RE" 
+                    end 
+  
+                  -- EDIT: delete all notes whose noteons AND noteoffs exist within Razor Edit
+                  elseif task == 8 then   
+                    if startppqposOut >= razorStart_ppq_pos and endppqposOut < razorEnd_ppq_pos then 
+                      if noteHoldNumber == -1 then
+                        reaper.MIDI_DeleteNote( take, n )
+                      elseif noteHoldNumber == pitch then
+                        reaper.MIDI_DeleteNote( take, n )
+                      end                    
+                      undoMessage = "delete notes contained within RE" 
                     end
-                  end
+                      
+                  -- EDIT: delete all notes < note under mouse cursor whose noteons exist within Razor Edit
+                  elseif task == 9 then   
+                    if mouseNote ~= nil and
+                      startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch > mouseNote then 
+                      reaper.MIDI_DeleteNote( take, n )
+                      undoMessage = "delete notes <= note under mouse cursor in RE" 
+                    end     
+                      
+                  -- EDIT: delete all notes > note under mouse cursor whose noteons exist within Razor Edit
+                  elseif task == 10 then   
+                    if mouseNote ~= nil and
+                      startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch < mouseNote then 
+                      reaper.MIDI_DeleteNote( take, n ) 
+                      undoMessage = "delete notes >= note under mouse cursor in RE" 
+                    end
                     
-                -- split notes whose noteons exist within Razor Edit at mouse cursor
-                elseif task == 7 then   
-                  if cursorSource == 1 then
-                    cursorPos = reaper.BR_GetMouseCursorContext_Position() -- get mouse position
-                  else
-                    cursorPos = reaper.GetCursorPosition()   -- get pos at edit cursor
-                  end
-                  editCursor_ppq_pos = reaper.MIDI_GetPPQPosFromProjTime(take, cursorPos) -- convert project time to PPQ
-                  if startppqposOut < editCursor_ppq_pos and editCursor_ppq_pos < endppqposOut then
-                    reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut, editCursor_ppq_pos-96, nil, nil, nil, nil)
-                    reaper.MIDI_InsertNote( take, sel, 0, editCursor_ppq_pos, endppqposOut, chan, pitch, vel, nil)
-                    reaper.MIDI_Sort(take)
-                  end  
-                  reaper.SetExtState(extName, 'DoRefresh', '1', false)      
-                  undoMessage = "split notes" 
-                end     -- of MIDI task switch section
-              end       -- for each note   
+                  -- EDIT: delete all notes <= note under mouse cursor whose noteons exist within Razor Edit
+                  elseif task == 15 then   
+                    if mouseNote ~= nil and
+                      startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch >= mouseNote then 
+                      reaper.MIDI_DeleteNote( take, n )
+                      undoMessage = "delete notes <= note under mouse cursor in RE" 
+                    end     
+                      
+                  -- EDIT: delete all notes >= note under mouse cursor whose noteons exist within Razor Edit
+                  elseif task == 16 then   
+                    if mouseNote ~= nil and
+                      startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and pitch <= mouseNote then 
+                      reaper.MIDI_DeleteNote( take, n ) 
+                      undoMessage = "delete notes >= note under mouse cursor in RE" 
+                    end
+                                      
+             -----------------------------------------------------------------------
+                -- select notehold notes with razor edits:
+                           
+                  elseif task == 5 then
+                    if notePos >= itemStart and notePos < itemEnd then   -- if within item bounds
+                      if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
+                        if noteHoldNumber == pitch then
+                          reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, nil, nil)
+                        end
+                      end
+                      undoMessage = "select noteHold notes in RE"
+                    end
+                    
+             -----------------------------------------------------------------------
+                 -- select notes with razor edits:
+                            
+                   -- EDIT: select all notes whose noteons exist within Razor Edit
+                   elseif task == 18 then
+                     if notePos >= itemStart and notePos < itemEnd then   -- if within item bounds
+                       if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
+                        reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, nil, nil)
+                       end
+
+                       undoMessage = "select all notes in RE"
+                     end
+              
+             -----------------------------------------------------------------------
+                -- nudge notes with razor edits:
+                
+                  -- EDIT: nudge notes whose noteons exist within Razor Edit forwards 
+                 --elseif task == 6 and incr > 0 then   --?? what was the reasoning here
+                 elseif task == 6 then
+                    if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
+                      if noteHoldNumber == -1 then                    
+                        reaper.MIDI_SetNote( take, n, true, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
+                      elseif noteHoldNumber == pitch then
+                        reaper.MIDI_SetNote( take, n, nil, nil, startppqposOut+incr, endppqposOut+incr, nil, nil, nil, nil) 
+                      end
+     
+                      if n == 0 then undoMessage = "nudge notes in REs" end
+    
+                    end
+  
+                  -- EDIT: nudge noteoffs whose noteons exist within Razor Edit forwards and backwards
+                  elseif task == 19 then  
+                    --reaper.ShowConsoleMsg(incr .. "\n")
+                    if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
+                      if noteHoldNumber == -1 then                    
+                        reaper.MIDI_SetNote( take, n, true, nil, nil, endppqposOut+incr, nil, nil, nil, nil)
+                      elseif noteHoldNumber == pitch then
+                        reaper.MIDI_SetNote( take, n, nil, nil, nil, endppqposOut+incr, nil, nil, nil, nil)
+                      end
+                      undoMessage = "adjust length of notes in RE" 
+                    end
+                    
+                -- toggle mute notes with razor edits:
+                  elseif task == 17 then  
+                    if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then -- pitch ~= lastNoteHit and 
+                      if noteHoldNumber == -1 then                    
+                        if muted == false then reaper.MIDI_SetNote( take, n, nil, true, nil, nil, nil, nil, nil, nil)
+                        else reaper.MIDI_SetNote( take, n, nil, false, nil, nil, nil, nil, nil, nil)
+                        end
+                      elseif noteHoldNumber == pitch then
+                        if muted == false then reaper.MIDI_SetNote( take, n, nil, true, nil, nil, nil, nil, nil, nil)
+                        else reaper.MIDI_SetNote( take, n, nil, false, nil, nil, nil, nil, nil, nil)
+                        end
+                      end
+                      undoMessage = "mute notes in RE" 
+                    end
+                    
+                  -- EDIT: change velocity of notes whose noteons exist within Razer Edits
+                  elseif task == 20 then  
+                    if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos then 
+                      vel = vel+incr
+                      if vel > 127 then vel = 127 end
+                      if vel < 1 then vel = 1 end
+                      
+                      if noteHoldNumber == -1 then                    
+                        reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, nil, vel)
+                      elseif noteHoldNumber == pitch then
+                        reaper.MIDI_SetNote( take, n, nil, nil, nil, nil, nil, nil, vel)
+                      end
+ 
+                      undoMessage = "changed velocity of notes in REs"
+                    end       
+  
+                  -- EDIT: transpose notes whose noteons exist within Razer Edits
+                  elseif task == 21 then
+                    if startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and noteHoldNumber ~= -1 and sel == true
+                    or startppqposOut >= razorStart_ppq_pos and startppqposOut < razorEnd_ppq_pos and noteHoldNumber == -1 then 
+                      local ogPitch = pitch
+                      pitch = pitch + incr
+                      if pitch > 127 then pitch = 127 end
+                      if pitch < 0 then pitch = 0 end
+                      reaper.MIDI_SetNote( take, n, true, nil, nil, nil, nil, pitch, nil)
+                      undoMessage = "transposed notes in REs"
+                      if noteHoldNumber == ogPitch then
+                        reaper.SetExtState(extName, "noteHold", pitch, false)
+                      end
+                    end
+                  end     -- of MIDI task switch section
+                --end       -- if within item bounds
+              end         -- for each note   
               
            -----------------------------------------------------------------------                
               reaper.MIDI_Sort( take )      -- run once after MIDI task switch section
                                             -- not sure i'm using this correctly
               reaper.UpdateArrange()        
-              
+              --reaper.SetExtState(extName, 'DoRefresh', '1', false)
             end         -- if it's MIDI
           end           -- for each take
         end             -- for each item
@@ -293,7 +275,9 @@ function MIDINotesInRE(task)
 
   
   -- EDIT: select and copy all MIDI in REs -- occurs here after note-by-note edit switch above
-  if task == 11 then copySelectedMIDIinRE()
+  if task == 11 then 
+    
+    copySelectedMIDIinRE()
     undoMessage = "select/copy all notes in RE"
   end                                       -- select/copy notes in REs
   reaper.PreventUIRefresh(-1)
@@ -362,9 +346,8 @@ end        -- function
     --]]------------------------------]]--
 
 function copySelectedMIDIinRE()
-  --reaper.ShowConsoleMsg("")
   reaper.PreventUIRefresh(1)
-  MIDINotesInRE(5)                            -- select RE-enclosed notes
+  --MIDINotesInRE(5)                            -- select RE-enclosed notes
   if RazorEditSelectionExistsPlus(0,1) then       -- if RE exists (don't make if not) -- unnecessary?
     local areas = GetRazorEdits()             -- get all areas 
     local areaData = areas[1]                 -- look at the first area
@@ -384,12 +367,9 @@ function copySelectedMIDIinRE()
       local item = items[1]                   -- get first item
       local take = reaper.GetTake(item, 0)    -- get first take
       if reaper.TakeIsMIDI(take) then         -- if it's MIDI,
-        --reaper.MIDI_InsertCC( take, 1, 0, razorStart_ppq_pos, 191, 16, 119, 1 )
         reaper.SetMediaItemSelected(item, 1)  -- select the first item
         reaper.Main_OnCommand(40153, 0)       -- open MIDI editor for selected item
-        --local windowHWND = reaper.JS_Window_GetFocus()
-        --reaper.JS_Window_SetOpacity( windowHWND, alpha, 50 )
-        --reaper.MIDI_InsertNote( take, 1, 0, razorStart_ppq_pos, razorStart_ppq_pos+100, 16, 0, 1, nil)
+                                              -- add dummy ccs used as markers
         reaper.MIDI_InsertCC( take, 1, 0, razorStart_ppq_pos, 191, 15, 119, 1 )
         reaper.MIDI_InsertCC( take, 1, 0, razorEnd_ppq_pos, 191, 15, 119, 1 )
         
@@ -772,9 +752,6 @@ end
 --]]
 
 extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'  
-extNameB = 'mccrabney: target notes'  
-
-
 
 ---------------------------------------------------------------------
     --[[------------------------------[[--
@@ -1028,6 +1005,7 @@ function GetVisibleGridDivision()  ----
     
   grid = grid-firstcursorpos
   reaper.Main_OnCommand(40756, 0) -- Snapping: Restore snap state
+  --reaper.ShowConsoleMsg(grid .. "\n")
   return grid   -- grid is in seconds. 
 
 end -- GetVisibleGridDivision()
