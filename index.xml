@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" name="mccrabney scripts" commit="3b4162140fc22fc9476eec6afec07418a53ed3e9">
+<index version="1" name="mccrabney scripts" commit="9597a0aa03a3b6396b3044a00cb7410442fcb2f5">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -191,6 +191,15 @@
         <source file="Modules/mccrabney_MIDI_Under_Mouse.lua">https://github.com/mccrabney/Reascripts/raw/cfc2df693ad085f79d1300a9aeccbe727a13b23e/MIDI%20Edits/Modules/mccrabney_MIDI_Under_Mouse.lua</source>
         <source file="Modules/mccrabney_Razor_Edit_functions.lua">https://github.com/mccrabney/Reascripts/raw/cfc2df693ad085f79d1300a9aeccbe727a13b23e/MIDI%20Edits/Modules/mccrabney_Razor_Edit_functions.lua</source>
         <source file="Modules/mccrabney_misc.lua">https://github.com/mccrabney/Reascripts/raw/cfc2df693ad085f79d1300a9aeccbe727a13b23e/MIDI%20Edits/Modules/mccrabney_misc.lua</source>
+      </version>
+      <version name="2.00" author="mccrabney" time="2026-08-21T17:30:23Z">
+        <changelog><![CDATA[+ changed core targeting/action behavior to work on selected MIDI notes instead of cursor-aimed MIDI notes
++ performance improvements]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/9597a0aa03a3b6396b3044a00cb7410442fcb2f5/MIDI%20Edits/mccrabney_Fiddler%20(arrange%20screen%20MIDI%20editing).lua</source>
+        <source file="Modules/Sexan_Area_51_mouse_mccrabney_tweak.lua">https://github.com/mccrabney/Reascripts/raw/9597a0aa03a3b6396b3044a00cb7410442fcb2f5/MIDI%20Edits/Modules/Sexan_Area_51_mouse_mccrabney_tweak.lua</source>
+        <source file="Modules/mccrabney_MIDI_Under_Mouse.lua">https://github.com/mccrabney/Reascripts/raw/9597a0aa03a3b6396b3044a00cb7410442fcb2f5/MIDI%20Edits/Modules/mccrabney_MIDI_Under_Mouse.lua</source>
+        <source file="Modules/mccrabney_Razor_Edit_functions.lua">https://github.com/mccrabney/Reascripts/raw/9597a0aa03a3b6396b3044a00cb7410442fcb2f5/MIDI%20Edits/Modules/mccrabney_Razor_Edit_functions.lua</source>
+        <source file="Modules/mccrabney_misc.lua">https://github.com/mccrabney/Reascripts/raw/9597a0aa03a3b6396b3044a00cb7410442fcb2f5/MIDI%20Edits/Modules/mccrabney_misc.lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Fiddler - adjust increment change (mousewheel).lua" type="script" desc="adjust increment change">
@@ -527,12 +536,6 @@
     <reapack name="mccrabney_Pincher (delete controller-specified MIDI notes under play cursor).lua" type="script" desc="Pincher (delete controller-specific MIDI notes under play cursor)">
       <version name="1.00" author="mccrabney" time="2024-01-22T17:38:33Z">
         <source main="main">https://github.com/mccrabney/Reascripts/raw/708454d1a63523b2c9fd6dbceaec36f27b17ebab/MIDI%20Edits/mccrabney_Pincher%20(delete%20controller-specified%20MIDI%20notes%20under%20play%20cursor).lua</source>
-      </version>
-    </reapack>
-    <reapack name="mccrabney_swing grid automation.lua" type="script" desc="swing grid automation">
-      <version name="1.02" author="mccrabney" time="2026-08-08T18:59:26Z">
-        <changelog><![CDATA[+ bug where non-swing-grid track AI couldn't be moved]]></changelog>
-        <source main="main">https://github.com/mccrabney/Reascripts/raw/9c5c40b5a4cd21db2d15444a8ba937f3842ff85f/MIDI%20Edits/mccrabney_swing%20grid%20automation.lua</source>
       </version>
     </reapack>
   </category>
