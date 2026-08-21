@@ -4,11 +4,16 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.33
+ * Version: 1.4
 --]]
  
 --[[
  * Changelog:
+ * v1.4 (2026-08-21)
+   + better RazorEditSelectionExists function
+   + fixed multi-selected note ends
+ * v1.34 (2025-1-3)
+   + reaper.set_action_options(1)
   * v1.33 (2024-5-21)
    + switch to using local Razor Edit Function module
  * v1.32 (2024-4-9)
@@ -31,20 +36,20 @@ for key in pairs(reaper) do _G[key]=reaper[key]  end
 local info = debug.getinfo(1,'S');
 dofile(script_folder .. "Modules/mccrabney_Razor_Edit_functions.lua")   
 extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
-
+reaper.set_action_options(1)
 -----------------------------------------------------------
     --[[------------------------------[[--
           check for razor edit 
     --]]------------------------------]]--
     
 function RazorEditSelectionExists()
- 
-  for i = 0, reaper.CountTracks(0)-1 do          -- for each track, check if RE is present
+  for i = 0, reaper.CountTracks(0)-1 do
     local retval, x = reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(0,i), "P_RAZOREDITS", "string", false)
-    if x ~= "" then return true end              -- if present, return true 
-    if x == nil then return false end            -- return that no RE exists
-  end
-end                                 
+    if x ~= "" then 
+    return true end
+  end--for  
+  return false
+end                              
   
 
 ---------------------------------------------------------------------
@@ -81,6 +86,7 @@ end
           nudge notes whose ons are in RE if present, else nudge note under mouse, closest first
     --]]------------------------------]]--
 
+local numSel = 0
 
 function main()
   reaper.PreventUIRefresh(1)
@@ -94,47 +100,87 @@ function main()
     incr = incr * -1                          -- how many ticks to move noteoff backwards, adjust as desired
   end
   
+  take, targetNoteNumber, targetNoteIndex = getNotesUnderMouseCursor()
+  if take~=nil then 
+    track = reaper.GetMediaItemTake_Track(take)
+    reaper.SetOnlyTrackSelected(track)
+  end
+  
   if RazorEditSelectionExists() then
     job = 1
-    task = 18
+    task = 19
     SetGlobalParam(job, task, _, _, incr)
   else
-    take, targetNoteNumber, targetNoteIndex = getNotesUnderMouseCursor()
-  
     local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"}
-  
-    if take ~= nil and targetNoteIndex ~= -1 then
-      _, _, _, startppqpos, endppqpos, _, pitch, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
-      _, _, _, startppqposNext, _, _, pitchNext, _ = reaper.MIDI_GetNote( take, targetNoteIndex+1 )
+    
+    if take ~= nil then
+      track = reaper.GetMediaItemTake_Track(take)
+      local selectedNotes = 0
+      local CountTrItem = reaper.CountTrackMediaItems(track)
+      if CountTrItem then                           -- if track has items
       
-      comp = math.fmod(endppqpos, math.abs(incr))
-      
-      if endppqpos-startppqpos + incr > 10 then 
-        
-        if comp ~= 0 then 
-          incr = incr - comp 
-        end
-        
-        if pitch ~= pitchNext then
-            reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, nil, endppqpos + incr, nil, nil, nil, nil)
-        else 
-          if endppqpos + incr > startppqpos and endppqpos + incr < startppqposNext then
-            reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, nil, endppqpos + incr, nil, nil, nil, nil)
+        notesCount, _, _ = reaper.MIDI_CountEvts(take)  -- count notes in take under mouse                    
+        for n = notesCount-1, 0, -1 do                        -- for each note, from back to front
+          _, selected, muteState, startppqpos, endposppq, _, pitch, _ = reaper.MIDI_GetNote(take, n)  -- get note data           
+          if selected == true then      -- if it's selected
+            selectedNotes = selectedNotes + 1
           end
         end
-      end
-
-      reaper.MIDI_Sort(take)
-      reaper.SetExtState(extName, 'DoRefresh', '1', false)
       
-      octave = math.floor(targetNoteNumber/12)-1                               -- establish the octave for readout
-      cursorNoteSymbol = pitchList[(targetNoteNumber - 12*(octave+1)+1)]       -- establish the note symbol for readout
-      reaper.Undo_OnStateChange2(proj, "changed length of note " .. targetNoteNumber .. ", (" .. cursorNoteSymbol .. octave .. ")")
+        for i = 0, CountTrItem-1 do              -- for each item, last to first               
+          item = reaper.GetTrackMediaItem(track,i)      
+          take = reaper.GetTake( item, 0 )       -- get the take
+          if take ~= nil then 
+            notesCount, _, _ = reaper.MIDI_CountEvts(take)  -- count notes in current take                    
+            
+            for n = notesCount-1, 0, -1 do       -- for each note, last to first
+              local _, selected, muteState, startppqpos, endposppq, chan, pitch, vel = reaper.MIDI_GetNote(take, n)  -- get note data           
+              if selected == true then           -- if it's selected
+                numSel = numSel + 1              -- get number of selected notes in item
+              end
+            end
+            
+            for n = notesCount-1, 0, -1 do       -- for each note, last to first
+              local _, selected, muteState, startppqpos, endposppq, chan, pitch, vel = reaper.MIDI_GetNote(take, n)  -- get note data           
+              if selected == true then           -- if it's selected
+                _, _, _, startppqpos, endppqpos, _, pitch, _ = reaper.MIDI_GetNote( take, n )
+                _, _, _, startppqposNext, _, _, pitchNext, _ = reaper.MIDI_GetNote( take, n+1 )
+                comp = math.fmod(endppqpos, math.abs(incr))  -- how much is needed to snap to grid
+                
+                if endppqpos-startppqpos + incr > 10 then   -- prevent notes from getting too small
+                  --reaper.MIDI_DisableSort( take )
+                  if comp ~= 0 and numSel == 1 then    -- if there's a comp and only 1 note is selected
+                    incr = incr - comp            -- add enough to snap to grid
+                  end
+                  
+                  if pitch ~= pitchNext then      -- 
+                    reaper.MIDI_SetNote( take, n, nil, nil, nil, endppqpos + incr, nil, nil, nil, nil)
+                  else                            -- if next note is same
+                    if endppqpos + incr > startppqpos then      -- if endpoint doesn't precede start
+                      reaper.MIDI_SetNote( take, n, nil, nil, nil, endppqpos + incr, nil, nil, nil, nil)
+                    end
+                  end
+                end -- if endpos-startpos + incr is greater than 10
+              end -- if it's selected
+            end -- for each note 
+          end -- if take not nil
+        end -- for each item                
+      end -- if track has items
+
+      --reaper.MIDI_Sort(take)
+      
+      if selectedNotes > 0 then 
+        reaper.Undo_OnStateChange2(proj, "changed length of MIDI note(s)")
+      end
     end
   end
+  --reaper.SetExtState(extName, 'DoRefresh', '1', false)
+  
   
   reaper.PreventUIRefresh(-1)
   reaper.UpdateArrange()
+
+--]]
 
 end
  
