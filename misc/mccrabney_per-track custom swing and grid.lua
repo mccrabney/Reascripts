@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.02
+ * Version: 1.03
 --]]
 
 --[[ instructions: 
@@ -24,6 +24,8 @@
 
 --[[
  * Changelog: 
+ * v1.03 (2026-08-21)
+  + minor bugfix and commenting
  * v1.02 (2026-06-01)
   + fixed bug where custom swing/div aren't loaded on track switch
  * v1.01 (2026-01-28)
@@ -38,6 +40,10 @@
 ---------------------------------------------------------------------------------------    
 dbg = false
 --dbg = true
+
+--local profiler = dofile(reaper.GetResourcePath() ..
+--  '/Scripts/ReaTeam Scripts/Development/cfillion_Lua profiler.lua')
+--reaper.defer = profiler.defer
 
 local _, script_filename, _, _, _, _, _ = reaper.get_action_context()
 local SCRIPT_DIRECTORY = script_filename:match('(.*)[%\\/]') .. "\\"
@@ -407,7 +413,7 @@ end
 function Run()
   
   STATE.editing_track = reaper.GetLastTouchedTrack() or reaper.GetTrack(0,0) -- get track
-  if STATE.editing_track ~= lastTouchedTrack then lastTouchedTrack = STATE.editing_track end
+  if STATE.editing_track ~= lastTouchedTrack then lastTouchedTrack = STATE.editing_track end 
   
   if set_dock_id then
     reaper.ImGui_SetNextWindowDockID(ctx, set_dock_id)
@@ -416,6 +422,7 @@ function Run()
   
   reaper.ImGui_SetNextWindowPos(ctx, sx, sy, 2, .5, 1.75) -- set pos based on mouse coordinates
   reaper.ImGui_SetNextWindowSize(ctx, 0.0, 0.0)
+  
   
   local imgui_visible, imgui_open = reaper.ImGui_Begin(ctx, SCRIPT_TITLE, true, 
     ImGui.WindowFlags_NoResize |
@@ -440,4 +447,5 @@ Init()
 
 -------------
 
-
+--profiler.attachToWorld() -- after all functions have been defined
+--profiler.run()
