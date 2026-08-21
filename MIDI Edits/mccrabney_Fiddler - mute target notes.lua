@@ -2,13 +2,17 @@
  * ReaScript Name: mute target notes
  * Author: mccrabney
  * Licence: GPL v3
- * REAPER: 6.0
+ * REAPER: 7.0
  * Extensions: None
- * Version: 1.13
+ * Version: 1.15
 --]]
  
 --[[
  * Changelog:
+ * v1.15 (2026-08-21)
+   + better RazorEditSelectionExists function
+ * v1.14 (2025-1-3)
+   + reaper.set_action_options(1)
  * v1.13 (2024-5-21)
    + switch to using local Razor Edit Function module 
  * v1.12 (2023-5-27)
@@ -32,20 +36,21 @@ for key in pairs(reaper) do _G[key]=reaper[key]  end
 local info = debug.getinfo(1,'S');
 dofile(script_folder .. "Modules/mccrabney_Razor_Edit_functions.lua")   
 extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
-
+reaper.set_action_options(1)
 -----------------------------------------------------------
     --[[------------------------------[[--
           check for razor edit 
     --]]------------------------------]]--
     
 function RazorEditSelectionExists()
- 
-  for i = 0, reaper.CountTracks(0)-1 do          -- for each track, check if RE is present
+  for i = 0, reaper.CountTracks(0)-1 do
     local retval, x = reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(0,i), "P_RAZOREDITS", "string", false)
-    if x ~= "" then return true end              -- if present, return true 
-    if x == nil then return false end            -- return that no RE exists
-  end
-end          
+    if x ~= "" then 
+    return true end
+  end--for  
+  return false
+end                              
+     
 
 
 ---------------------------------------------------------------------
@@ -85,6 +90,8 @@ end
 function main()
   reaper.PreventUIRefresh(1)
   
+  --[[
+  
   if RazorEditSelectionExists() then
     job = 1
     task = 17
@@ -110,6 +117,9 @@ function main()
   
   reaper.PreventUIRefresh(-1)
   reaper.UpdateArrange()
+
+--]]
+  reaper.SetExtState(extName, 'Mute', '1', false)
 
 end
  

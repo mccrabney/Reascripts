@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.44
+ * Version: 2.00
 
 -- @provides
 --   Modules/Sexan_Area_51_mouse_mccrabney_tweak.lua > mccrabney_Fiddler - nudge target notes (mousewheel)/Sexan_Area_51_mouse_mccrabney_tweak.lua
@@ -17,46 +17,13 @@
 --[[
  * Changelog:
 
- * v1.44 (2024-5-21)
-   + switch to using local Razor Edit Function module 
- * v1.43 (2024-4-7)
-   + nudge increments now snap to next/prev increment division 
- * v1.42 (2023-12-23)
-   + fixed loss of target note if "step" function has been engaged
- * v1.41 (2023-12-23)
-   + disable refresh (do in Fiddler script instead)
- * v1.40 (2023-12-08)
-   + conform to changes in other scripts 
- * v1.39 (2023-6-11)
-   + reset step upon nudge 
-   + switch target cursor to edit cursor upon nudge - makes more predictable
- * v1.38 (2023-6-11)
-   + bring up to speed with "shownotes" target note selector feature 
- * v1.37a 2023-6-9)
-   + reverted previous negatively nudged note change
- * v1.37 (2023-6-8)
-   + fixed equidistant note nudge bug
-   + if negatively nudged note occupies same space as another note, add 1 tick instead of subtracting one tick
- * v1.36 (2023-6-3)
-   + reverted to local getCursorInfo function, prevents de-sync with "show notes" script
- * v1.35 (2023-5-28)
-   + disallow nudged note from occupying the same tick position as the next/previous note
- * v1.34 (2023-5-27)
-   + added relative support
- * v1.33 (2023-5-27)
-   + updated name of parent script extstate 
- * v1.32 (2023-05-26)
-   + implemented variable nudge increment controlled by "mccrabney_MIDI edit - adjust ppq increment for edit scripts" 
- * v1.31 (2023-05-21)
-   + removed hzoom dependent increment
-   + fixed note overwrite bug
- * v1.3 (2023-05-19)
-   + added hzoom dependent increment
- * v1.2 (2023-05-11)
-   + updated to prevent notes from escaping RE bounds
- * v1.1 (2023-05-09)
-   + requires extstates from mccrabney_MIDI edit - show notes, under mouse and last-received.lua
+ * v2.00 (2025)
+   + better RazorEditSelectionExists function
+   + nudge mouse cursor with note nudge
+
 --]]
+
+
 
 ---------------------------------------------------------------------
 local script_folder = debug.getinfo(1).source:match("@?(.*[\\|/])")
@@ -64,16 +31,21 @@ for key in pairs(reaper) do _G[key]=reaper[key]  end
 local info = debug.getinfo(1,'S');
 dofile(script_folder .. "Modules/mccrabney_Razor_Edit_functions.lua")   
 extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
-
+reaper.set_action_options(1,2)
 package.path = debug.getinfo(1, "S").source:match [[^@?(.*[\/])[^\/]-$]] .. "?.lua;"
 require("Modules/mccrabney_MIDI_Under_Mouse")
 require("Modules/mccrabney_misc")
 require("Modules/Sexan_Area_51_mouse_mccrabney_tweak")   -- GET DIRECTORY FOR REQUIRE  -- AREA MOUSE INPUT HANDLING
 
-if reaper.HasExtState(extName, 8) then                        -- get cursor
-  cursorSource = tonumber(reaper.GetExtState( extName, 8 ))         -- based on input from child script
-else
-  cursorSource = 1
+
+local startTime, endTime = reaper.GetSet_ArrangeView2( 0, 0, 0, 0)  -- get arrangescreen pos
+local zoom_lvl = reaper.GetHZoomLevel()  
+
+local main_wnd = reaper.GetMainHwnd()                                -- GET MAIN WINDOW
+local track_window = reaper.JS_Window_FindChildByID(main_wnd, 0x3E8) -- GET TRACK VIEW
+
+if reaper.HasExtState(extName, 7) then
+  incr = tostring(reaper.GetExtState( extName, 7 ))
 end
 
 -----------------------------------------------------------
@@ -82,13 +54,13 @@ end
     --]]------------------------------]]--
     
 function RazorEditSelectionExists()
-  for i = 0, reaper.CountTracks(0)-1 do          -- for each track, check if RE is present
+  for i = 0, reaper.CountTracks(0)-1 do
     local retval, x = reaper.GetSetMediaTrackInfo_String(reaper.GetTrack(0,i), "P_RAZOREDITS", "string", false)
-    if x ~= "" then return true end              -- if present, return true 
-    if x == nil then return false end            -- return that no RE exists
-  end
-end                                 
-  
+    if x ~= "" then 
+    return true end
+  end--for  
+  return false
+end                             
   
 function getNotesUnderMouseCursor()
   
@@ -121,130 +93,119 @@ end
           nudge notes whose ons are in RE if present, else nudge note under mouse, closest first
     --]]------------------------------]]--
 
+selectedNotes = 0
+      
+
 function main()
-  step = tonumber(reaper.GetExtState(extName, 0 ))
-  --reaper.ShowConsoleMsg("step " .. step .. "\n")
-  --reaper.SetExtState(extName, 'DoRefresh', '1', false)
-  --reaper.SetExtState(extName, 'SlowRefresh', '1', false)
-  reaper.ClearConsole()  
+  --step = tonumber(reaper.GetExtState(extName, 0 ))
   reaper.PreventUIRefresh(1)
   incr = tonumber(reaper.GetExtState(extName, 7 ))
   if incr == nil then incr = 0 end
   
-  --take, targetPitch, targetNoteIndex, targetNotePos, track, tcpHeight, cursorSource = getCursorInfo()
-  take, targetPitch, showNotes, targetNoteIndex, targetNotePos, targetEndPos, track, trPos, tcpHeight, trName, cursorPos = getCursorInfo() 
-  --_, _, targetNoteIndex = getNotesUnderMouseCursor()
-  --reaper.ShowConsoleMsg("nudge - " .. targetPitch .. "\n")
-  
-  _,_,a,b,c,device,direction  = reaper.get_action_context() 
+  _, _, a, b, c, device, direction  = reaper.get_action_context() 
   --reaper.ShowConsoleMsg(a .. " | " .. b .. " | " .. c .. " | " .. device .. " | " .. direction .. "\n")
   
   if device == 16383 and direction == 129      -- for relative 
-  or device == 127 and direction >= 15 then    -- for mousewheel
+  or device == 127   and direction >= 15 then    -- for mousewheel
     incr = incr
   end
   
   if device == 16383 and direction == 16383     -- for relative
-  or device == 127 and direction <= -15 then    -- for mousewheel
+  or device == 127   and direction <= -15 then    -- for mousewheel
     incr = incr * -1
   end  
+  
+  take, _, _, targetNoteIndex, _, _, _, _, _, _, cursorPos = getCursorInfo() 
+  x, y = reaper.GetMousePosition()
+  
+  noteTable = {}
+  if take ~= nil then 
+    track = reaper.GetMediaItemTake_Track(take)
+    reaper.SetOnlyTrackSelected(track)
+  end
   
   if RazorEditSelectionExists() then            -- perform the edit on RE
     job = 1
     task = 6
     SetGlobalParam(job, task, _, _, incr)
+    --reaper.ShowConsoleMsg(incr .. "\n")
   else                                          -- perform the edit on extState target note
     local pitchList = {"C_", "C#", "D_", "D#", "E_", "F_", "F#", "G_", "G#", "A_", "A#", "B_"}
     
-    if take ~= nil and targetNoteIndex ~= nil and targetNoteIndex ~= -1 then
-      _, _, _, startppqpos, endposppq, _, pitch, _ = reaper.MIDI_GetNote( take, targetNoteIndex )
-
-      --reaper.ShowConsoleMsg("targetnoteindex: " .. targetNoteIndex .. "\n")
-      --reaper.ShowConsoleMsg("start: " .. startppqpos .. "\n")
-      --reaper.ShowConsoleMsg("incr: " .. incr .. "\n")
-      
-      comp = math.fmod(startppqpos, math.abs(incr))
-
-      
-      --if targetNoteIndex - 1 == -1 then reaper.ShowConsoleMsg("-1" .. "\n") end
-      if targetNoteIndex - 1 == -1 then pitch2 = -1 end
-      
-      if incr > 0 then 
-        if comp ~= 0 then 
-          incr = incr - comp 
-          --reaper.ShowConsoleMsg("comp: " .. comp .. "\n")
-          
-        end
-
-        _, _, _, startppqposNext, _, _, pitch2, _ = reaper.MIDI_GetNote( take, targetNoteIndex +1 )      
-        _, _, _, startppqposPrev, endposppqPrev, _, _, _ = reaper.MIDI_GetNote( take, targetNoteIndex -1 )
-        --reaper.ShowConsoleMsg("startppqposPrev: " .. targetNoteIndex - 1 .. " " .. startppqposPrev .. "\n")
+    --if take ~= nil and targetNoteIndex ~= nil and targetNoteIndex ~= -1 then
+    if take ~= nil then
+      reaper.MIDI_DisableSort(take)
+      local CountTrItem = reaper.CountTrackMediaItems(track)
+      if CountTrItem then                           -- if track has items
         
-        if pitch == pitch2 and endposppq + incr < startppqposNext then 
-          reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
-        end
-      end
-      
-      if incr < 0 then
-        if comp ~= 0 then 
-          incr = comp * -1
-        end
-        
---      if targetNoteIndex - 1 or targetNoteIndex +1  == 0
-        _, _, _, startppqposPrev, endposppqPrev, _, pitch2, _ = reaper.MIDI_GetNote( take, targetNoteIndex -1 ) 
-        _, _, _, startppqposNext, _, _, _, _ = reaper.MIDI_GetNote( take, targetNoteIndex +1 )
-        
-        if pitch == pitch2 and startppqpos + incr > endposppqPrev then 
-          reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
-        end
-      end
-      
-      --reaper.ShowConsoleMsg("amount added: " .. incr .. "\n")
-      --reaper.ShowConsoleMsg(notePPQ .. "\n")
-      
-      local targetChange = 0
-      if pitch ~= pitch2 and pitch2 ~= -1 then                                     -- if two different notes
-        if incr > 0 and startppqposNext ~= 0 then                 -- if moving forwards
-          if startppqpos + incr == startppqposNext then           -- if nudge encroaches on next note 
-            targetChange = 1
-            incr = incr + 1                                       -- add 1 tick to incr
-          end
-        elseif incr < 0 and startppqposPrev ~= 0 then             -- if nudge encroaches on prev note
-          if startppqpos + incr == startppqposPrev then           -- subtract 1 tick to incr
-            targetChange = -1
-            incr = incr - 1
+        notesCount, _, _ = reaper.MIDI_CountEvts(take)  -- count notes in take under mouse                    
+        for n = notesCount-1, 0, -1 do                  -- for each note, from back to front
+          _, selected, muteState, startppqpos, endposppq, _, pitch, _ = reaper.MIDI_GetNote(take, n)  -- get note data           
+          if selected == true then                  -- if it's selected
+            selectedNotes = selectedNotes + 1
           end
         end
         
-        --reaper.ShowConsoleMsg(incr .. "\n")
-        
-        reaper.MIDI_SetNote( take, targetNoteIndex, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
-      end
-
-      if cursorSource == 0 then         -- 
-        reaper.SetExtState(extName, 'stepDown', 1, false) 
-      else
-        reaper.SetExtState(extName, 'toggleCursor', 1, true)
-        reaper.SetExtState(extName, 'stepDown', 1, false) 
-      end
-     
-      local newTime = reaper.MIDI_GetProjTimeFromPPQPos(take, startppqpos + incr)
-      reaper.SetEditCurPos( newTime, 1, 0)
+        if selectedNotes == 0 then 
+          reaper.MIDI_SetNote( take, targetNoteIndex, true) 
+          selectedNotes = 1
+        end
       
-      reaper.MIDI_Sort(take)
-    
-      octave = math.floor(targetPitch/12)-1                               -- establish the octave for readout
-      cursorNoteSymbol = pitchList[(targetPitch - 12*(octave+1)+1)]       -- establish the note symbol for readout
-      reaper.Undo_OnStateChange2(proj, "nudged note " .. targetPitch .. "(" .. cursorNoteSymbol .. octave .. ")")
-    end
-    
-    --reaper.SetExtState(extName, 'DoRefresh', '1', false)
-    reaper.PreventUIRefresh(-1)
-    reaper.UpdateArrange()
+        if selectedNotes == 1 then
+          notesCount, _, _ = reaper.MIDI_CountEvts(take)  -- count notes in current take                    
+          for n = notesCount-1, 0, -1 do       -- for each note, last to first
+            _, selected, _, startppqpos, endposppq, _, _, _ = reaper.MIDI_GetNote(take, n)  -- get note data           
+            if selected == true then           -- if it's selected
+              comp = math.fmod(startppqpos, math.abs(incr))
+              
+              if incr > 0 then 
+                if comp ~= 0 then incr = incr - comp end
+              elseif incr < 0 then
+                if comp ~= 0 then incr = comp * -1 end
+              end
+              
+              reaper.MIDI_SetNote( take, n, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
+              local newTime = reaper.MIDI_GetProjTimeFromPPQPos(take, startppqpos + incr)
+              reaper.SetEditCurPos( newTime, 1, 0)
+              
+              cursorPosPpq = reaper.MIDI_GetPPQPosFromProjTime(take, cursorPos)
+              if cursorPosPpq > startppqpos and cursorPosPpq < endposppq then
+                cursorPos = reaper.MIDI_GetProjTimeFromPPQPos(take, cursorPosPpq + incr)
+                cursorPosPixel = math.floor((cursorPos - startTime) * zoom_lvl) -- note start pixel
+                local sx, sy = reaper.JS_Window_ClientToScreen( track_window, cursorPosPixel, y )
+                reaper.JS_Mouse_SetPosition(sx, y)
+              end
+            end
+          end -- for each note
+          --reaper.MIDI_Sort(take)
+        elseif selectedNotes > 1 then
+          for i = 0, CountTrItem-1 do              -- for each item, last to first               
+            local item = reaper.GetTrackMediaItem(track,i)      
+            local take = reaper.GetTake( item, 0 )       -- get the take
+            if take ~= nil then 
+              notesCount, _, _ = reaper.MIDI_CountEvts(take)  -- count notes in current take                    
+              
+              for n = notesCount-1, 0, -1 do       -- for each note, last to first
+                _, selected, _, startppqpos, endposppq, _, _, _ = reaper.MIDI_GetNote(take, n)  -- get note data           
+                if selected == true then           -- if it's selected
+                  reaper.MIDI_SetNote( take, n, nil, nil, startppqpos + incr, endposppq + incr, nil, nil, nil, nil)
+                  local newTime = reaper.MIDI_GetProjTimeFromPPQPos(take, startppqpos + incr)
+                  reaper.SetEditCurPos( newTime, 1, 0)
+                end
+              end -- for each note
+            end -- if take not nil
+          end -- for each item
+        end
+        reaper.MIDI_Sort(take)
+      end -- if track has items
+    end -- if take is not nil
+  end -- if not razor edit
+  if selectedNotes > 0 then 
+    reaper.Undo_OnStateChange2(proj, "nudged note(s)")
   end
-  
-
-end
+  reaper.PreventUIRefresh(-1)
+  reaper.UpdateArrange()
+end -- main
 
 main()
 
