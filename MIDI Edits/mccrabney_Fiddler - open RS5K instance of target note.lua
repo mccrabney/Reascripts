@@ -2,13 +2,15 @@
  * ReaScript Name: open RS5K instance of target note
  * Author: mccrabney
  * Licence: GPL v3
- * REAPER: 6.0
+ * REAPER: 7.0
  * Extensions: None
- * Version: 1.2
+ * Version: 1.3
 --]]
  
 --[[
  * Changelog:
+ * v1.3 (2025-1-3)
+   + reaper.set_action_options(1)
  * v1.2 (2024-5-21)
    + switch to using local Razor Edit Function module 
  * v1.1 
@@ -28,7 +30,7 @@ for key in pairs(reaper) do _G[key]=reaper[key]  end
 local info = debug.getinfo(1,'S');
 dofile(script_folder .. "Modules/mccrabney_Razor_Edit_functions.lua")   
 extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
-
+reaper.set_action_options(1)
 ---------------------------------------------------------------------
     --[[------------------------------[[--
           refer to extstates to get MIDI under mouse
