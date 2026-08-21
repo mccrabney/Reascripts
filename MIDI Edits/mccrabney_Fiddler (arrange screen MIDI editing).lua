@@ -4,13 +4,13 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 2.00
+ * Version: 2.01
  * Provides: Modules/*.lua
 --]]
 
 --[[
  * Changelog:
- * v2.00 (2026-08-21)
+ * v2.01 (2026-08-21)
    + changed core targeting/action behavior to work on selected MIDI notes instead of cursor-aimed MIDI notes
    + performance improvements
 --]]
