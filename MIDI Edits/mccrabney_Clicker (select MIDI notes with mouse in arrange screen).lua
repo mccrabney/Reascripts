@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.00
+ * Version: 1.01
 --]]
 
 --[[
  * Changelog:
+ * v1.01 (08-22-2026)
+   + fixed bug where clicking another item doesn't deselect notes on prev selected items
  * v1.00 ()
    + initial release
 --]]
@@ -39,11 +41,10 @@ end
 -------------------------------------------
 
 local clickTime = -1
-
+    
 function Main()
   if reaper.HasExtState(extName, 'time') then
     heartbeat = reaper.GetExtState(extName, 'time', 1)
-    --reaper.ShowConsoleMsg(heartbeat .. "\n")
   end
 
   prjChangeCount = reaper.GetProjectStateChangeCount(0)         -- refresh ui at every change
@@ -61,14 +62,25 @@ function Main()
   end
   
   if track and mouse.l_click and window == "arrange" then    -- if a click event occurs on a track in arrange
+    reaper.ClearConsole()
     local mouse_keyboard_state = reaper.JS_Mouse_GetState(-1)
     local keyboard_modifiers = mouse_keyboard_state & 60
     local ctrl = keyboard_modifiers == 4
-    
-    local mouseTake = 0
     local CountTrItem = reaper.CountTrackMediaItems(track)   -- count track items
     local tk
-    if CountTrItem then                                 -- if track has items
+    if CountTrItem then                             -- if track has items
+
+      if take ~= lastTake and not ctrl then         -- if clicked on different take and ctrl not held,
+        for i = 0, CountTrItem-1 do                 -- for each item,               
+          local item = reaper.GetTrackMediaItem(track, i)  -- get each item
+          local tk = reaper.GetActiveTake(item)     -- get the take
+          if tk and reaper.TakeIsMIDI(tk) then      -- if take not nil and is MIDI
+            reaper.MIDI_SelectAll(tk, 0)            -- deselect all notes
+          end -- if take not nil
+        end -- for each item
+        lastTake = take
+      end
+      
       for i = 0, CountTrItem-1 do                       -- for each item, first to last           
         local item = reaper.GetTrackMediaItem(track,i)  -- get each item start and endpoints
         local itemStart = reaper.GetMediaItemInfo_Value( item, 'D_POSITION' )
@@ -78,7 +90,7 @@ function Main()
           if tk and reaper.TakeIsMIDI(tk) then mouseTake = tk end  -- if MIDI, assign mouseTake
         end -- if cursor in item bounds
       end -- for each item
-      
+ 
       if targetNoteIndex == -1 then                 -- if there's no target note under the mouse cursor,
         for i = 0, CountTrItem-1 do                 -- for each item,               
           local item = reaper.GetTrackMediaItem(track, i)  -- get each item
@@ -89,8 +101,8 @@ function Main()
         end -- for each item
         reaper.Undo_OnStateChange2(proj, "deselected all MIDI notes")
       end -- if no target note
-      
-      if mouseTake == take and targetNoteIndex ~= -1 then   -- if mouseTake = fiddler take
+
+      if mouseTake == take and targetNoteIndex ~= -1 then   -- if mouseTake = fiddler take and there is a target note
         if reaper.TakeIsMIDI(mouseTake) then                -- and if it's MIDI
           local _, sel, _, _, _, _, pitch = reaper.MIDI_GetNote(mouseTake, targetNoteIndex)  -- get targetnote
           if ctrl then
@@ -102,16 +114,15 @@ function Main()
               reaper.Undo_OnStateChange2(proj, "deselected note " .. pitch)
             end -- if targetnote selected
           else
-            for i = 0, CountTrItem-1 do                 -- for each item,               
+            for i = 0, CountTrItem-1 do                         -- for each item,               
               local item = reaper.GetTrackMediaItem(track, i)  -- get each item
-              local tk = reaper.GetActiveTake(item)     -- get the take
-              --reaper.ShowConsoleMsg(i .. " " .. reaper.MIDI_EnumSelNotes(tk, 0) .. "\n")
-              if tk ~= mouseTake and reaper.TakeIsMIDI(tk) then      -- if take not nil and is MIDI
+              local tk = reaper.GetActiveTake(item)      -- get the take
+              if tk ~= mouseTake and reaper.TakeIsMIDI(tk) then -- if take not nil and is MIDI
                 if reaper.MIDI_EnumSelNotes(tk, 0) ~= -1 then
-                  reaper.MIDI_SelectAll(tk, 0)          -- deselect all notes
+                  reaper.MIDI_SelectAll(tk, 0)                  -- deselect all notes
                 end
-              elseif tk == mouseTake then -- if take not nil
-                reaper.MIDI_SelectAll(tk, 0)          -- deselect all notes
+              elseif tk == mouseTake then                       -- if take not nil
+                reaper.MIDI_SelectAll(tk, 0)                    -- deselect all notes
               end
             end -- for each item
             reaper.Undo_OnStateChange2(proj, "deselected all MIDI notes")
@@ -123,15 +134,13 @@ function Main()
         end -- if take is MIDI
       end -- if take
     end -- if track has items
-    --reaper.SetExtState(extName, 'DoRefresh', 1, false)
   end -- if click event occurs
   
-  local state = reaper.JS_VKeys_GetState(.1)
-  
-  ret = state:byte(0x10) -- shift key hex code
-  if ret == 1 then 
-    --reaper.ShowConsoleMsg("!" .. "\n") 
-  end
+  --local state = reaper.JS_VKeys_GetState(.1)
+  --ret = state:byte(0x10) -- shift key hex code
+  --if ret == 1 then 
+  --  reaper.ShowConsoleMsg("!" .. "\n") 
+  --end
   
   reaper.defer(Main)
 end
