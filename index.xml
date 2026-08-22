@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" commit="9881bf0543ecffd0a5026e30035e78591b013508">
+<index version="1" commit="4a79fb89656d3763cadc79701d532eba6e42c8dd">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -185,6 +185,12 @@
     <reapack name="mccrabney_Fiddler - toggle note input at edit cursor.lua" type="script" desc="toggle note input at edit cursor">
       <version name="1.0" author="mccrabney" time="2026-08-21T17:48:20Z">
         <source main="main">https://github.com/mccrabney/Reascripts/raw/d99d09ddec30339544645274a619b78d6007e1ed/MIDI%20Edits/mccrabney_Fiddler%20-%20toggle%20note%20input%20at%20edit%20cursor.lua</source>
+      </version>
+    </reapack>
+    <reapack name="mccrabney_Fiddler - transpose note closest to mouse (mousewheel).lua" type="script" desc="transpose note closest to mouse (mousewheel)">
+      <version name="1.00" author="mccrabney" time="2026-08-22T13:56:37Z">
+        <changelog><![CDATA[+ initial release]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/4a79fb89656d3763cadc79701d532eba6e42c8dd/MIDI%20Edits/mccrabney_Fiddler%20-%20transpose%20note%20closest%20to%20mouse%20(mousewheel).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Fiddler - transpose selected notes (mousewheel).lua" type="script" desc="transpose target notes (mousewheel)">
