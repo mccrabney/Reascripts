@@ -4,33 +4,38 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.01
+ * Version: 1.03
 --]]
 
 --[[
  * Changelog:
+ * v1.03 (08-27-2026)
+   + heartbeat detector for Fiddler (run invisibly if Fiddler is not running)
+ * v1.02 (08-22-2026)
+   + comment out profiler, added howto comments, cleaned up unused variables
  * v1.01 (08-22-2026)
    + fixed bug where clicking another item doesn't deselect notes on prev selected items
  * v1.00 ()
    + initial release
 --]]
  
+-- discussion thread: https://forum.cockos.com/showthread.php?t=274257
 
 -- HOW TO USE:
 -- run this defer script alongside Fiddler.
--- click on MIDI notes to select them. click again to deselect. click empty space to deselect all.
+-- click on MIDI notes to select them one at a time. ctrl-click to add/subtract notes to selection
+-- click empty space to deselect all.
+-- you may need to adjust your ctrl-click media item mouse modifier to avoid changing item selection
 
-local profiler = dofile(reaper.GetResourcePath() ..
-  '/Scripts/ReaTeam Scripts/Development/cfillion_Lua profiler.lua')
-reaper.defer = profiler.defer
+--local profiler = dofile(reaper.GetResourcePath() ..
+--  '/Scripts/ReaTeam Scripts/Development/cfillion_Lua profiler.lua')
+--reaper.defer = profiler.defer
 
 reaper.set_action_options(1)
 local extName = 'mccrabney_Fiddler (arrange screen MIDI editing).lua'
 package.path = debug.getinfo(1, "S").source:match [[^@?(.*[\/])[^\/]-$]] .. "?.lua;"
 require("Modules/Sexan_Area_51_mouse_mccrabney_tweak")
 
-local prjChangeCount = -1  
-local lastprjChangeCount = -1  
   
 function getNotesUnderMouseCursor()
   guidString = reaper.GetExtState(extName, 3 )
@@ -39,30 +44,22 @@ function getNotesUnderMouseCursor()
   return take, targetNoteIndex
 end  
 -------------------------------------------
-
-local clickTime = -1
-    
+--local fiddlerStatus = 0
 function Main()
-  if reaper.HasExtState(extName, 'time') then
-    heartbeat = reaper.GetExtState(extName, 'time', 1)
-  end
-
-  prjChangeCount = reaper.GetProjectStateChangeCount(0)         -- refresh ui at every change
-  if prjChangeCount ~= lastprjChangeCount then
-    lastprjChangeCount = prjChangeCount
-  end  
-    
   mouse = MouseInfo()
   
-  if mouse.l_click then 
+  if mouse.l_click then                             -- on click, 
+    localTime = reaper.time_precise()               -- check time
+    if reaper.HasExtState(extName, 'time') then     -- check Fiddler heartbeat, report status
+      heartbeat = tonumber(reaper.GetExtState(extName, 'time', 1))
+      if localTime-heartbeat < 1 then fiddlerStatus = 1 else fiddlerStatus = 0 end
+    end  
     take, targetNoteIndex = getNotesUnderMouseCursor()
     track, window = reaper.GetThingFromPoint(mouse.x, mouse.y)
     cursorPos = mouse.p
-    clickTime = reaper.time_precise()
   end
-  
-  if track and mouse.l_click and window == "arrange" then    -- if a click event occurs on a track in arrange
-    reaper.ClearConsole()
+ 
+  if track and mouse.l_click and fiddlerStatus == 1 and window == "arrange" then    -- if a click event occurs on a track in arrange
     local mouse_keyboard_state = reaper.JS_Mouse_GetState(-1)
     local keyboard_modifiers = mouse_keyboard_state & 60
     local ctrl = keyboard_modifiers == 4
@@ -102,7 +99,7 @@ function Main()
         reaper.Undo_OnStateChange2(proj, "deselected all MIDI notes")
       end -- if no target note
 
-      if mouseTake == take and targetNoteIndex ~= -1 then   -- if mouseTake = fiddler take and there is a target note
+      if mouseTake and mouseTake == take and targetNoteIndex ~= -1 then   -- if mouseTake = fiddler take and there is a target note
         if reaper.TakeIsMIDI(mouseTake) then                -- and if it's MIDI
           local _, sel, _, _, _, _, pitch = reaper.MIDI_GetNote(mouseTake, targetNoteIndex)  -- get targetnote
           if ctrl then
@@ -135,18 +132,11 @@ function Main()
       end -- if take
     end -- if track has items
   end -- if click event occurs
-  
-  --local state = reaper.JS_VKeys_GetState(.1)
-  --ret = state:byte(0x10) -- shift key hex code
-  --if ret == 1 then 
-  --  reaper.ShowConsoleMsg("!" .. "\n") 
-  --end
-  
+
   reaper.defer(Main)
 end
 
 Main()
-
 
 --profiler.attachToWorld() -- after all functions have been defined
 --profiler.run()
