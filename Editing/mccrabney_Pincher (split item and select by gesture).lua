@@ -13,7 +13,7 @@
    + do not enable snap if snap was off at init
    + 1 pixel padding for movement threshold
  * v1.00 (~mid 2026)
-   + IR
+   + Initial Release
 --]]
 
 
