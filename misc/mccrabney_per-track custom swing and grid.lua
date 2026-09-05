@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.03
+ * Version: 1.04
 --]]
 
 --[[ instructions: 
@@ -24,6 +24,8 @@
 
 --[[
  * Changelog: 
+ * v1.04 (2026-09-05)
+  + save/recall last window position
  * v1.03 (2026-08-21)
   + minor bugfix and commenting
  * v1.02 (2026-06-01)
@@ -39,11 +41,14 @@
 
 ---------------------------------------------------------------------------------------    
 dbg = false
---dbg = true
 
 --local profiler = dofile(reaper.GetResourcePath() ..
 --  '/Scripts/ReaTeam Scripts/Development/cfillion_Lua profiler.lua')
 --reaper.defer = profiler.defer
+
+if not reaper.ImGui_GetBuiltinPath then
+  return reaper.MB('make sure ReaIMGUI is installed', '>ö<', 0)
+end
 
 local _, script_filename, _, _, _, _, _ = reaper.get_action_context()
 local SCRIPT_DIRECTORY = script_filename:match('(.*)[%\\/]') .. "\\"
@@ -53,7 +58,7 @@ reaper.set_action_options(1)
 
 SCRIPT_TITLE = "Per-track custom swing and grid"
 
-local ctx = reaper.ImGui_CreateContext(SCRIPT_TITLE, ImGui.ConfigFlags_NoSavedSettings)
+local ctx = reaper.ImGui_CreateContext(SCRIPT_TITLE, reaper.ImGui_ConfigFlags_None())
 
 if not reaper.ImGui_CreateContext then
   reaper.MB("Download ReaImGui extension via Reapack ReaTeam extension repository.", "Error", 0)
@@ -344,7 +349,7 @@ function gridManager()
   ImGui.Text( ctx, "PROJECT: '" .. prjName .. "'") 
   
   ImGui.SameLine(ctx, 301.0, -1.0)       -- debug button
-  dbgButton = ImGui.Button(ctx, "debug##dbg",  0.0, 0.0) 
+  dbgButton = ImGui.Button(ctx, ">ö<##dbg",  0.0, 0.0) 
   if dbgButton then          
     if dbg == false then dbg = true 
       debug("mccrabney - Per-track custom swing and grid",1)
@@ -375,7 +380,7 @@ function gridManager()
     if i < 8 then ImGui.SameLine(ctx, 0.0, -1.0)end
   end
   
-  _ = ImGui.InvisibleButton(ctx, " ",  78, 15) ImGui.SameLine(ctx, 0.0, -1.0)
+  _ = ImGui.InvisibleButton(ctx, " ", 78, 15) ImGui.SameLine(ctx, 0.0, -1.0)
   
   for i = 1, 4 do
     reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_Button(), prjCOLOR[i+8])
@@ -420,14 +425,15 @@ function Run()
     set_dock_id = nil
   end
   
-  reaper.ImGui_SetNextWindowPos(ctx, sx, sy, 2, .5, 1.75) -- set pos based on mouse coordinates
-  reaper.ImGui_SetNextWindowSize(ctx, 0.0, 0.0)
+  --reaper.ImGui_SetNextWindowPos(ctx, sx, sy, 2, .5, 1.75) -- set pos based on mouse coordinates
+  --reaper.ImGui_SetNextWindowSize(ctx, 0.0, 0.0)
   
   
   local imgui_visible, imgui_open = reaper.ImGui_Begin(ctx, SCRIPT_TITLE, true, 
     ImGui.WindowFlags_NoResize |
     ImGui.WindowFlags_NoScrollbar |
-    ImGui.WindowFlags_NoFocusOnAppearing )
+    ImGui.WindowFlags_NoFocusOnAppearing |
+    ImGui.WindowFlags_NoDocking )
 
   if imgui_visible then   -- if window is visible, run Main()
     gridManager()
