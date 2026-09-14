@@ -4,7 +4,7 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.04
+ * Version: 1.05
 --]]
 
 --[[ instructions: 
@@ -20,11 +20,15 @@
   these params are saved in the track extstate and will be retrieved upon selection
   the "clear" button will remove saved grid settings for the selected track. 
   
+  toggle the "mouse" button to update the custom swing/grid of tracks on mouseover.
+  
 --]]
 
 --[[
  * Changelog: 
- * v1.04 (2026-09-05)
+ * v1.05 (2026-09-14)
+  + added "under mouse" mode, where track swing/grid is shown on track mouseover.
+* v1.04 (2026-09-05)
   + save/recall last window position
  * v1.03 (2026-08-21)
   + minor bugfix and commenting
@@ -40,7 +44,6 @@
 --]]
 
 ---------------------------------------------------------------------------------------    
-dbg = false
 
 --local profiler = dofile(reaper.GetResourcePath() ..
 --  '/Scripts/ReaTeam Scripts/Development/cfillion_Lua profiler.lua')
@@ -74,7 +77,7 @@ end
 function Exit() SetButtonState() end
 
 function debug(statement, newLine, clear)
-  if clear then reaper.ClearConsole() end
+  --if clear then reaper.ClearConsole() end
   if dbg == true then reaper.ShowConsoleMsg(statement)
     if newLine == 1 then reaper.ShowConsoleMsg("\n") end
   end
@@ -97,26 +100,34 @@ local prTripletGrid = {}
 local trTripletGrid = {}
 local COLOR = {}
 local prjCOLOR = {}
+
+dbg = false
+mouseTrack = false
 STATE.trswing = -1
 STATE.prjswing = -1
 buttonOnColor = 0x42ddf5AA
 buttonOffColor = 0x00000000
+mouseColor = 0x00000000
 trDiv = nil
 prjDiv = nil
 lasttrSwing = -1       -- prevent unnecessary extstate writing
 noTrSwing = -1
-
 --------------------------------------------------------------------
 -- INIT --
 ---------------------------------------------------------------------
 function Init()
+  reaper.DeleteExtState( "crabSwingGrid", 1, 1 )
   x, y = reaper.GetMousePosition()                               -- mouse pos at script start
   sx, sy = reaper.ImGui_PointConvertNative(ctx, x, y, false)     -- convert to native imgui 
   SetButtonState(1)
   reaper.atexit(Exit)
   reaper.defer(Run)
+  
+--  local _, _, val = reaper.EnumProjExtState(0, "crabSwingGrid", 3 ) -- check for project extstate
+--  if val then
+--    _, extPrjMouse = reaper.GetProjExtState(0, "crabSwingGrid", 3)
 end
-
+  
 ----------------------------------------------------------------------
 -- body --------------------------------------------------------------
 ----------------------------------------------------------------------
@@ -125,10 +136,11 @@ function gridManager()
   projID, _ = reaper.EnumProjects(-1)  -- watch for project/tab change and get prj extstates
   _, _, val = reaper.EnumProjExtState(0, "crabSwingGrid", 0 ) -- check for project extstate
   if projID ~= projIDprev and val then      -- on track change, and if extstate,
-    prjSwing = nil                    -- nil values so they are retrieved appropriately:
+    prjSwing = nil                          -- nil values so they are retrieved appropriately:
     prjDiv = nil                            -- get from prj extstate if present or init if not
     _, extPrjSwing = reaper.GetProjExtState(0, "crabSwingGrid", 1)
     _, extPrjDiv   = reaper.GetProjExtState(0, "crabSwingGrid", 2)
+    _, extPrjMouse   = reaper.GetProjExtState(0, "crabSwingGrid", 3)
     if extPrjSwing and extPrjSwing ~= "" then  
       extPrjSwing = tonumber(extPrjSwing)    
     else                                                      -- if no value to be retrieved,
@@ -140,6 +152,19 @@ function gridManager()
     else                                                      -- if no value to be retrieved,
       _, initDiv, _, _ = reaper.GetSetProjectGrid(0, false)   -- get grid details at project init
     end
+    
+    if extPrjMouse == "true" then 
+      mouseTrack = true
+      mouseColor = 0x42ddf5AA
+    else 
+      mouseTrack = false 
+      mouseColor = 0x00000000
+    end
+    
+    --if extPrjMouse and extPrjMouse ~= "" then 
+    --  mouseTrack = extPrjMouse
+    --  if extPrjMouse == true then mouseColor = 0x42ddf5AA else mouseColor = 0x00000000 end
+    --end
     update = 1                                                -- reset values
     projIDprev = projID                                       -- do once on project change
   end
@@ -160,7 +185,7 @@ function gridManager()
                         
     if prjSwing == nil then       -- get project swing extstate, set prj swing if absent
       if extPrjSwing ~= "" then         -- if there's a number in extstate
-        prjSwing = extPrjSwing    
+        prjSwing = extPrjSwing
         debug("prjSwing grabbed from project extstate: " .. prjSwing,1)
       else
         prjSwing = initSwing      -- set prj swing to swing from project init
@@ -348,18 +373,40 @@ function gridManager()
   if prjName == "" then prjName = "unsaved project" end  
   ImGui.Text( ctx, "PROJECT: '" .. prjName .. "'") 
   
-  ImGui.SameLine(ctx, 301.0, -1.0)       -- debug button
+  ImGui.SameLine(ctx, 250.0, -1.0)       -- debug button
+   reaper.ImGui_PushStyleColor(ctx, reaper.ImGui_Col_Button(), mouseColor)  -- button color 
+  mouseButton = ImGui.Button(ctx, "MOUSE##mouse",  0.0, 0.0) 
+  --_, mouseButton = ImGui.Checkbox(ImGui_Context ctx, "MOUSE##mouse", mouseButton)
+  
+  if mouseButton then          
+    if mouseTrack == false then
+      mouseTrack = true
+      reaper.SetProjExtState(0, "crabSwingGrid", 3, tostring(mouseTrack))  -- set project extstat
+      mouseColor = 0x42ddf5AA
+      debug("~~~ mouseTrack on ~~~",1)
+    else 
+      mouseTrack = false
+      reaper.SetProjExtState(0, "crabSwingGrid", 3, tostring(mouseTrack))  -- set project extstat
+      mouseColor = 0x000000FF
+      debug("~~~ mouseTrack off ~~~",1)
+    end
+  end
+  reaper.ImGui_PopStyleColor(ctx, 1)
+  
+  ImGui.SameLine(ctx, 313.0, -1.0)       -- debug button
   dbgButton = ImGui.Button(ctx, ">ö<##dbg",  0.0, 0.0) 
   if dbgButton then          
-    if dbg == false then dbg = true 
+    if dbg == false then dbg = true
       debug("mccrabney - Per-track custom swing and grid",1)
       debug("~~~ debug messaging on ~~~",1)
+      debug(tostring(mouseTrack),1)
     else 
       if reaper.GetToggleCommandState(42663) == 1 then 
         reaper.Main_OnCommand(42663, 0)
       end
       dbg = false 
     end
+  
   end
   
   for i = 1, 8 do      -- cycle through PROJECT buttons and control their color & status
@@ -409,15 +456,20 @@ function gridManager()
   end
 end
 
---
-
 
 ------------------
 -- RUN
 ---------------------
 function Run()
+
+  if mouseTrack == true then                   -- if under-mouse is activated, target track under mouse
+    STATE.editing_track, info = reaper.GetThingFromPoint(reaper.GetMousePosition())
+  end
   
-  STATE.editing_track = reaper.GetLastTouchedTrack() or reaper.GetTrack(0,0) -- get track
+  if STATE.editing_track == nil or mouseTrack == false then     -- if not, get selecte/last touched
+    STATE.editing_track = reaper.GetLastTouchedTrack() or reaper.GetTrack(0,0) -- get track
+  end
+  
   if STATE.editing_track ~= lastTouchedTrack then lastTouchedTrack = STATE.editing_track end 
   
   if set_dock_id then
@@ -425,17 +477,15 @@ function Run()
     set_dock_id = nil
   end
   
-  --reaper.ImGui_SetNextWindowPos(ctx, sx, sy, 2, .5, 1.75) -- set pos based on mouse coordinates
-  --reaper.ImGui_SetNextWindowSize(ctx, 0.0, 0.0)
-  
-  
+  reaper.ImGui_SetNextWindowSize(ctx, 0.0, 0.0)
+   
   local imgui_visible, imgui_open = reaper.ImGui_Begin(ctx, SCRIPT_TITLE, true, 
     ImGui.WindowFlags_NoResize |
     ImGui.WindowFlags_NoScrollbar |
     ImGui.WindowFlags_NoFocusOnAppearing |
     ImGui.WindowFlags_NoDocking )
 
-  if imgui_visible then   -- if window is visible, run Main()
+  if imgui_visible then   -- if window is visible, run gridManager()
     gridManager()
     reaper.ImGui_End(ctx)
   end
