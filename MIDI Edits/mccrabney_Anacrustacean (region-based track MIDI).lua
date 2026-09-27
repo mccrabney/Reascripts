@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.03
+ * Version: 1.04
 --]]
  
 --[[
  * Changelog:
+ * v1.04 (2026-09-27)
+  + fixed issue where previously selected track was altered when script is applied to a n/a track
  * v1.03 (2026-08-03)
   + fixed crash when no appropriate track was present
  * v1.02 (2026-07-28)
@@ -306,6 +308,7 @@ function Main()
     if overdub == 0 then               -- if overdub flag was off and is turning on (do once)
       overdub = 1                      -- set overdub flag on
       local selTrack = reaper.GetSelectedTrack(0,0)
+      crabTrack = selTrack
       local recInput = reaper.GetMediaTrackInfo_Value(selTrack, 'I_RECINPUT')
       local recArm = reaper.GetMediaTrackInfo_Value(selTrack, 'I_RECARM')
       _, trName = reaper.GetTrackName(selTrack)
