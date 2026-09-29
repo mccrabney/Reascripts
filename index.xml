@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<index version="1" commit="0abaa73dfb1005cb4b64eed16c9a18afd79cec7e" name="mccrabney scripts">
+<index version="1" commit="530b730d20ddf421e6eedbc41c9e2ff2e565b11a" name="mccrabney scripts">
   <category name="Audio">
     <reapack name="mccrabney_find tiny items and items without fades in track.lua" type="script" desc="find tiny items and items without fades in track">
       <version name="1.1" author="mccrabney" time="2023-01-09T15:15:03Z">
@@ -45,6 +45,10 @@
       <version name="1.04" author="mccrabney" time="2026-09-27T11:26:49Z">
         <changelog><![CDATA[+ fixed issue where previously selected track was altered when script is applied to a n/a track]]></changelog>
         <source main="main">https://github.com/mccrabney/Reascripts/raw/0abaa73dfb1005cb4b64eed16c9a18afd79cec7e/MIDI%20Edits/mccrabney_Anacrustacean%20(region-based%20track%20MIDI).lua</source>
+      </version>
+      <version name="1.05" author="mccrabney" time="2026-09-29T11:24:46Z">
+        <changelog><![CDATA[+ fixred split notes when anacrusis extends into existing notes in next sequence]]></changelog>
+        <source main="main">https://github.com/mccrabney/Reascripts/raw/530b730d20ddf421e6eedbc41c9e2ff2e565b11a/MIDI%20Edits/mccrabney_Anacrustacean%20(region-based%20track%20MIDI).lua</source>
       </version>
     </reapack>
     <reapack name="mccrabney_Clicker (select MIDI notes with mouse in arrange screen).lua" type="script" desc="Clicker">
