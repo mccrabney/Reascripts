@@ -4,11 +4,13 @@
  * Licence: GPL v3
  * REAPER: 7.0
  * Extensions: None
- * Version: 1.04
+ * Version: 1.05
 --]]
  
 --[[
  * Changelog:
+ * v1.05 (2026-09-28)
+  + fixred split notes when anacrusis extends into existing notes in next sequence
  * v1.04 (2026-09-27)
   + fixed issue where previously selected track was altered when script is applied to a n/a track
  * v1.03 (2026-08-03)
@@ -49,7 +51,6 @@
 --local profiler = dofile(reaper.GetResourcePath() ..
 --  '/Scripts/ReaTeam Scripts/Development/cfillion_Lua profiler.lua')
 --reaper.defer = profiler.defer
-
 reaper.set_action_options(1)
 local _, _, sec, cmd = reaper.get_action_context()
 
@@ -155,15 +156,21 @@ end
 ---- split table  ---------------------------
 function split(track)
   countTrItem = reaper.CountTrackMediaItems(track)
-  for t = countTrItem-1, 0, -1 do                     -- for each item, last to first
+  for t = countTrItem-1, 0, -1 do                                         -- for each item, last to first
     local item = reaper.GetTrackMediaItem(track, t)      
     local itemPos = reaper.GetMediaItemInfo_Value(item, 'D_POSITION')
     if itemPos >= regionTable[1][1] and itemPos < regionTable[#regionTable][2] then  -- if w/in full region bounds
       local take = reaper.GetActiveTake(item)       
       if reaper.TakeIsMIDI(take) then 
-        for i = #regionSplitTable, 1, -1 do           -- for each entry in table, last to first
+        local _, numNotes = reaper.MIDI_CountEvts(take)
+        for i = #regionSplitTable, 1, -1 do                               -- for each entry in table, last to first
           reaper.GetSetMediaItemTakeInfo_String(take, 'P_NAME', i, 1)     -- name each MIDI item
-          reaper.SplitMediaItem(item, reaper.MIDI_GetProjTimeFromPPQPos(take, regionSplitTable[i])) -- split 
+          if regionSplitTable[i][1] == 0 then
+            reaper.SplitMediaItem(item, reaper.MIDI_GetProjTimeFromPPQPos(take, regionSplitTable[i][2])) -- split 
+          elseif regionSplitTable[i][1] == 1 then
+            reaper.SplitMediaItem(item, reaper.MIDI_GetProjTimeFromPPQPos(take, regionSplitTable[i][2])) -- split 
+            --reaper.SetMediaItemSelected(item, 1)
+          end
         end -- for each region in table
       end -- if take is midi
     end --if item is w/in region
@@ -171,11 +178,13 @@ function split(track)
 end -- split table
 
 --------------------------------------------------------------
--------- split at region divisions ---------------------------
+-------- split at region divisions -------------- -------------
 function sequence(track)
   reaper.SetOnlyTrackSelected(track)
   reaper.Main_OnCommand(40289, 0) -- deselect all items
   local countTrItem = reaper.CountTrackMediaItems(track)  -- refresh item count
+  local overLaps = 0
+  transTable = {}
   for t = 0, countTrItem-1 do         -- for each item, first to last            
     local item = reaper.GetTrackMediaItem(track, t)      
     local itemPos = reaper.GetMediaItemInfo_Value(item, 'D_POSITION')
@@ -185,28 +194,43 @@ function sequence(track)
       local take = reaper.GetActiveTake(item)       
       if reaper.TakeIsMIDI(take) then 
         local _, numNotes, numCCs = reaper.MIDI_CountEvts(take)
+        local transNoteIndex, transNotPitch
         for j = #regionTable, 1, -1 do    -- for each region, last to first
-          local lastendppqpos = -1
-          local transNote = 0
+          local lastendppqpos = -1        -- set up n/a value for flag 
           rgnStartppq = math.floor(reaper.MIDI_GetPPQPosFromProjTime(take, regionTable[j][1]))
           rgnEndppq = math.floor(reaper.MIDI_GetPPQPosFromProjTime(take, regionTable[j][2]))
+          
+          local transstartppqpos
           for p = 0, numNotes, 1 do       -- for each note, first to last
-            local _, _, _, startppqpos, endppqpos = reaper.MIDI_GetNote(take, p)
+            local _, _, _, startppqpos, endppqpos, _, pitch = reaper.MIDI_GetNote(take, p)
             startppqpos =  math.floor(startppqpos)
-            endppqpos =  math.floor(endppqpos)
+            endppqpos   =  math.floor(endppqpos)
             local regionPosPpq = math.floor(reaper.MIDI_GetPPQPosFromProjTime(take, regionTable[j][1]))
             if startppqpos < regionPosPpq and endppqpos > regionPosPpq then  -- if note trans region
-              if endppqpos > lastendppqpos then 
-                lastendppqpos = endppqpos 
-              end -- get last noteoff pos
-            end -- if note trans region
+              overLaps = overLaps+1
+              transTable[overLaps] = {p, pitch, reaper.MIDI_GetProjTimeFromPPQPos(take, startppqpos), reaper.MIDI_GetProjTimeFromPPQPos(take, endppqpos)}
+            end  -- if note trans region
           end -- for each note
-          if lastendppqpos ~= -1 then
-            regionTable[j][1] = reaper.MIDI_GetProjTimeFromPPQPos(take, lastendppqpos)   -- change split point to note end
+
+          if #transTable > 0 then         -- if there is at least one trans-region note,
+            local count = 0
+            --regionSplitTable[j] = {0, lastendppqpos}
+            for i = #transTable, 1, -1 do
+              for p = 0, numNotes, 1 do       -- for each note, first to last
+                local _, sel, mute, startppqpos, endppqpos, _, pitch = reaper.MIDI_GetNote(take, p)
+                startppqpos =  math.floor(startppqpos)
+                endppqpos   =  math.floor(endppqpos)
+                if reaper.MIDI_GetPPQPosFromProjTime(take, transTable[i][3]) < startppqpos then
+                  regionSplitTable[j] = {1, reaper.MIDI_GetPPQPosFromProjTime(take, regionTable[j][1])}
+                  reaper.MIDI_SetNote(take, transTable[i][1], sel, mute, startppqposIn, reaper.MIDI_GetPPQPosFromProjTime(take, regionTable[j][1]))
+                end -- if note trans region
+              end -- for each note
+            end
+          else -- if there is no trans-region note
+            regionSplitTable[j] = {0, reaper.MIDI_GetPPQPosFromProjTime(take, regionTable[j][1])}
           end
-          regionSplitTable[j] = reaper.MIDI_GetPPQPosFromProjTime(take, regionTable[j][1])
         end -- for each region
-      local _, numNotes, numCCs = reaper.MIDI_CountEvts(take)
+        local _, numNotes, numCCs = reaper.MIDI_CountEvts(take)
       end -- if take is MIDI
     end -- if within region bounds
   end -- for each item
@@ -214,7 +238,7 @@ function sequence(track)
 end
   
 ------------------------------------------------------------------
------ if there is a trans-region note, accommodate anacrusis -------
+----- if there is a trans-region note, accommodate anacrusis-------
 function dangle(track)
   local countTrItem = reaper.CountTrackMediaItems(track)  -- refresh item count
   for j = #ogRgnTable, 1, -1 do          -- for each original region, last to first
@@ -223,11 +247,13 @@ function dangle(track)
       local take = reaper.GetActiveTake(item)
       local _, itemName = reaper.GetSetMediaItemTakeInfo_String(take, 'P_NAME', '', 0)  
       if reaper.TakeIsMIDI(take) then  
+        
         if tonumber(itemName) == j then   -- if MIDI item name matches the region
           local itemPos = reaper.GetMediaItemInfo_Value(item, 'D_POSITION')
           local itemLength = reaper.GetMediaItemInfo_Value(item, 'D_LENGTH')
           local itemEnd = itemPos + itemLength
-          if math.floor(itemPos*1000) ~= math.floor(ogRgnTable[j][1]*1000) then  -- if itempos has changed from OG
+          
+          if math.floor(itemPos*1000) ~= math.floor(ogRgnTable[j][1]*1000) then  -- if item start pos doesn't match region pos
             reaper.SetMediaItemInfo_Value(item, 'D_POSITION', ogRgnTable[j][1])  -- move item to region start
             local comp = itemPos-ogRgnTable[j][1]                 -- calculate makeup distance
             reaper.SetMediaItemInfo_Value(item, 'B_LOOPSRC', 0)   -- force loop off for source
@@ -242,7 +268,7 @@ function dangle(track)
             itemEnd = itemPos + itemLength                                  -- update
             reaper.GetSetMediaItemTakeInfo_String(take, 'P_NAME', j, 1)     -- name each MIDI item
             reaper.Main_OnCommand(40289, 0)          -- deselect all items
-          end
+          end  -- if item end position has been updated from original
           
           if itemEnd > ogRgnTable[j][2] then         -- if itemEnd is further than region end
             local lastendppqpos = -1                 -- set N/A
@@ -268,8 +294,28 @@ function dangle(track)
               local newEndPos = reaper.MIDI_GetProjTimeFromPPQPos(take, lastendppqpos)
               local comp = newEndPos - ogRgnTable[j][2]
               reaper.SetMediaItemInfo_Value(item, 'D_LENGTH', ogRgnTable[j][2]-itemPos+comp)    -- makeup length
-            end
+            end 
           end -- if itemEnd > rgn end
+          -- [[
+          ----------------RESUME WORK HERE--------------------
+          local longest = 0
+          if #transTable then             -- if there are overlapped, split notes 
+            local _, numNotes, _ = reaper.MIDI_CountEvts(take)
+            for i = #transTable, 1, -1 do
+              for p = numNotes, 0, -1 do         -- for each note, last to first
+                local _, sel, mute, startppqpos, endppqpos, chan, pitch, vel = reaper.MIDI_GetNote(take, p)
+                local localPos = reaper.MIDI_GetProjTimeFromPPQPos(take, startppqpos)
+                if transTable[i][3] == localPos and transTable[i][2] == pitch then 
+                  reaper.MIDI_SetNote(take, p, sel, mute, startppqpos, reaper.MIDI_GetPPQPosFromProjTime(take, transTable[i][4]))
+                  if transTable[i][4]-transTable[i][3] > longest then
+                    longest = transTable[i][4]-transTable[i][3]
+                    local comp = transTable[i][4]-itemEnd                  
+                    reaper.SetMediaItemInfo_Value(item, 'D_LENGTH', itemLength+comp)  -- makeup length
+                  end
+                end  
+              end
+            end
+          end
         end -- if item matches region
       end -- if take is MIDI
     end -- for each item
@@ -302,13 +348,14 @@ end
 local overdub = 0        -- initialize overdub flag
 regionSplitTable = {}    -- ppq values at which to split item
 function Main()
+  
   local playState = reaper.GetPlayState()          
   local trName = ""
   if playState == 5 then               -- if overdub,
     if overdub == 0 then               -- if overdub flag was off and is turning on (do once)
       overdub = 1                      -- set overdub flag on
       local selTrack = reaper.GetSelectedTrack(0,0)
-      crabTrack = selTrack
+      --crabTrack = selTrack
       local recInput = reaper.GetMediaTrackInfo_Value(selTrack, 'I_RECINPUT')
       local recArm = reaper.GetMediaTrackInfo_Value(selTrack, 'I_RECARM')
       _, trName = reaper.GetTrackName(selTrack)
@@ -319,12 +366,13 @@ function Main()
     end -- if overdub was off and is turning on
   else                                 -- if overdub disengaged
     if overdub == 1 and regionTable and crabTrack then    -- if overdub was on and is turning off
+      reaper.ClearConsole()
       overdub = 0                      -- set overdub flag off
       reaper.PreventUIRefresh(1)
       reaper.Undo_BeginBlock()
       sequence(crabTrack)              -- split region-sized MIDI items
       dangle(crabTrack)                -- accommodate anacrusis
-      crop(crabTrack)                  -- remove empty MIDI items
+      --crop(crabTrack)                  -- remove empty MIDI items
       reaper.Undo_EndBlock("split MIDI on '" .. trName .. "'", 0 )
       reaper.PreventUIRefresh(-1)
     end -- do once
